@@ -1,0 +1,34 @@
+package:
+  name: geant4-vmc
+  version: "6.8"
+
+source:
+  git: https://github.com/vmc-project/geant4_vmc
+  tag: v6-8
+
+build:
+  script: build.sh
+
+requirements:
+  build:
+    - {{ compiler('cxx') }}
+    - cmake
+    - make
+  host:
+    - root
+    - vmc
+    - geant4
+    - vgm
+    - xerces-c
+  run:
+    - root
+    - vmc
+    - geant4
+    - vgm
+    - xerces-c
+
+test:
+  commands:
+    - test -f $PREFIX/lib/libgeant4vmc.so
+    - test -f $PREFIX/lib/libg4root.so
+    - test -d $PREFIX/include/geant4vmc

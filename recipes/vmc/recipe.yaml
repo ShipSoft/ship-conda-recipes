@@ -1,0 +1,25 @@
+package:
+  name: vmc
+  version: "2.2"
+
+source:
+  git: https://github.com/vmc-project/vmc
+  tag: v2-2
+
+build:
+  script: build.sh
+
+requirements:
+  build:
+    - {{ compiler('cxx') }}
+    - cmake
+    - make
+  host:
+    - root
+  run:
+    - root
+
+test:
+  commands:
+    - test -f $PREFIX/lib/libVMCLibrary.so
+    - test -d $PREFIX/include/vmc

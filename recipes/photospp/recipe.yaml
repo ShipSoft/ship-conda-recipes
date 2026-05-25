@@ -1,0 +1,35 @@
+package:
+  name: photospp
+  version: "3.64"
+
+source:
+  git: https://gitlab.cern.ch/photospp/photospp
+  tag: v3.64
+
+build:
+  script: build.sh
+
+requirements:
+  build:
+    - {{ compiler('cxx') }}
+    - {{ compiler('fortran') }}
+    - autoconf
+    - automake
+    - libtool
+    - make
+  host:
+    - hepmc3
+    - root
+    - pythia8
+    - tauolapp
+  run:
+    - hepmc3
+    - root
+    - pythia8
+    - tauolapp
+
+test:
+  commands:
+    - test -f $PREFIX/lib/libPhotospp.so
+    - test -f $PREFIX/lib/libPhotosppHepMC3.so
+    - test -d $PREFIX/include/Photos

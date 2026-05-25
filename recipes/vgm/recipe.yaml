@@ -1,0 +1,29 @@
+package:
+  name: vgm
+  version: "5.4"
+
+source:
+  git: https://github.com/vmc-project/vgm
+  tag: v5-4
+
+build:
+  script: build.sh
+
+requirements:
+  build:
+    - {{ compiler('cxx') }}
+    - cmake
+    - make
+  host:
+    - root
+    - geant4
+    - xerces-c
+  run:
+    - root
+    - geant4
+    - xerces-c
+
+test:
+  commands:
+    - test -f $PREFIX/lib/libBaseVGM.a
+    - test -d $PREFIX/include/VGM

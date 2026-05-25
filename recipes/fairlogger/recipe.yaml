@@ -1,0 +1,25 @@
+package:
+  name: fairlogger
+  version: "2.3.2"
+
+source:
+  git: https://github.com/FairRootGroup/FairLogger
+  tag: v2.3.2
+
+build:
+  script: build.sh
+
+requirements:
+  build:
+    - {{ compiler('cxx') }}
+    - cmake
+    - make
+  host:
+    - fmt
+  run:
+    - fmt
+
+test:
+  commands:
+    - test -f $PREFIX/lib/libFairLogger.so
+    - test -d $PREFIX/include/fairlogger

@@ -1,0 +1,60 @@
+name: Build and upload conda packages
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        tier:
+          - tier0
+          - tier1
+          - tier2
+          - tier3
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: prefix-dev/setup-pixi@v0.8.1
+
+      - name: Build Tier 0 packages
+        if: matrix.tier == 'tier0'
+        run: |
+          pixi run build-faircmakemodules
+          pixi run build-pythia6
+
+      - name: Build Tier 1 packages
+        if: matrix.tier == 'tier1'
+        run: |
+          pixi run build-vmc
+          pixi run build-vgm
+          pixi run build-fairlogger
+          pixi run build-rootegpythia6
+          pixi run build-genfit
+          pixi run build-tauolapp
+          pixi run build-photospp
+
+      - name: Build Tier 2 packages
+        if: matrix.tier == 'tier2'
+        run: |
+          pixi run build-geant3
+          pixi run build-geant4-vmc
+
+      - name: Build Tier 3 packages
+        if: matrix.tier == 'tier3'
+        run: |
+          pixi run build-fairroot
+
+      - name: Upload to prefix.dev
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        env:
+          PREFIX_DEV_API_KEY: ${{ secrets.PREFIX_DEV_API_KEY }}
+        run: |
+          for pkg in output/linux-64/*.conda; do
+            rattler-build upload prefix -c ship "$pkg"
+          done

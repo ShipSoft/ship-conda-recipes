@@ -1,0 +1,53 @@
+package:
+  name: fairroot
+  version: "19.0.1"
+
+source:
+  git: https://github.com/FairRootGroup/FairRoot
+  tag: v19.0.1
+
+build:
+  script: build.sh
+
+requirements:
+  build:
+    - {{ compiler('cxx') }}
+    - {{ compiler('fortran') }}
+    - cmake
+    - make
+  host:
+    - root
+    - geant4
+    - geant4-vmc
+    - geant3
+    - vmc
+    - boost
+    - fairlogger
+    - faircmakemodules
+    - yaml-cpp
+    - pythia8
+    - pythia6
+    - evtgen
+    - hepmc2
+    - xerces-c
+    - gsl
+  run:
+    - root
+    - geant4
+    - geant4-vmc
+    - geant3
+    - vmc
+    - boost
+    - fairlogger
+    - yaml-cpp
+    - pythia8
+    - pythia6
+    - evtgen
+    - hepmc2
+    - xerces-c
+    - gsl
+
+test:
+  commands:
+    - test -f $PREFIX/lib/libFairTools.so
+    - test -d $PREFIX/include

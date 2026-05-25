@@ -1,0 +1,20 @@
+package:
+  name: faircmakemodules
+  version: "1.0.0"
+
+source:
+  git: https://github.com/FairRootGroup/FairCMakeModules
+  tag: v1.0.0
+
+build:
+  noarch: generic
+  script: build.sh
+
+requirements:
+  build:
+    - cmake
+    - {{ compiler('cxx') }}
+
+test:
+  commands:
+    - test -f $PREFIX/share/cmake/FairCMakeModules/FairCMakeModulesConfig.cmake

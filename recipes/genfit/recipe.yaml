@@ -1,0 +1,28 @@
+package:
+  name: genfit
+  version: "2.3.0"
+
+source:
+  git: https://github.com/GenFit/GenFit
+  tag: 02-03-00
+
+build:
+  script: build.sh
+
+requirements:
+  build:
+    - {{ compiler('cxx') }}
+    - cmake
+    - make
+  host:
+    - root
+    - boost
+    - googletest
+  run:
+    - root
+    - boost
+
+test:
+  commands:
+    - test -f $PREFIX/lib/libgenfit2.so
+    - test -d $PREFIX/include/GenFit

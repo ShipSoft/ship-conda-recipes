@@ -1,0 +1,28 @@
+package:
+  name: geant3
+  version: "4.5"
+
+source:
+  git: https://github.com/vmc-project/geant3
+  tag: v4-5
+
+build:
+  script: build.sh
+
+requirements:
+  build:
+    - {{ compiler('c') }}
+    - {{ compiler('cxx') }}
+    - {{ compiler('fortran') }}
+    - cmake
+    - make
+  host:
+    - root
+    - vmc
+  run:
+    - root
+    - vmc
+
+test:
+  commands:
+    - test -f $PREFIX/lib/libgeant321.so || test -f $PREFIX/lib64/libgeant321.so
