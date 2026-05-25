@@ -5,50 +5,75 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  workflow_dispatch:
+    inputs:
+      packages:
+        description: "Space-separated list of packages to build (empty = auto-detect)"
+        required: false
 
 jobs:
-  build:
+  detect:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        tier:
-          - tier0
-          - tier1
-          - tier2
-          - tier3
+    outputs:
+      build_order: ${{ steps.compute.outputs.build_order }}
+      has_packages: ${{ steps.compute.outputs.has_packages }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
+      - name: Detect changed recipes and compute build order
+        id: compute
+        run: |
+          if [ -n "${{ inputs.packages }}" ]; then
+            # Manual trigger: use provided package list
+            CHANGED="${{ inputs.packages }}"
+          else
+            # Auto-detect from changed files
+            if [ "${{ github.event_name }}" = "pull_request" ]; then
+              BASE="${{ github.event.pull_request.base.sha }}"
+            else
+              BASE="${{ github.event.before }}"
+            fi
+            # On first push (no before), build everything
+            if [ "$BASE" = "0000000000000000000000000000000000000000" ]; then
+              CHANGED=$(ls -d recipes/*/ | xargs -I{} basename {})
+            else
+              CHANGED=$(git diff --name-only "$BASE" HEAD -- recipes/ \
+                | sed -n 's|^recipes/\([^/]*\)/.*|\1|p' \
+                | sort -u \
+                | tr '\n' ' ')
+            fi
+          fi
+
+          if [ -z "$CHANGED" ]; then
+            echo "has_packages=false" >> "$GITHUB_OUTPUT"
+            echo "No recipe changes detected."
+          else
+            echo "Changed recipes: $CHANGED"
+            ORDER=$(bash ci/build-order.sh $CHANGED | tr '\n' ' ')
+            echo "Build order: $ORDER"
+            echo "build_order=$ORDER" >> "$GITHUB_OUTPUT"
+            echo "has_packages=true" >> "$GITHUB_OUTPUT"
+          fi
+
+  build:
+    needs: detect
+    if: needs.detect.outputs.has_packages == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
       - uses: prefix-dev/setup-pixi@v0.8.1
 
-      - name: Build Tier 0 packages
-        if: matrix.tier == 'tier0'
+      - name: Build packages in dependency order
         run: |
-          pixi run build-faircmakemodules
-          pixi run build-pythia6
-
-      - name: Build Tier 1 packages
-        if: matrix.tier == 'tier1'
-        run: |
-          pixi run build-vmc
-          pixi run build-vgm
-          pixi run build-fairlogger
-          pixi run build-rootegpythia6
-          pixi run build-genfit
-          pixi run build-tauolapp
-          pixi run build-photospp
-
-      - name: Build Tier 2 packages
-        if: matrix.tier == 'tier2'
-        run: |
-          pixi run build-geant3
-          pixi run build-geant4-vmc
-
-      - name: Build Tier 3 packages
-        if: matrix.tier == 'tier3'
-        run: |
-          pixi run build-fairroot
+          for pkg in ${{ needs.detect.outputs.build_order }}; do
+            echo "::group::Building $pkg"
+            pixi run rattler-build build \
+              --recipe "recipes/$pkg" \
+              --channel https://prefix.dev/ship
+            echo "::endgroup::"
+          done
 
       - name: Upload to prefix.dev
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -56,5 +81,5 @@ jobs:
           PREFIX_DEV_API_KEY: ${{ secrets.PREFIX_DEV_API_KEY }}
         run: |
           for pkg in output/linux-64/*.conda; do
-            rattler-build upload prefix -c ship "$pkg"
+            pixi run rattler-build upload prefix -c ship "$pkg"
           done
