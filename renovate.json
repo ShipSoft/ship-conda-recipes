@@ -7,10 +7,10 @@
     {
       "customType": "regex",
       "description": "Update tags in rattler-build recipes (GitHub sources)",
-      "managerFilePatterns": ["recipes/**/recipe.yaml"],
+      "managerFilePatterns": ["/recipe\\.yaml$/"],
       "matchStringsStrategy": "combination",
       "matchStrings": [
-        "tag:\\s*(?<currentValue>[^\\s\\n]+)",
+        "tag:\\s*\"?(?<currentValue>[^\"\\s\\n]+)\"?",
         "git:\\s*https://github\\.com/(?<packageName>[^/\\s]+/[^\\s]+?)(?:\\.git)?\\s*\\n"
       ],
       "datasourceTemplate": "github-tags"
@@ -18,10 +18,10 @@
     {
       "customType": "regex",
       "description": "Update tags in rattler-build recipes (GitLab CERN sources)",
-      "managerFilePatterns": ["recipes/**/recipe.yaml"],
+      "managerFilePatterns": ["/recipe\\.yaml$/"],
       "matchStringsStrategy": "combination",
       "matchStrings": [
-        "tag:\\s*(?<currentValue>[^\\s\\n]+)",
+        "tag:\\s*\"?(?<currentValue>[^\"\\s\\n]+)\"?",
         "git:\\s*https://gitlab\\.cern\\.ch/(?<packageName>[^/\\s]+/[^\\s]+?)(?:\\.git)?\\s*\\n"
       ],
       "datasourceTemplate": "gitlab-tags",
