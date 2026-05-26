@@ -11,8 +11,8 @@ build:
 
 requirements:
   build:
-    - {{ compiler('cxx') }}
-    - {{ compiler('fortran') }}
+    - ${{ compiler('cxx') }}
+    - ${{ compiler('fortran') }}
     - autoconf
     - automake
     - libtool
@@ -28,8 +28,8 @@ requirements:
     - pythia8
     - tauolapp
 
-test:
-  commands:
-    - test -f $PREFIX/lib/libPhotospp.so
-    - test -f $PREFIX/lib/libPhotosppHepMC3.so
-    - test -d $PREFIX/include/Photos
+tests:
+  - script:
+      - test -f $PREFIX/lib/libPhotospp.so
+      - test -f $PREFIX/lib/libPhotosppHepMC3.so
+      - test -d $PREFIX/include/Photos

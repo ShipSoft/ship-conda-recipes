@@ -3,21 +3,20 @@ package:
   version: "6.4.28"
 
 source:
-  git: https://github.com/SND-LHC/pythia6
-  tag: v6.4.28-snd
+  url: https://github.com/SND-LHC/pythia6/archive/refs/heads/v6.4.28-snd.tar.gz
 
 build:
   script: build.sh
 
 requirements:
   build:
-    - {{ compiler('c') }}
-    - {{ compiler('cxx') }}
-    - {{ compiler('fortran') }}
+    - ${{ compiler('c') }}
+    - ${{ compiler('cxx') }}
+    - ${{ compiler('fortran') }}
     - cmake
     - make
 
-test:
-  commands:
-    - test -f $PREFIX/lib/libpythia6.so
-    - test -f $PREFIX/lib/libPythia6.so
+tests:
+  - script:
+      - test -f $PREFIX/lib/libpythia6.so
+      - test -f $PREFIX/lib/libPythia6.so

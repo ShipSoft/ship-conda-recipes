@@ -1,4 +1,5 @@
 #!/bin/bash -e
+mkdir -p build && cd build
 cmake ${CMAKE_ARGS} ${SRC_DIR} \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_LIBDIR=lib \

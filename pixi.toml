@@ -1,4 +1,4 @@
-[project]
+[workspace]
 name = "ship-conda-recipes"
 description = "Conda recipes for SHiP experiment packages not available on conda-forge"
 channels = ["conda-forge"]

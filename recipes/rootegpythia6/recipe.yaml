@@ -3,16 +3,15 @@ package:
   version: "0.1"
 
 source:
-  git: https://github.com/luketpickering/ROOTEGPythia6
-  tag: feb7c7eb8d368aee20bf1cb01f1bbfb9cfaeb6b5
+  url: https://github.com/luketpickering/ROOTEGPythia6/archive/feb7c7eb8d368aee20bf1cb01f1bbfb9cfaeb6b5.tar.gz
 
 build:
   script: build.sh
 
 requirements:
   build:
-    - {{ compiler('cxx') }}
-    - {{ compiler('fortran') }}
+    - ${{ compiler('cxx') }}
+    - ${{ compiler('fortran') }}
     - cmake
     - make
   host:
@@ -20,6 +19,6 @@ requirements:
   run:
     - root
 
-test:
-  commands:
-    - test -f $PREFIX/lib/libEGPythia6.so
+tests:
+  - script:
+      - test -f $PREFIX/lib/libEGPythia6.so

@@ -11,8 +11,8 @@ build:
 
 requirements:
   build:
-    - {{ compiler('cxx') }}
-    - {{ compiler('fortran') }}
+    - ${{ compiler('cxx') }}
+    - ${{ compiler('fortran') }}
     - cmake
     - make
   host:
@@ -21,7 +21,7 @@ requirements:
     - geant4-vmc
     - geant3
     - vmc
-    - boost
+    - libboost-devel
     - fairlogger
     - faircmakemodules
     - yaml-cpp
@@ -37,7 +37,7 @@ requirements:
     - geant4-vmc
     - geant3
     - vmc
-    - boost
+    - libboost-devel
     - fairlogger
     - yaml-cpp
     - pythia8
@@ -47,7 +47,7 @@ requirements:
     - xerces-c
     - gsl
 
-test:
-  commands:
-    - test -f $PREFIX/lib/libFairTools.so
-    - test -d $PREFIX/include
+tests:
+  - script:
+      - test -f $PREFIX/lib/libFairTools.so
+      - test -d $PREFIX/include

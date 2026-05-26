@@ -13,8 +13,8 @@ build:
 requirements:
   build:
     - cmake
-    - {{ compiler('cxx') }}
+    - ${{ compiler('cxx') }}
 
-test:
-  commands:
-    - test -f $PREFIX/share/cmake/FairCMakeModules/FairCMakeModulesConfig.cmake
+tests:
+  - script:
+      - test -f $PREFIX/share/cmake/FairCMakeModules-1.0.0/FairCMakeModulesConfig.cmake

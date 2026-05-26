@@ -11,18 +11,18 @@ build:
 
 requirements:
   build:
-    - {{ compiler('cxx') }}
+    - ${{ compiler('cxx') }}
     - cmake
     - make
   host:
     - root
     - boost
-    - googletest
+    - gtest
   run:
     - root
     - boost
 
-test:
-  commands:
-    - test -f $PREFIX/lib/libgenfit2.so
-    - test -d $PREFIX/include/GenFit
+tests:
+  - script:
+      - test -f $PREFIX/lib/libgenfit2.so
+      - test -f $PREFIX/include/AbsFitter.h

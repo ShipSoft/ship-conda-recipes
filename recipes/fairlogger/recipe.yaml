@@ -11,7 +11,7 @@ build:
 
 requirements:
   build:
-    - {{ compiler('cxx') }}
+    - ${{ compiler('cxx') }}
     - cmake
     - make
   host:
@@ -19,7 +19,7 @@ requirements:
   run:
     - fmt
 
-test:
-  commands:
-    - test -f $PREFIX/lib/libFairLogger.so
-    - test -d $PREFIX/include/fairlogger
+tests:
+  - script:
+      - test -f $PREFIX/lib/libFairLogger.so
+      - test -d $PREFIX/include/fairlogger

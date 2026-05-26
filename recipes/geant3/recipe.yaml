@@ -11,9 +11,9 @@ build:
 
 requirements:
   build:
-    - {{ compiler('c') }}
-    - {{ compiler('cxx') }}
-    - {{ compiler('fortran') }}
+    - ${{ compiler('c') }}
+    - ${{ compiler('cxx') }}
+    - ${{ compiler('fortran') }}
     - cmake
     - make
   host:
@@ -23,6 +23,6 @@ requirements:
     - root
     - vmc
 
-test:
-  commands:
-    - test -f $PREFIX/lib/libgeant321.so || test -f $PREFIX/lib64/libgeant321.so
+tests:
+  - script:
+      - test -f $PREFIX/lib/libgeant321.so || test -f $PREFIX/lib64/libgeant321.so

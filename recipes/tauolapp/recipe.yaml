@@ -11,8 +11,8 @@ build:
 
 requirements:
   build:
-    - {{ compiler('cxx') }}
-    - {{ compiler('fortran') }}
+    - ${{ compiler('cxx') }}
+    - ${{ compiler('fortran') }}
     - autoconf
     - automake
     - libtool
@@ -26,8 +26,8 @@ requirements:
     - root
     - pythia8
 
-test:
-  commands:
-    - test -f $PREFIX/lib/libTauolaCxxInterface.so
-    - test -f $PREFIX/lib/libTauolaFortran.so
-    - test -f $PREFIX/lib/libTauolaHepMC3.so
+tests:
+  - script:
+      - test -f $PREFIX/lib/libTauolaCxxInterface.so
+      - test -f $PREFIX/lib/libTauolaFortran.so
+      - test -f $PREFIX/lib/libTauolaHepMC3.so

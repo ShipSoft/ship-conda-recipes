@@ -7,6 +7,7 @@ unset SIMPATH
 sed -i 's/list(APPEND boost_dependencies program_options)/list(APPEND boost_dependencies program_options serialization)/' \
     "${SRC_DIR}/CMakeLists.txt"
 
+mkdir -p build && cd build
 cmake ${CMAKE_ARGS} ${SRC_DIR} \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_CXX_STANDARD=20 \

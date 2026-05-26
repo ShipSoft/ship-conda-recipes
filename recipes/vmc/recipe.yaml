@@ -11,7 +11,7 @@ build:
 
 requirements:
   build:
-    - {{ compiler('cxx') }}
+    - ${{ compiler('cxx') }}
     - cmake
     - make
   host:
@@ -19,7 +19,7 @@ requirements:
   run:
     - root
 
-test:
-  commands:
-    - test -f $PREFIX/lib/libVMCLibrary.so
-    - test -d $PREFIX/include/vmc
+tests:
+  - script:
+      - test -f $PREFIX/lib/libVMCLibrary.so
+      - test -d $PREFIX/include/vmc

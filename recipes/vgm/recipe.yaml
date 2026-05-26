@@ -11,7 +11,7 @@ build:
 
 requirements:
   build:
-    - {{ compiler('cxx') }}
+    - ${{ compiler('cxx') }}
     - cmake
     - make
   host:
@@ -23,7 +23,7 @@ requirements:
     - geant4
     - xerces-c
 
-test:
-  commands:
-    - test -f $PREFIX/lib/libBaseVGM.a
-    - test -d $PREFIX/include/VGM
+tests:
+  - script:
+      - test -f $PREFIX/lib/libBaseVGM.a
+      - test -d $PREFIX/include/VGM

@@ -7,6 +7,7 @@ sed -i \
   -e '/^ROOT_GENERATE_DICTIONARY/i include_directories(${CMAKE_CURRENT_LIST_DIR}/inc)' \
   "${SRC_DIR}/CMakeLists.txt"
 
+mkdir -p build && cd build
 cmake ${CMAKE_ARGS} ${SRC_DIR} \
     -DCMAKE_BUILD_TYPE=Release \
     -DROOTEGPythia6_Pythia6_BUILTIN=ON \
