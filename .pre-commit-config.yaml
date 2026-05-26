@@ -24,6 +24,10 @@ repos:
   - id: shellcheck
     files: recipes/.*/build\.sh$
     args: [--severity=warning]
+- repo: https://github.com/fsfe/reuse-tool
+  rev: v5.0.2
+  hooks:
+  - id: reuse
 
 ci:
   autofix_prs: true
