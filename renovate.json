@@ -1,0 +1,46 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  "schedule": ["every weekend"],
+  "prConcurrentLimit": 5,
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Update tags in rattler-build recipes (GitHub sources)",
+      "managerFilePatterns": ["recipes/**/recipe.yaml"],
+      "matchStringsStrategy": "combination",
+      "matchStrings": [
+        "tag:\\s*(?<currentValue>[^\\s\\n]+)",
+        "git:\\s*https://github\\.com/(?<packageName>[^/\\s]+/[^\\s]+?)(?:\\.git)?\\s*\\n"
+      ],
+      "datasourceTemplate": "github-tags"
+    },
+    {
+      "customType": "regex",
+      "description": "Update tags in rattler-build recipes (GitLab CERN sources)",
+      "managerFilePatterns": ["recipes/**/recipe.yaml"],
+      "matchStringsStrategy": "combination",
+      "matchStrings": [
+        "tag:\\s*(?<currentValue>[^\\s\\n]+)",
+        "git:\\s*https://gitlab\\.cern\\.ch/(?<packageName>[^/\\s]+/[^\\s]+?)(?:\\.git)?\\s*\\n"
+      ],
+      "datasourceTemplate": "gitlab-tags",
+      "registryUrlTemplate": "https://gitlab.cern.ch"
+    }
+  ],
+  "packageRules": [
+    {
+      "description": "Use loose versioning for HEP tag schemes",
+      "matchManagers": ["custom.regex"],
+      "versioning": "loose"
+    },
+    {
+      "description": "Packages pinned to commits/branches, not release tags",
+      "matchPackageNames": [
+        "luketpickering/ROOTEGPythia6",
+        "SND-LHC/pythia6"
+      ],
+      "enabled": false
+    }
+  ]
+}
