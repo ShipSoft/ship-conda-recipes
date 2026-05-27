@@ -7,6 +7,7 @@ source:
   tag: v19.0.1
 
 build:
+  number: 2
   script: build.sh
 
 requirements:
@@ -37,7 +38,6 @@ requirements:
     - geant4-vmc
     - geant3
     - vmc
-    - libboost-devel
     - fairlogger
     - yaml-cpp
     - pythia8
