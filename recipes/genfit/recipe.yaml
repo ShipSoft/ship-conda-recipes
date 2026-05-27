@@ -7,7 +7,7 @@ source:
   tag: 02-03-00
 
 build:
-  number: 2
+  number: 3
   script: build.sh
 
 requirements:
@@ -17,7 +17,6 @@ requirements:
     - make
   host:
     - root
-    - libboost-devel
     - gtest
   run:
     - root
