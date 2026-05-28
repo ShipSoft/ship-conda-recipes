@@ -1,10 +1,13 @@
+context:
+  version: "26.05.7"
+
 package:
   name: fairship
-  version: "0.0.0"
+  version: ${{ version }}
 
 source:
   git: https://github.com/ShipSoft/FairShip
-  rev: 29b3869b25f8416ba3371d6cad547b84eb650cc2
+  rev: ab839844699bf204cf6916819d8f4b929e28c8d2
 
 build:
   script: build.sh
