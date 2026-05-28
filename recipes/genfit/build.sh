@@ -1,9 +1,4 @@
 #!/bin/bash -e
-
-# Patch CMakeLists.txt to pass bare header names to ROOT_GENERATE_DICTIONARY
-# instead of absolute paths, avoiding runtime errors when the source dir is gone.
-sed -i 's|${CMAKE_CURRENT_SOURCE_DIR}/[^/]*/include/||g' "${SRC_DIR}/CMakeLists.txt"
-
 mkdir -p build && cd build
 cmake ${CMAKE_ARGS} ${SRC_DIR} \
     -DCMAKE_BUILD_TYPE=Release \
