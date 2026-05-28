@@ -1,0 +1,57 @@
+package:
+  name: fairship
+  version: "0.0.0"
+
+source:
+  git: https://github.com/ShipSoft/FairShip
+  rev: 29b3869b25f8416ba3371d6cad547b84eb650cc2
+
+build:
+  script: build.sh
+
+requirements:
+  build:
+    - ${{ compiler('cxx') }}
+    - cmake
+    - make
+  host:
+    - root
+    - geant4
+    - geant4-vmc
+    - geant3
+    - vmc
+    - fairroot
+    - faircmakemodules
+    - fairlogger
+    - genfit
+    - rootegpythia6
+    - pythia6
+    - pythia8
+    - evtgen
+    - hepmc2
+    - fmt
+    - gsl
+    - xerces-c
+  run:
+    - root
+    - geant4
+    - geant4-vmc
+    - geant3
+    - vmc
+    - fairroot
+    - fairlogger
+    - genfit
+    - rootegpythia6
+    - pythia6
+    - pythia8
+    - evtgen
+    - hepmc2
+    - fmt
+    - gsl
+    - xerces-c
+
+tests:
+  - script:
+      - test -f $PREFIX/lib/libShipData.so
+      - test -d $PREFIX/include
+      - test -d $PREFIX/share/FairShip/geometry
