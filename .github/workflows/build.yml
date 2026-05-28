@@ -34,5 +34,6 @@ jobs:
           for pkg in output/linux-64/*.conda output/noarch/*.conda; do
             [ -f "$pkg" ] || continue
             pixi run rattler-build upload prefix \
+              --api-key "$PREFIX_DEV_API_KEY" \
               -c ship --skip-existing "$pkg"
           done
