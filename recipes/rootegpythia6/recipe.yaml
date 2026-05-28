@@ -3,7 +3,10 @@ package:
   version: "0.1"
 
 source:
-  url: https://github.com/luketpickering/ROOTEGPythia6/archive/feb7c7eb8d368aee20bf1cb01f1bbfb9cfaeb6b5.tar.gz
+  git: https://github.com/luketpickering/ROOTEGPythia6
+  rev: feb7c7eb8d368aee20bf1cb01f1bbfb9cfaeb6b5
+  patches:
+    - fix-dictionary-paths.patch
 
 build:
   script: build.sh
