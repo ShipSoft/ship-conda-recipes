@@ -16,7 +16,6 @@ on a [prefix.dev](https://prefix.dev) channel.
 | fairlogger | 2.3.2 | 1 | Yes |
 | rootegpythia6 | 0.1 | 1 | No (niche) |
 | genfit | 2.3.0 | 1 | Yes |
-| tauolapp | 1.1.8 | 1 | Yes |
 | photospp | 3.64 | 1 | Yes |
 | geant3 | 4.5 | 2 | Yes |
 | geant4-vmc | 6.8 | 2 | Yes |
