@@ -10,5 +10,6 @@
   "photospp": ["tauolapp"],
   "geant3": ["vmc"],
   "geant4-vmc": ["vmc", "vgm"],
-  "fairroot": ["faircmakemodules", "fairlogger", "pythia6", "vmc", "geant3", "geant4-vmc"]
+  "fairroot": ["faircmakemodules", "fairlogger", "pythia6", "vmc", "geant3", "geant4-vmc"],
+  "fairship": ["fairroot", "faircmakemodules", "fairlogger", "genfit", "rootegpythia6", "pythia6", "vmc", "geant3", "geant4-vmc"]
 }

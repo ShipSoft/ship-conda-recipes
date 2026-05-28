@@ -38,7 +38,8 @@
       "description": "Packages pinned to commits/branches, not release tags",
       "matchPackageNames": [
         "luketpickering/ROOTEGPythia6",
-        "SND-LHC/pythia6"
+        "SND-LHC/pythia6",
+        "ShipSoft/FairShip"
       ],
       "enabled": false
     }
