@@ -1,0 +1,17 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -43,10 +43,11 @@ else()
+   find_package(Pythia6 REQUIRED)
+ endif()
+
++include_directories(${CMAKE_CURRENT_LIST_DIR}/inc)
+ ROOT_GENERATE_DICTIONARY(TPythia6
+-              ${CMAKE_CURRENT_LIST_DIR}/inc/TMCParticle.h
+-              ${CMAKE_CURRENT_LIST_DIR}/inc/TPythia6.h
+-              ${CMAKE_CURRENT_LIST_DIR}/inc/TPythia6Decayer.h
++              TMCParticle.h
++              TPythia6.h
++              TPythia6Decayer.h
+               LINKDEF ${CMAKE_CURRENT_LIST_DIR}/inc/LinkDef.h
+               OPTIONS --noIncludePaths)
+
