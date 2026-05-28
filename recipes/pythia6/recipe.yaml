@@ -3,7 +3,10 @@ package:
   version: "6.4.28"
 
 source:
-  url: https://github.com/SND-LHC/pythia6/archive/refs/heads/v6.4.28-snd.tar.gz
+  git: https://github.com/SND-LHC/pythia6
+  tag: v6.4.28-snd
+  patches:
+    - restore-dummy-pdflib.patch
 
 build:
   number: 3

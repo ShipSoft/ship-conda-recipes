@@ -1,0 +1,29 @@
+--- a/pythia-6.4.28.f
++++ b/pythia-6.4.28.f
+@@ -81353,7 +81353,7 @@ C*********************************************************************
+ C...PDFSET
+ C...Dummy routine, to be removed when PDFLIB is to be linked.
+
+-      SUBROUTINE PDFSETX(PARM,VALUE)
++      SUBROUTINE PDFSET(PARM,VALUE)
+
+ C...Double precision and integer declarations.
+       IMPLICIT DOUBLE PRECISION(A-H, O-Z)
+@@ -81385,7 +81385,7 @@ C*********************************************************************
+ C...STRUCTM
+ C...Dummy routine, to be removed when PDFLIB is to be linked.
+
+-      SUBROUTINE STRUCTMX(XX,QQ,UPV,DNV,USEA,DSEA,STR,CHM,BOT,TOP,GLU)
++      SUBROUTINE STRUCTM(XX,QQ,UPV,DNV,USEA,DSEA,STR,CHM,BOT,TOP,GLU)
+
+ C...Double precision and integer declarations.
+       IMPLICIT DOUBLE PRECISION(A-H, O-Z)
+@@ -81423,7 +81423,7 @@ C*********************************************************************
+ C...STRUCTP
+ C...Dummy routine, to be removed when PDFLIB is to be linked.
+
+-      SUBROUTINE STRUCTPX(XX,QQ2,P2,IP2,UPV,DNV,USEA,DSEA,STR,CHM,
++      SUBROUTINE STRUCTP(XX,QQ2,P2,IP2,UPV,DNV,USEA,DSEA,STR,CHM,
+      &BOT,TOP,GLU)
+
+ C...Double precision and integer declarations.
