@@ -5,6 +5,8 @@ package:
 source:
   git: https://github.com/GenFit/GenFit
   tag: 02-03-00
+  patches:
+    - fix-dictionary-paths.patch
 
 build:
   number: 3
