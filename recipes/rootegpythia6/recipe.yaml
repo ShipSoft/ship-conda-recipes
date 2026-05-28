@@ -11,13 +11,14 @@ build:
 requirements:
   build:
     - ${{ compiler('cxx') }}
-    - ${{ compiler('fortran') }}
     - cmake
     - make
   host:
     - root
+    - pythia6
   run:
     - root
+    - pythia6
 
 tests:
   - script:
