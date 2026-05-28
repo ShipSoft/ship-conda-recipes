@@ -21,12 +21,12 @@ requirements:
     - hepmc3
     - root
     - pythia8
-    - tauolapp
+    - tauloa
   run:
     - hepmc3
     - root
     - pythia8
-    - tauolapp
+    - tauloa
 
 tests:
   - script:
