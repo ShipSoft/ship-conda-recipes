@@ -1,0 +1,11 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -227,7 +227,7 @@ endif()
+     list(APPEND boost_dependencies filesystem serialization program_options)
+   endif()
+   if(BUILD_EXAMPLES)
+-    list(APPEND boost_dependencies program_options)
++    list(APPEND boost_dependencies program_options serialization)
+   endif()
+   if(BUILD_TESTING)
+     list(APPEND boost_dependencies filesystem)

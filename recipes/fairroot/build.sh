@@ -1,12 +1,6 @@
 #!/bin/bash -e
 unset SIMPATH
 
-# Upstream bug (≤ v19.0.1): propagator example links Boost::serialization
-# but top-level CMakeLists.txt only requests it with BUILD_BASEMQ=ON.
-# Fix: https://github.com/FairRootGroup/FairRoot/pull/1631
-sed -i 's/list(APPEND boost_dependencies program_options)/list(APPEND boost_dependencies program_options serialization)/' \
-    "${SRC_DIR}/CMakeLists.txt"
-
 mkdir -p build && cd build
 cmake ${CMAKE_ARGS} ${SRC_DIR} \
     -DCMAKE_BUILD_TYPE=Release \

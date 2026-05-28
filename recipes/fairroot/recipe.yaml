@@ -5,6 +5,8 @@ package:
 source:
   git: https://github.com/FairRootGroup/FairRoot
   tag: v19.0.1
+  patches:
+    - fix-boost-serialization.patch
 
 build:
   number: 2
