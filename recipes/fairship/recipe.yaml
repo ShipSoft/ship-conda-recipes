@@ -6,8 +6,8 @@ package:
   version: ${{ version }}
 
 source:
-  git: https://github.com/ShipSoft/FairShip
-  rev: ab839844699bf204cf6916819d8f4b929e28c8d2
+  url: https://github.com/ShipSoft/FairShip/archive/ab839844699bf204cf6916819d8f4b929e28c8d2.tar.gz
+  sha256: 70659bb8b25078e696165c8a54f317dcbc009a2ef5bde267c5cc8512eefcca6d
 
 build:
   script: build.sh

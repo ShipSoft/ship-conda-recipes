@@ -3,8 +3,8 @@ package:
   version: "2.2"
 
 source:
-  git: https://github.com/vmc-project/vmc
-  tag: v2-2
+  url: https://github.com/vmc-project/vmc/archive/refs/tags/v2-2.tar.gz
+  sha256: 6da6a32352c5a3eb62d07aed92414a0baf2793f6ec0630402e3df7fcb1b73d7b
 
 build:
   script: build.sh

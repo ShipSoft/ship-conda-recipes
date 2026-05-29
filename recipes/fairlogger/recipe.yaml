@@ -3,8 +3,8 @@ package:
   version: "2.3.2"
 
 source:
-  git: https://github.com/FairRootGroup/FairLogger
-  tag: v2.3.2
+  url: https://github.com/FairRootGroup/FairLogger/archive/refs/tags/v2.3.2.tar.gz
+  sha256: 17878988b220ab6e06944d0d91d4cc82f0e0c5dc3b16ddade2db72abf7c28add
 
 build:
   script: build.sh
