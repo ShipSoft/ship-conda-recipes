@@ -3,8 +3,8 @@ package:
   version: "1.0.0"
 
 source:
-  git: https://github.com/FairRootGroup/FairCMakeModules
-  tag: v1.0.0
+  url: https://github.com/FairRootGroup/FairCMakeModules/archive/refs/tags/v1.0.0.tar.gz
+  sha256: ec60c31f38050c1173d512c58c684650db66736877c580936f7ecca33eeaf696
 
 build:
   noarch: generic

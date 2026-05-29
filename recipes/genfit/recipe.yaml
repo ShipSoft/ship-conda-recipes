@@ -3,8 +3,8 @@ package:
   version: "2.3.0"
 
 source:
-  git: https://github.com/GenFit/GenFit
-  tag: 02-03-00
+  url: https://github.com/GenFit/GenFit/archive/refs/tags/02-03-00.tar.gz
+  sha256: 741eb6cbfccc3403061cd4ccd62083adf3f9b187ea4236453eef777d4824b05e
   patches:
     - fix-dictionary-paths.patch
 

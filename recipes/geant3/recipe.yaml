@@ -3,8 +3,8 @@ package:
   version: "4.5"
 
 source:
-  git: https://github.com/vmc-project/geant3
-  tag: v4-5
+  url: https://github.com/vmc-project/geant3/archive/refs/tags/v4-5.tar.gz
+  sha256: 0fbfe4a9e50b3bc8af7efc11d2b167c341ba0ec3103ddbdf6d88736fd1f26e23
 
 build:
   script: build.sh
