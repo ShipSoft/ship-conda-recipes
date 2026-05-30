@@ -13,7 +13,6 @@ on a [prefix.dev](https://prefix.dev) channel.
 | pythia6 | 6.4.28 | 0 | No (SND-LHC fork) |
 | vmc | 2.2 | 1 | Yes |
 | vgm | 5.4 | 1 | Yes |
-| fairlogger | 2.3.2 | 1 | Yes |
 | rootegpythia6 | 0.1 | 1 | No (niche) |
 | genfit | 2.3.0 | 1 | Yes |
 | photospp | 3.64 | 1 | Yes |
