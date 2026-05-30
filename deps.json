@@ -3,12 +3,11 @@
   "pythia6": [],
   "vmc": [],
   "vgm": [],
-  "fairlogger": [],
   "rootegpythia6": [],
   "genfit": [],
   "photospp": [],
   "geant3": ["vmc"],
   "geant4-vmc": ["vmc", "vgm"],
-  "fairroot": ["faircmakemodules", "fairlogger", "pythia6", "vmc", "geant3", "geant4-vmc"],
-  "fairship": ["fairroot", "faircmakemodules", "fairlogger", "genfit", "rootegpythia6", "pythia6", "vmc", "geant3", "geant4-vmc"]
+  "fairroot": ["faircmakemodules", "pythia6", "vmc", "geant3", "geant4-vmc"],
+  "fairship": ["fairroot", "faircmakemodules", "genfit", "rootegpythia6", "pythia6", "vmc", "geant3", "geant4-vmc"]
 }
