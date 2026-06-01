@@ -7,12 +7,14 @@ source:
   sha256: c0d91c01b11609f2ef3b809a7f0ee1c328e69111cf6109f819833823a83a4f1d
 
 build:
-  noarch: generic
+  skip:
+    - win
   script: build.sh
 
 requirements:
   build:
     - cmake
+    - make
 
 tests:
   - package_contents:
