@@ -1,0 +1,47 @@
+context:
+  version: "0.2.0"
+
+package:
+  name: phlex
+  version: ${{ version }}
+
+source:
+  url: https://github.com/Framework-R-D/phlex/archive/refs/tags/v${{ version }}.tar.gz
+  sha256: 37833e1b976ec534d8da5b9ec412f297426e2e534ae8e471124f6a1859fe9841
+
+build:
+  skip:
+    - win
+  script: build.sh
+  dynamic_linking:
+    missing_dso_allowlist:
+      - lib/libpython*
+      - lib/libCore*
+      - lib/libRIO*
+      - lib/libTree*
+
+requirements:
+  build:
+    - ${{ compiler('cxx') }}
+    - cmake
+    - make
+  host:
+    - cetmodules
+    - libboost-devel
+    - fmt
+    - tbb-devel
+    - spdlog
+    - jsonnet
+    - root
+  run:
+    - libboost-devel
+    - fmt
+    - tbb
+    - spdlog
+    - jsonnet
+    - root
+
+tests:
+  - package_contents:
+      lib:
+        - phlex_core
