@@ -1,0 +1,38 @@
+context:
+  version: "6.27.0"
+
+package:
+  name: geomodel
+  version: ${{ version }}
+
+source:
+  url: https://gitlab.cern.ch/GeoModelDev/GeoModel/-/archive/${{ version }}/GeoModel-${{ version }}.tar.gz
+  sha256: 018c5087b70d956793d06dc040f842018eb3bedd9b2f175c6090af63ce963408
+
+build:
+  skip:
+    - win
+  script: build.sh
+
+requirements:
+  build:
+    - ${{ compiler('cxx') }}
+    - cmake
+    - make
+  host:
+    - sqlite
+    - xerces-c
+    - nlohmann_json
+    - eigen
+    - geant4
+  run:
+    - sqlite
+    - xerces-c
+    - nlohmann_json
+    - eigen
+    - geant4
+
+tests:
+  - package_contents:
+      lib:
+        - GeoModelKernel
