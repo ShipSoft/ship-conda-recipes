@@ -1,0 +1,30 @@
+context:
+  version: "0.22.0"
+
+package:
+  name: jsonnet
+  version: ${{ version }}
+
+source:
+  url: https://github.com/google/jsonnet/archive/refs/tags/v${{ version }}.tar.gz
+  sha256: 5914b9904d97efa662d919519cef1a14e4132bfddddaeed8b061b4a8af628f8d
+
+build:
+  skip:
+    - win
+  script: build.sh
+
+requirements:
+  build:
+    - ${{ compiler('cxx') }}
+    - cmake
+    - make
+  host:
+    - nlohmann_json
+
+tests:
+  - package_contents:
+      lib:
+        - jsonnet
+      include:
+        - libjsonnet.h

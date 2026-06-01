@@ -9,5 +9,9 @@
   "geant3": ["vmc"],
   "geant4-vmc": ["vmc", "vgm"],
   "fairroot": ["faircmakemodules", "pythia6", "vmc", "geant3", "geant4-vmc"],
-  "fairship": ["fairroot", "faircmakemodules", "genfit", "rootegpythia6", "pythia6", "vmc", "geant3", "geant4-vmc"]
+  "fairship": ["fairroot", "faircmakemodules", "genfit", "rootegpythia6", "pythia6", "vmc", "geant3", "geant4-vmc"],
+  "cetmodules": [],
+  "jsonnet": [],
+  "geomodel": [],
+  "phlex": ["cetmodules", "jsonnet"]
 }
