@@ -3,7 +3,7 @@ cmake ${CMAKE_ARGS} -S ${SRC_DIR} -B build
 cmake --build build --target install
 
 # Patch config so find_package(cetmodules) includes modules loaded via FetchContent
-cat >> "${PREFIX}/share/cetmodules/cmake/cetmodulesConfig.cmake" <<'EOF'
+cat >> "${PREFIX}/lib/cetmodules/cmake/cetmodulesConfig.cmake" <<'EOF'
 include(CetProvideDependency)
 include(CetCMakeEnv)
 include(CetCMakeUtils)

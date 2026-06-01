@@ -13,9 +13,8 @@ build:
 requirements:
   build:
     - cmake
-    - ${{ compiler('cxx') }}
 
 tests:
   - package_contents:
       files:
-        - share/cetmodules/cmake/cetmodulesConfig.cmake
+        - lib/cetmodules/cmake/cetmodulesConfig.cmake
