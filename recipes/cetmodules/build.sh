@@ -1,5 +1,6 @@
 #!/bin/bash -e
-cmake ${CMAKE_ARGS} -S ${SRC_DIR} -B build
+cmake -S ${SRC_DIR} -B build \
+    -DCMAKE_INSTALL_PREFIX=${PREFIX}
 cmake --build build --target install
 
 # Patch config so find_package(cetmodules) includes modules loaded via FetchContent
