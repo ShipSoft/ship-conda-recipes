@@ -1,9 +1,12 @@
-package:
-  name: photospp
+context:
   version: "3.64"
 
+package:
+  name: photospp
+  version: ${{ version }}
+
 source:
-  url: https://gitlab.cern.ch/photospp/photospp/-/archive/v3.64/photospp-v3.64.tar.gz
+  url: https://gitlab.cern.ch/photospp/photospp/-/archive/v${{ version }}/photospp-v${{ version }}.tar.gz
   sha256: d42cb01eca6eea517dc6a729cd34db515d6894e6f4bab73072cb5a6fa9b93d63
 
 build:
