@@ -6,26 +6,37 @@
   "customManagers": [
     {
       "customType": "regex",
-      "description": "Update tags in rattler-build recipes (GitHub sources)",
+      "description": "Update versions in rattler-build recipes (GitHub template sources)",
       "managerFilePatterns": ["/recipe\\.yaml$/"],
       "matchStringsStrategy": "combination",
       "matchStrings": [
-        "tag:\\s*\"?(?<currentValue>[^\"\\s\\n]+)\"?",
-        "git:\\s*https://github\\.com/(?<packageName>[^/\\s]+/[^\\s]+?)(?:\\.git)?\\s*\\n"
+        "context:\\n\\s+version:\\s*\"(?<currentValue>[^\"]+)\"",
+        "url:\\s*https://github\\.com/(?<packageName>[^/]+/[^/]+)/archive/"
       ],
-      "datasourceTemplate": "github-tags"
+      "datasourceTemplate": "github-tags",
+      "extractVersionTemplate": "^v?(?<version>.+)$"
     },
     {
       "customType": "regex",
-      "description": "Update tags in rattler-build recipes (GitLab CERN sources)",
+      "description": "Update versions in rattler-build recipes (GitLab CERN template sources)",
       "managerFilePatterns": ["/recipe\\.yaml$/"],
       "matchStringsStrategy": "combination",
       "matchStrings": [
-        "tag:\\s*\"?(?<currentValue>[^\"\\s\\n]+)\"?",
-        "git:\\s*https://gitlab\\.cern\\.ch/(?<packageName>[^/\\s]+/[^\\s]+?)(?:\\.git)?\\s*\\n"
+        "context:\\n\\s+version:\\s*\"(?<currentValue>[^\"]+)\"",
+        "url:\\s*https://gitlab\\.cern\\.ch/(?<packageName>[^/]+/[^/]+)/-/archive/"
       ],
       "datasourceTemplate": "gitlab-tags",
-      "registryUrlTemplate": "https://gitlab.cern.ch"
+      "registryUrlTemplate": "https://gitlab.cern.ch",
+      "extractVersionTemplate": "^v?(?<version>.+)$"
+    },
+    {
+      "customType": "regex",
+      "description": "Update tags in rattler-build recipes (GitHub hardcoded tag sources)",
+      "managerFilePatterns": ["/recipe\\.yaml$/"],
+      "matchStrings": [
+        "url:\\s*https://github\\.com/(?<packageName>[^/]+/[^/]+)/archive/refs/tags/(?<currentValue>[^/${}\\s]+)\\.tar\\.gz"
+      ],
+      "datasourceTemplate": "github-tags"
     }
   ],
   "packageRules": [

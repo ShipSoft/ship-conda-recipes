@@ -1,9 +1,12 @@
-package:
-  name: cetmodules
+context:
   version: "4.02.00"
 
+package:
+  name: cetmodules
+  version: ${{ version }}
+
 source:
-  url: https://github.com/FNALssi/cetmodules/archive/refs/tags/4.02.00.tar.gz
+  url: https://github.com/FNALssi/cetmodules/archive/refs/tags/${{ version }}.tar.gz
   sha256: 431940833989cbb47879fcab27e2ce1778cdeb0e95a4ab26aa20aba942de836a
 
 build:

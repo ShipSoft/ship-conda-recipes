@@ -1,9 +1,12 @@
-package:
-  name: fairroot
+context:
   version: "19.0.1"
 
+package:
+  name: fairroot
+  version: ${{ version }}
+
 source:
-  url: https://github.com/FairRootGroup/FairRoot/archive/refs/tags/v19.0.1.tar.gz
+  url: https://github.com/FairRootGroup/FairRoot/archive/refs/tags/v${{ version }}.tar.gz
   sha256: 7aac7288bb68f7e37535638f3fd4cf60c2c6b4fc30350462f398bbb93e8eea52
   patches:
     - fix-boost-serialization.patch
