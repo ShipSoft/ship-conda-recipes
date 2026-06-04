@@ -20,4 +20,4 @@ requirements:
 
 tests:
   - script:
-      - test -f $PREFIX/share/cmake/FairCMakeModules-1.0.0/FairCMakeModulesConfig.cmake
+      - test -f $PREFIX/share/cmake/FairCMakeModules-${{ version }}/FairCMakeModulesConfig.cmake
