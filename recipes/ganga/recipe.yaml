@@ -1,0 +1,42 @@
+context:
+  version: "8.7.12"
+
+package:
+  name: ganga
+  version: ${{ version }}
+
+source:
+  url: https://github.com/ganga-devs/ganga/archive/refs/tags/${{ version }}.tar.gz
+  sha256: 9a5966b3eff859b5f9716f7af5f51d3da7c2574c67e99268921dc5fdcf142a53
+
+build:
+  skip:
+    - win
+    - osx
+  noarch: python
+  script: python -m pip install . -vv --no-deps --no-build-isolation
+
+requirements:
+  host:
+    - python >=3.9
+    - pip
+    - setuptools
+  run:
+    - python >=3.9
+    - ipython >=5.0.0
+    - aiofile >=3.7.4
+    - aiohttp >=3.8.4
+    - absl-py >=0.1.2
+    - google-api-python-client
+    - google-auth-httplib2
+    - google-auth-oauthlib
+    - requests >=2.23.0
+    - docker-py
+    - pymongo
+    - gdown
+    - htcondor
+
+tests:
+  - python:
+      imports:
+        - ganga

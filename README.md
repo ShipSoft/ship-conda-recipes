@@ -19,6 +19,7 @@ on a [prefix.dev](https://prefix.dev) channel.
 | geant3 | 4.5 | 2 | Yes |
 | geant4-vmc | 6.8 | 2 | Yes |
 | fairroot | 19.0.1 | 3 | No (carries patch) |
+| ganga | 8.7.12 | 0 | No (HEP-specific, not in conda-forge today) |
 
 ## Building
 

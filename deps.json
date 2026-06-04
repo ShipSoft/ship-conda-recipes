@@ -13,5 +13,6 @@
   "cetmodules": [],
   "jsonnet": [],
   "geomodel": [],
-  "phlex": ["cetmodules", "jsonnet"]
+  "phlex": ["cetmodules", "jsonnet"],
+  "ganga": []
 }
