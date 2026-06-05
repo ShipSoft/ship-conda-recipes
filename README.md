@@ -9,7 +9,6 @@ on a [prefix.dev](https://prefix.dev) channel.
 
 | Package | Version | Tier | Upstream candidate? |
 |---------|---------|------|---------------------|
-| faircmakemodules | 1.0.0 | 0 | Yes |
 | pythia6 | 6.4.28 | 0 | No (SND-LHC fork) |
 | ganga | 8.7.12 | 0 | No (HEP-specific, not in conda-forge today) |
 | gsl-lite | 1.1.0 | 0 | No (newer than conda-forge) |
