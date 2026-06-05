@@ -1,0 +1,37 @@
+context:
+  version: "26.06.0"
+
+package:
+  name: shipgeometryservice
+  version: ${{ version }}
+
+source:
+  url: https://github.com/ShipSoft/geometry_service/archive/fb0576b936d93524e19732c5dbbd73848e0a39ee.tar.gz
+  sha256: d0c366b825943e0e0a51ca4ec1e29ad986ce81be44083d99da5f7b1b9820b409
+
+build:
+  skip:
+    - win
+  script: build.sh
+
+requirements:
+  build:
+    - ${{ compiler('cxx') }}
+    - cmake
+    - make
+  host:
+    - shipgeometry
+    - geomodel
+    - geant4
+    - mp-units
+  run:
+    - shipgeometry
+    - geomodel
+    - geant4
+    - mp-units
+
+tests:
+  - script:
+      - test -f $PREFIX/lib/libSHiPGeometryService.so
+      - test -f $PREFIX/lib/cmake/SHiPGeometryService/SHiPGeometryServiceConfig.cmake
+      - test -f $PREFIX/include/GeometryService/SHiPGeometryService.h

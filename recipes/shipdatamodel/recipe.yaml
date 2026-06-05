@@ -1,0 +1,33 @@
+context:
+  version: "26.06.0"
+
+package:
+  name: shipdatamodel
+  version: ${{ version }}
+
+source:
+  url: https://github.com/ShipSoft/data-model/archive/e709b820219f56663d9985a89e17a5fded3b0892.tar.gz
+  sha256: 14b93f2c779454a4706698de59f4f1eb2c19489e3906b333a869bd91aacc7609
+
+build:
+  skip:
+    - win
+  script: build.sh
+
+requirements:
+  build:
+    - ${{ compiler('cxx') }}
+    - cmake
+    - make
+  host:
+    - root
+  run:
+    - root
+
+tests:
+  - script:
+      - test -f $PREFIX/lib/libSHiPDataModel.so
+      - test -f $PREFIX/lib/libSHiPDataModel.rootmap
+      - test -f $PREFIX/lib/libSHiPDataModel_rdict.pcm
+      - test -f $PREFIX/lib/cmake/SHiPDataModel/SHiPDataModelConfig.cmake
+      - test -f $PREFIX/include/SHiP/MCParticle.hpp

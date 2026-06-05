@@ -1,0 +1,30 @@
+context:
+  version: "2.5.0"
+
+package:
+  name: mp-units
+  version: ${{ version }}
+
+source:
+  url: https://github.com/mpusz/mp-units/archive/refs/tags/v${{ version }}.tar.gz
+  sha256: a6bd48bee699f11f0ed5b04b8c5006d15f76e6d898e058db3880554d2e47a400
+
+build:
+  skip:
+    - win
+  script: build.sh
+
+requirements:
+  build:
+    - ${{ compiler('cxx') }}
+    - cmake
+    - make
+  host:
+    - gsl-lite
+  run:
+    - gsl-lite
+
+tests:
+  - script:
+      - test -d $PREFIX/include/mp-units
+      - test -f $PREFIX/lib/cmake/mp-units/mp-unitsConfig.cmake
