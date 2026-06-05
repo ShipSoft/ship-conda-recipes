@@ -1,15 +1,23 @@
 #!/bin/bash -e
 
-# Hide std::__format weak template instantiations from the dynamic symbol
-# table of every shared library produced here. libstdc++.so does not export
-# strong overrides for them, so without this script the weak duplicates baked
-# into libGeoModel{Xml,Write,Read,DBManager} become the only definitions the
-# dynamic linker can see, and subtle libstdcxx-devel header drift between the
-# geomodel build host and downstream consumers crashes std::format users at
-# runtime (ShipSoft/Geometry#26).
+# Hide every std::__format symbol from the dynamic symbol table of every
+# shared library produced here, including vtables, typeinfo, typeinfo names,
+# and template-instantiated functions. libstdc++.so does not export strong
+# overrides for them, so without this script the weak/vague-linkage copies
+# baked into libGeoModel{Xml,Write,Read,DBManager} become the only definitions
+# the dynamic linker can see; subtle libstdcxx-devel header drift between the
+# geomodel build host and downstream consumers then crashes std::format users
+# at runtime (ShipSoft/Geometry#26).
+#
+# The mangled namespace prefix `St8__format` matches every mangling form we
+# need to hide:
+#   _ZNSt8__format…  functions
+#   _ZTVNSt8__format…  vtables
+#   _ZTINSt8__format…  typeinfo
+#   _ZTSNSt8__format…  typeinfo names
 cat > "${SRC_DIR}/hide-std-format.ver" <<'EOF'
 {
-  local: _ZNSt8__format*;
+  local: *NSt8__format*;
 };
 EOF
 

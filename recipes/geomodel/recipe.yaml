@@ -10,7 +10,7 @@ source:
   sha256: 018c5087b70d956793d06dc040f842018eb3bedd9b2f175c6090af63ce963408
 
 build:
-  number: 3
+  number: 4
   skip:
     - win
   script: build.sh
