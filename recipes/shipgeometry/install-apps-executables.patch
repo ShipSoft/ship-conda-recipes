@@ -1,0 +1,27 @@
+Install build_geometry and validate_geometry into bin/.
+
+Upstream's apps/CMakeLists.txt defines both executables but never installs
+them, so the rattler-build package was missing them and the tests block
+silently failed on `test -f $PREFIX/bin/build_geometry`. Add a small
+install(TARGETS ...) rule.
+
+Literal `bin` rather than ${CMAKE_INSTALL_BINDIR} because GNUInstallDirs
+isn't included until after `add_subdirectory(apps)` in v0.1.0's top-level
+CMakeLists, so the variable would be empty here.
+
+Open upstream PR adds the same install rule plus a local
+`include(GNUInstallDirs)` so it can use the variable properly. Once
+released, drop this patch.
+
+--- a/apps/CMakeLists.txt
++++ b/apps/CMakeLists.txt
+@@ -13,5 +13,9 @@
+ add_executable(validate_geometry validate_geometry.cpp)
+ target_link_libraries(validate_geometry
+     PRIVATE
+         sqlite3
+ )
++
++install(TARGETS build_geometry validate_geometry
++    RUNTIME DESTINATION bin
++)

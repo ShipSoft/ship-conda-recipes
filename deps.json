@@ -14,5 +14,12 @@
   "jsonnet": [],
   "geomodel": [],
   "phlex": ["cetmodules", "jsonnet"],
-  "ganga": []
+  "ganga": [],
+  "gsl-lite": [],
+  "mp-units": ["gsl-lite"],
+  "random123": [],
+  "shipdatamodel": [],
+  "shipgeometry": ["geomodel"],
+  "shipgeometryservice": ["shipgeometry", "geomodel", "mp-units"],
+  "aegir": ["shipdatamodel", "phlex", "shipgeometryservice", "mp-units", "random123"]
 }

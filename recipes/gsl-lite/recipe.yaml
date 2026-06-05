@@ -1,0 +1,26 @@
+context:
+  version: "1.1.0"
+
+package:
+  name: gsl-lite
+  version: ${{ version }}
+
+source:
+  url: https://github.com/gsl-lite/gsl-lite/archive/refs/tags/v${{ version }}.tar.gz
+  sha256: bc786258eda511980942b973f5f394c854705bb0462ee46f82a8c39b5e19ea03
+
+build:
+  skip:
+    - win
+  script: build.sh
+
+requirements:
+  build:
+    - ${{ compiler('cxx') }}
+    - cmake
+    - make
+
+tests:
+  - script:
+      - test -d $PREFIX/include/gsl-lite
+      - test -f $PREFIX/share/cmake/gsl-lite/gsl-liteConfig.cmake

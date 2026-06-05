@@ -1,0 +1,62 @@
+context:
+  version: "0.1.0"
+
+package:
+  name: aegir
+  version: ${{ version }}
+
+source:
+  url: https://github.com/ShipSoft/aegir/archive/refs/tags/v${{ version }}.tar.gz
+  sha256: 5627d89957f4ce4148478d3c3a7a46702210b4ed8974a23977b685f181491ff8
+
+build:
+  skip:
+    - win
+  script: build.sh
+
+requirements:
+  build:
+    - ${{ compiler('cxx') }}
+    - cmake
+    - make
+  host:
+    - shipdatamodel
+    - phlex
+    - shipgeometryservice
+    - root
+    - geant4
+    - pythia8
+    - random123
+    - libboost-devel
+    - tbb-devel
+    - spdlog
+    - fmt
+    - mp-units
+    - ms-gsl
+  run:
+    - shipdatamodel
+    - phlex
+    - shipgeometryservice
+    - root
+    - geant4
+    - pythia8
+    - random123
+    - libboost-devel
+    - tbb
+    - spdlog
+    - fmt
+    - mp-units
+    - ms-gsl
+
+tests:
+  - script:
+      - test -f $PREFIX/lib/libparticle_gun_source.so
+      - test -f $PREFIX/lib/libpythia8_source.so
+      - test -f $PREFIX/lib/libfixed_target_source.so
+      - test -f $PREFIX/lib/libgeometry_builtin_provider.so
+      - test -f $PREFIX/lib/libgeometry_gdml_provider.so
+      - test -f $PREFIX/lib/libgeometry_geomodel_provider.so
+      - test -f $PREFIX/lib/libgeant4_module.so
+      - test -f $PREFIX/lib/libsim_output_module.so
+      - test -f $PREFIX/bin/pythia8_benchmark
+      - test -d $PREFIX/share/aegir/workflows

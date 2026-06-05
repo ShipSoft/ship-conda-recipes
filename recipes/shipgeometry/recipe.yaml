@@ -1,0 +1,45 @@
+context:
+  version: "0.1.0"
+
+package:
+  name: shipgeometry
+  version: ${{ version }}
+
+source:
+  url: https://github.com/ShipSoft/Geometry/archive/refs/tags/v${{ version }}.tar.gz
+  sha256: 081fdd9654f032b91ab703ff74f28c087a6e96868c67c9df23fba25b6651e03c
+  patches:
+    - install-apps-executables.patch
+
+build:
+  skip:
+    - win
+  script: build.sh
+
+requirements:
+  build:
+    - ${{ compiler('cxx') }}
+    - cmake
+    - make
+  host:
+    - geomodel
+    - sqlite
+  run:
+    - geomodel
+    - sqlite
+
+tests:
+  - script:
+      - test -f $PREFIX/lib/libSHiPGeometry.so
+      - test -f $PREFIX/lib/libCavern.so
+      - test -f $PREFIX/lib/libTarget.so
+      - test -f $PREFIX/lib/libMuonShield.so
+      - test -f $PREFIX/lib/libMagnet.so
+      - test -f $PREFIX/lib/libDecayVolume.so
+      - test -f $PREFIX/lib/libTrackers.so
+      - test -f $PREFIX/lib/libCalorimeter.so
+      - test -f $PREFIX/lib/libUpstreamTagger.so
+      - test -f $PREFIX/lib/libTimingDetector.so
+      - test -f $PREFIX/bin/build_geometry
+      - test -f $PREFIX/bin/validate_geometry
+      - test -f $PREFIX/lib/cmake/SHiPGeometry/SHiPGeometryConfig.cmake
