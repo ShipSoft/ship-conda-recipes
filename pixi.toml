@@ -9,7 +9,6 @@ rattler-build = ">=0.35"
 
 [tasks]
 # Build individual recipes (use: pixi run build-<name>)
-build-faircmakemodules = "rattler-build build --recipe recipes/faircmakemodules"
 build-pythia6 = "rattler-build build --recipe recipes/pythia6"
 build-vmc = "rattler-build build --recipe recipes/vmc"
 build-vgm = "rattler-build build --recipe recipes/vgm"
