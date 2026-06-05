@@ -1,6 +1,7 @@
 #!/bin/bash -e
 cmake ${CMAKE_ARGS} -S ${SRC_DIR} -B build \
     -DCMAKE_CXX_STANDARD=20 \
+    -DCMAKE_CXX_FLAGS="-fvisibility-inlines-hidden" \
     -DCMAKE_INSTALL_LIBDIR=lib \
     -DGEOMODEL_USE_BUILTIN_JSON=OFF \
     -DGEOMODEL_USE_BUILTIN_XERCESC=OFF \
