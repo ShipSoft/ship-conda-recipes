@@ -3,7 +3,7 @@ package:
   version: "6.7.1"
 
 source:
-  url: https://github.com/vmc-project/geant4_vmc/archive/refs/tags/v6-7-p1.tar.gz
+  url: https://github.com/vmc-project/geant4_vmc/archive/refs/tags/v6-8.tar.gz
   sha256: e1e80c78987f94d6e2f9644052a57f43946fc73309197a4c4400906d227d27ae
 
 build:
