@@ -10,7 +10,7 @@ source:
     - fix-pythia6-private-link.patch
 
 build:
-  number: 2
+  number: 3
   script: build.sh
 
 requirements:
