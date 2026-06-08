@@ -9,7 +9,7 @@ source:
     - fix-dictionary-paths.patch
 
 build:
-  number: 3
+  number: 4
   script: build.sh
 
 requirements:
@@ -18,10 +18,12 @@ requirements:
     - cmake
     - make
   host:
-    - root
+    - root 6.40.*
     - gtest
   run:
-    - root
+    - root 6.40.*
+  run_exports:
+    - root 6.40.*
 
 tests:
   - script:
