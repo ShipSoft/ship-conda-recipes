@@ -9,6 +9,7 @@ source:
     - fix-dictionary-paths.patch
 
 build:
+  number: 1
   script: build.sh
 
 requirements:
@@ -17,11 +18,13 @@ requirements:
     - cmake
     - make
   host:
-    - root
+    - root 6.40.*
     - pythia6
   run:
-    - root
+    - root 6.40.*
     - pythia6
+  run_exports:
+    - root 6.40.*
 
 tests:
   - script:

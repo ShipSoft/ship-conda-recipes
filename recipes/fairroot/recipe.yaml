@@ -12,7 +12,7 @@ source:
     - fix-boost-serialization.patch
 
 build:
-  number: 2
+  number: 3
   script: build.sh
 
 requirements:
@@ -22,7 +22,7 @@ requirements:
     - cmake
     - make
   host:
-    - root
+    - root 6.40.*
     - geant4
     - geant4-vmc
     - geant3
@@ -38,7 +38,7 @@ requirements:
     - xerces-c
     - gsl
   run:
-    - root
+    - root 6.40.*
     - geant4
     - geant4-vmc
     - geant3
@@ -51,6 +51,8 @@ requirements:
     - hepmc2
     - xerces-c
     - gsl
+  run_exports:
+    - root 6.40.*
 
 tests:
   - script:

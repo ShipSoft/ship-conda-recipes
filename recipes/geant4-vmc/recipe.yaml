@@ -7,6 +7,7 @@ source:
   sha256: e1e80c78987f94d6e2f9644052a57f43946fc73309197a4c4400906d227d27ae
 
 build:
+  number: 1
   script: build.sh
 
 requirements:
@@ -15,17 +16,19 @@ requirements:
     - cmake
     - make
   host:
-    - root
+    - root 6.40.*
     - vmc
     - geant4
     - vgm
     - xerces-c
   run:
-    - root
+    - root 6.40.*
     - vmc
     - geant4
     - vgm
     - xerces-c
+  run_exports:
+    - root 6.40.*
 
 tests:
   - script:

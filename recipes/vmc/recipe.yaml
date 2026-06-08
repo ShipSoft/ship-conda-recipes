@@ -7,6 +7,7 @@ source:
   sha256: 6da6a32352c5a3eb62d07aed92414a0baf2793f6ec0630402e3df7fcb1b73d7b
 
 build:
+  number: 1
   script: build.sh
 
 requirements:
@@ -15,9 +16,11 @@ requirements:
     - cmake
     - make
   host:
-    - root
+    - root 6.40.*
   run:
-    - root
+    - root 6.40.*
+  run_exports:
+    - root 6.40.*
 
 tests:
   - script:
