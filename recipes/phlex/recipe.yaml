@@ -10,7 +10,7 @@ source:
   sha256: 37833e1b976ec534d8da5b9ec412f297426e2e534ae8e471124f6a1859fe9841
 
 build:
-  number: 1
+  number: 2
   skip:
     - win
   script: build.sh
@@ -28,14 +28,14 @@ requirements:
     - make
   host:
     - cetmodules
-    - libboost-devel >=1.88,<1.89
+    - libboost-devel
     - fmt
     - tbb-devel
     - spdlog
     - jsonnet
     - root
   run:
-    - libboost-devel >=1.88,<1.89
+    - libboost-devel
     - fmt
     - tbb
     - spdlog
