@@ -7,9 +7,10 @@ source:
   sha256: 891d637fe278c9f77eca14d66eaeb7d49af6d2bdef73af637fcc41783b096832
   patches:
     - fix-dictionary-paths.patch
+    - fix-pythia6-private-link.patch
 
 build:
-  number: 1
+  number: 2
   script: build.sh
 
 requirements:
