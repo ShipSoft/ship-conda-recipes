@@ -1,0 +1,26 @@
+When BUILTIN=OFF we link against the conda pythia6 package via the bundled
+FindPythia6.cmake, which creates a Pythia6::Pythia6 IMPORTED target locally.
+That target is NOT part of the install(EXPORT) set, so the generated
+ROOTEGPythia6Targets.cmake ends up with INTERFACE_LINK_LIBRARIES that
+references a target the consumer's CMake scope doesn't know about — e.g.
+FairShip's `find_package(ROOTEGPythia6 REQUIRED)` then dies with:
+
+    The link interface of target "ROOT::EGPythia6" contains:
+        Pythia6::Pythia6
+      but the target was not found.
+
+Demote the link to PRIVATE so libEGPythia6.so still gets the DT_NEEDED for
+libPythia6.so at link time, without leaking the unresolvable target name
+into the exported interface.
+
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -59,7 +59,7 @@
+
+ add_library(ROOT::EGPythia6 ALIAS EGPythia6)
+
+-target_link_libraries(EGPythia6 PUBLIC ROOT::EG Pythia6::Pythia6)
++target_link_libraries(EGPythia6 PUBLIC ROOT::EG PRIVATE Pythia6::Pythia6)
+ target_include_directories(EGPythia6 PUBLIC 
+   $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/inc>
+   $<INSTALL_INTERFACE:include>)
