@@ -32,14 +32,14 @@ requirements:
     - fmt
     - tbb-devel
     - spdlog
-    - jsonnet
+    - libjsonnet
     - root
   run:
     - libboost-devel >=1.90,<1.91
     - fmt
     - tbb
     - spdlog
-    - jsonnet
+    - libjsonnet
     - root
 
 tests:

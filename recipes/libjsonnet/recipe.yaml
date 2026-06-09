@@ -2,7 +2,9 @@ context:
   version: "0.22.0"
 
 package:
-  name: jsonnet
+  # Named `libjsonnet` (not `jsonnet`) to disambiguate from conda-forge's
+  # `jsonnet`, which packages only the Python bindings.
+  name: libjsonnet
   version: ${{ version }}
 
 source:
@@ -10,6 +12,7 @@ source:
   sha256: 5914b9904d97efa662d919519cef1a14e4132bfddddaeed8b061b4a8af628f8d
 
 build:
+  number: 0
   skip:
     - win
   script: build.sh
@@ -24,7 +27,11 @@ requirements:
 
 tests:
   - package_contents:
+      bin:
+        - jsonnet
       lib:
         - jsonnet
+        - jsonnet++
       include:
         - libjsonnet.h
+        - libjsonnet++.h
