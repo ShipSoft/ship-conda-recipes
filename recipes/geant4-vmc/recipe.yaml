@@ -1,13 +1,17 @@
+context:
+  version: "6.8"
+  tag: "v6-8"
+
 package:
   name: geant4-vmc
-  version: "6.7.1"
+  version: ${{ version }}
 
 source:
-  url: https://github.com/vmc-project/geant4_vmc/archive/refs/tags/v6-8.tar.gz
-  sha256: e1e80c78987f94d6e2f9644052a57f43946fc73309197a4c4400906d227d27ae
+  url: https://github.com/vmc-project/geant4_vmc/archive/refs/tags/${{ tag }}.tar.gz
+  sha256: 5fc038ef63739bd7a7bf63e43589af020e37dc2154512619d11a6bed31fbe7b8
 
 build:
-  number: 2
+  number: 0
   script: build.sh
 
 requirements:
