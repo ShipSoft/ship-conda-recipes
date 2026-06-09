@@ -16,17 +16,13 @@ jobs:
         with:
           locked: true
 
-      - name: Build all packages (skip existing)
+      - name: Build all recipes (skip existing)
         run: |
-          for pkg in $(bash ci/build-order.sh); do
-            echo "::group::Building $pkg"
-            pixi run rattler-build build \
-              --recipe "recipes/$pkg" \
-              --channel https://prefix.dev/ship \
-              --channel conda-forge \
-              --skip-existing=all
-            echo "::endgroup::"
-          done
+          pixi run rattler-build build \
+            --recipe-dir recipes/ \
+            --channel https://prefix.dev/ship \
+            --channel conda-forge \
+            --skip-existing=all
 
       - name: Upload to prefix.dev
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'

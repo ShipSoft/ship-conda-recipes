@@ -31,7 +31,16 @@ on a [prefix.dev](https://prefix.dev) channel.
 
 ```bash
 pixi install
-pixi run build-<package-name>
+pixi run build-all
 ```
 
-Packages must be built in tier order (0 → 1 → 2 → 3 → 4).
+Builds every recipe under `recipes/`. rattler-build resolves the
+cross-recipe dependency order from each recipe's `requirements:` block
+and skips packages that have already been built.
+
+To build a single recipe:
+
+```bash
+pixi run rattler-build build --recipe recipes/<package-name> \
+    --channel https://prefix.dev/ship --channel conda-forge
+```
