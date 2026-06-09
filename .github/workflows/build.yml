@@ -18,8 +18,7 @@ on:
 
 jobs:
   build:
-    # TODO: pin to @main once https://github.com/ShipSoft/.github/pull/3 merges.
-    uses: ShipSoft/.github/.github/workflows/rattler-build-and-upload.yml@ci/rattler-build-reusable-workflow
+    uses: ShipSoft/.github/.github/workflows/rattler-build-and-upload.yml@main
     with:
       recipe: ${{ inputs.recipe || '' }}
       force: ${{ inputs.force || false }}
