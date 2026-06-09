@@ -31,10 +31,12 @@
     },
     {
       "customType": "regex",
-      "description": "Update tags in rattler-build recipes (GitHub hardcoded tag sources)",
+      "description": "Update HEP-style tags in rattler-build recipes (context.tag + templated GitHub URL)",
       "managerFilePatterns": ["/recipe\\.yaml$/"],
+      "matchStringsStrategy": "combination",
       "matchStrings": [
-        "url:\\s*https://github\\.com/(?<packageName>[^/]+/[^/]+)/archive/refs/tags/(?<currentValue>[^/${}\\s]+)\\.tar\\.gz"
+        "tag:\\s*\"(?<currentValue>[^\"]+)\"",
+        "url:\\s*https://github\\.com/(?<packageName>[^/]+/[^/]+)/archive/"
       ],
       "datasourceTemplate": "github-tags"
     }
