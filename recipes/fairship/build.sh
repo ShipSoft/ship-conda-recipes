@@ -9,7 +9,6 @@ cmake ${CMAKE_ARGS} ${SRC_DIR} \
     -DCMAKE_CXX_STANDARD=20 \
     -DCMAKE_INSTALL_LIBDIR=lib \
     -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
-    -DGeant4VMC_DIR="${PREFIX}/lib/Geant4VMC-6.7.1" \
     "-DCMAKE_CXX_FLAGS=-isystem ${PREFIX}/include/geant4vmc -isystem ${PREFIX}/include/Geant4"
 cmake --build . -j${CPU_COUNT}
 cmake --install .
