@@ -10,7 +10,7 @@ source:
   sha256: 37833e1b976ec534d8da5b9ec412f297426e2e534ae8e471124f6a1859fe9841
 
 build:
-  number: 3
+  number: 4
   skip:
     - win
   script: build.sh
@@ -32,14 +32,14 @@ requirements:
     - fmt
     - tbb-devel
     - spdlog
-    - jsonnet
+    - libjsonnet
     - root
   run:
     - libboost-devel >=1.90,<1.91
     - fmt
     - tbb
     - spdlog
-    - jsonnet
+    - libjsonnet
     - root
 
 tests:
