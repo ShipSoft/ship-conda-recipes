@@ -7,7 +7,7 @@ source:
   sha256: f503f541f65a7184a386e83b021cdd6c96e78fbc2be65f1ce583d39c1375aca4
 
 build:
-  number: 1
+  number: 2
   script: build.sh
 
 requirements:
@@ -17,14 +17,15 @@ requirements:
     - make
   host:
     - root 6.40.*
-    - geant4
+    - geant4 11.4.*
     - xerces-c
   run:
     - root 6.40.*
-    - geant4
+    - geant4 11.4.*
     - xerces-c
   run_exports:
     - root 6.40.*
+    - geant4 11.4.*
 
 tests:
   - script:

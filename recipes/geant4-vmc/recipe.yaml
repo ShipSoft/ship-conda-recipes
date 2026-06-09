@@ -7,7 +7,7 @@ source:
   sha256: e1e80c78987f94d6e2f9644052a57f43946fc73309197a4c4400906d227d27ae
 
 build:
-  number: 1
+  number: 2
   script: build.sh
 
 requirements:
@@ -18,17 +18,18 @@ requirements:
   host:
     - root 6.40.*
     - vmc
-    - geant4
+    - geant4 11.4.*
     - vgm
     - xerces-c
   run:
     - root 6.40.*
     - vmc
-    - geant4
+    - geant4 11.4.*
     - vgm
     - xerces-c
   run_exports:
     - root 6.40.*
+    - geant4 11.4.*
 
 tests:
   - script:
