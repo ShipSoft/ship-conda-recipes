@@ -6,32 +6,24 @@ on:
   pull_request:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      recipe:
+        description: Single recipe directory (e.g. random123); empty = all
+        type: string
+        default: ''
+      force:
+        description: Drop --skip-existing (use to rebuild over the same version)
+        type: boolean
+        default: false
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-      - uses: prefix-dev/setup-pixi@v0.9.6
-        with:
-          locked: true
-
-      - name: Build all recipes (skip existing)
-        run: |
-          pixi run rattler-build build \
-            --recipe-dir recipes/ \
-            --channel https://prefix.dev/ship \
-            --channel conda-forge \
-            --skip-existing=all
-
-      - name: Upload to prefix.dev
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        env:
-          PREFIX_DEV_API_KEY: ${{ secrets.PREFIX_DEV_API_KEY }}
-        run: |
-          for pkg in output/linux-64/*.conda output/noarch/*.conda; do
-            [ -f "$pkg" ] || continue
-            pixi run rattler-build upload prefix \
-              --api-key "$PREFIX_DEV_API_KEY" \
-              -c ship --skip-existing "$pkg"
-          done
+    # TODO: pin to @main once https://github.com/ShipSoft/.github/pull/3 merges.
+    uses: ShipSoft/.github/.github/workflows/rattler-build-and-upload.yml@ci/rattler-build-reusable-workflow
+    with:
+      recipe: ${{ inputs.recipe || '' }}
+      force: ${{ inputs.force || false }}
+      upload: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+      channel-name: ship
+    secrets:
+      prefix-dev-api-key: ${{ secrets.PREFIX_DEV_API_KEY }}
