@@ -1,0 +1,61 @@
+name: Channel snapshot
+
+on:
+  schedule:
+    - cron: '0 6 * * 1'  # Mondays, 06:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Generate channel snapshot
+        run: |
+          set -euo pipefail
+          {
+            echo "# prefix.dev/ship channel snapshot"
+            echo
+            echo "_Updated: $(date -u +%Y-%m-%d)_"
+            for subdir in linux-64 noarch; do
+              repodata=$(curl -fsSL "https://prefix.dev/ship/${subdir}/repodata.json" 2>/dev/null) || continue
+              count=$(echo "$repodata" | jq '."packages.conda" | length')
+              [ "$count" = "0" ] && continue
+              echo
+              echo "## ${subdir}"
+              echo
+              echo "| Package | Version | Build | Build number | Uploaded |"
+              echo "|---------|---------|-------|--------------|----------|"
+              echo "$repodata" | jq -r '
+                ."packages.conda"
+                | to_entries
+                | map(.value)
+                | sort_by(.name, .version, (.build_number // 0))
+                | .[]
+                | "| \(.name) | \(.version) | `\(.build)` | \(.build_number // 0) | \(((.timestamp // 0) / 1000) | strftime("%Y-%m-%d")) |"
+              '
+            done
+          } > channel-snapshot.md
+
+      - name: Open / update snapshot PR
+        uses: peter-evans/create-pull-request@v8
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: 'chore(snapshot): refresh prefix.dev/ship channel snapshot'
+          title: 'chore: refresh channel snapshot'
+          body: |
+            Weekly snapshot of the [prefix.dev/ship](https://prefix.dev/channels/ship) channel.
+
+            Auto-generated; merge to keep `channel-snapshot.md` current. The diff
+            shows new builds, version bumps, and any accidental publishes since
+            the last snapshot.
+          branch: channel-snapshot
+          base: main
+          labels: snapshot
+          delete-branch: true
+          add-paths: channel-snapshot.md
