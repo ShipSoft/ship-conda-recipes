@@ -10,7 +10,7 @@ source:
   sha256: 37833e1b976ec534d8da5b9ec412f297426e2e534ae8e471124f6a1859fe9841
 
 build:
-  number: 4
+  number: 5
   skip:
     - win
   script: build.sh
@@ -24,6 +24,7 @@ build:
 requirements:
   build:
     - ${{ compiler('cxx') }}
+    - sysroot_linux-64 2.17.*
     - cmake
     - make
   host:
