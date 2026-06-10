@@ -9,7 +9,7 @@ source:
     - restore-dummy-pdflib.patch
 
 build:
-  number: 3
+  number: 4
   script: build.sh
 
 requirements:
@@ -17,6 +17,7 @@ requirements:
     - ${{ compiler('c') }}
     - ${{ compiler('cxx') }}
     - ${{ compiler('fortran') }}
+    - sysroot_linux-64 2.17.*
     - cmake
     - make
 

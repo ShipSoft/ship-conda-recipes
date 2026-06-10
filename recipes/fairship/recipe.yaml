@@ -10,12 +10,13 @@ source:
   sha256: 70659bb8b25078e696165c8a54f317dcbc009a2ef5bde267c5cc8512eefcca6d
 
 build:
-  number: 2
+  number: 3
   script: build.sh
 
 requirements:
   build:
     - ${{ compiler('cxx') }}
+    - sysroot_linux-64 2.17.*
     - cmake
     - make
   host:

@@ -10,12 +10,13 @@ source:
     - fix-pythia6-private-link.patch
 
 build:
-  number: 3
+  number: 4
   script: build.sh
 
 requirements:
   build:
     - ${{ compiler('cxx') }}
+    - sysroot_linux-64 2.17.*
     - cmake
     - make
   host:
