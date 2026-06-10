@@ -3,8 +3,8 @@ package:
   version: "6.4.28"
 
 source:
-  url: https://github.com/SND-LHC/pythia6/archive/refs/tags/v6.4.28-snd.tar.gz
-  sha256: d5558cd419c8d46bdc958064cb97f963d1ea793866414c025906ec15033512ed
+  url: https://github.com/SND-LHC/pythia6/archive/a918d08839df79965787e1fbf43ea16acc1e443d.tar.gz
+  sha256: 3806efdb4fd1e295082f193bd0d03800d3fa904525cb82b0a9540401701711fa
   patches:
     - restore-dummy-pdflib.patch
 
