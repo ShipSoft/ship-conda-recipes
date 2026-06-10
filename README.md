@@ -7,25 +7,33 @@ on a [prefix.dev](https://prefix.dev) channel.
 
 ## Packages
 
-| Package | Version | Tier | Upstream candidate? |
-|---------|---------|------|---------------------|
-| pythia6 | 6.4.28 | 0 | No (SND-LHC fork) |
-| ganga | 8.7.12 | 0 | No (HEP-specific, not in conda-forge today) |
-| gsl-lite | 1.1.0 | 0 | No (newer than conda-forge) |
-| mp-units | 2.5.0 | 0 | Yes (conda-forge feedstock) |
-| random123 | 1.14.0 | 0 | Yes (conda-forge feedstock) |
-| vmc | 2.2 | 1 | Yes |
-| vgm | 5.4 | 1 | Yes |
-| rootegpythia6 | 0.1 | 1 | No (niche) |
-| genfit | 2.3.0 | 1 | Yes |
-| photospp | 3.64 | 1 | Yes |
-| shipdatamodel | 26.06.0 | 1 | No (SHiP-specific) |
-| geant3 | 4.5 | 2 | Yes |
-| geant4-vmc | 6.8 | 2 | Yes |
-| shipgeometry | 0.1.0 | 2 | No (SHiP-specific) |
-| fairroot | 19.0.1 | 3 | No (carries patch) |
-| shipgeometryservice | 26.06.0 | 3 | No (SHiP-specific) |
-| aegir | 0.1.0 | 4 | No (SHiP-specific) |
+| Package | Version | Upstream candidate? |
+|---------|---------|---------------------|
+| pythia6 | 6.4.28 | No (SND-LHC fork) |
+| ganga | 8.7.12 | No (HEP-specific, not in conda-forge today) |
+| gsl-lite | 1.1.0 | No (newer than conda-forge) |
+| mp-units | 2.5.0 | Yes (conda-forge feedstock) |
+| random123 | 1.14.0 | Yes (conda-forge feedstock) |
+| vmc | 2.2 | Yes |
+| vgm | 5.4 | Yes |
+| rootegpythia6 | 0.1 | No (niche) |
+| genfit | 2.3.0 | Yes |
+| photospp | 3.64 | Yes |
+| shipdatamodel | 26.06.0 | No (SHiP-specific) |
+| geant3 | 4.5 | Yes |
+| geant4-vmc | 6.8 | Yes |
+| shipgeometry | 0.1.0 | No (SHiP-specific) |
+| fairroot | 19.0.1 | No (carries patch) |
+| shipgeometryservice | 26.06.0 | No (SHiP-specific) |
+| aegir | 0.1.0 | No (SHiP-specific) |
+
+### Upstreamed to conda-forge
+
+Previously packaged here, now consumed directly from conda-forge:
+
+- [FairLogger](https://github.com/conda-forge/fairlogger-feedstock)
+- [FairCMakeModules](https://github.com/conda-forge/faircmakemodules-feedstock)
+- [cetmodules](https://github.com/conda-forge/cetmodules-feedstock)
 
 ## Building
 
