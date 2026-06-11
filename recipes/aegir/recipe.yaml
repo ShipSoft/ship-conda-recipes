@@ -62,3 +62,22 @@ tests:
       - test -f $PREFIX/lib/libsim_output_module.so
       - test -f $PREFIX/bin/pythia8_benchmark
       - test -d $PREFIX/share/aegir/workflows
+
+about:
+  homepage: https://github.com/ShipSoft/aegir
+  repository: https://github.com/ShipSoft/aegir
+  summary: Phlex-based simulation framework for the SHiP experiment
+  description: |
+    aegir is the next-generation simulation framework for the SHiP
+    experiment, built on top of the Phlex parallel data-processing
+    toolkit and the SHiP event data model. It composes pluggable
+    sources (particle gun, Pythia8, fixed-target), geometry providers
+    (built-in, GDML, GeoModel via SHiPGeometryService), a Geant4
+    transform module, and an RNTuple-based output observer into a
+    multi-threaded simulation workflow.
+  license: LGPL-3.0-or-later
+  license_file: LICENSE.md
+
+extra:
+  recipe-maintainers:
+    - olantwin

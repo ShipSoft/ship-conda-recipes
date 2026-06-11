@@ -30,3 +30,22 @@ tests:
   - script:
       - test -d $PREFIX/include/mp-units
       - test -f $PREFIX/lib/cmake/mp-units/mp-unitsConfig.cmake
+
+about:
+  homepage: https://mpusz.github.io/mp-units/
+  repository: https://github.com/mpusz/mp-units
+  summary: Domain-correct C++ quantities and units library (ISO 80000)
+  description: |
+    mp-units is a modern C++ (C++20 and later) library providing
+    compile-time safety for domain-specific quantities and units,
+    from dimensional analysis to quantity-kind safety. Built on the
+    ISO 80000 International System of Quantities, it prevents
+    accidental mixing of quantities sharing the same dimension but
+    representing different physical concepts and is a C++29
+    standardisation candidate.
+  license: MIT
+  license_file: LICENSE.md
+
+extra:
+  recipe-maintainers:
+    - olantwin

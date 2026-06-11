@@ -25,3 +25,20 @@ tests:
   - script:
       - test -f $PREFIX/lib/libpythia6.so
       - test -f $PREFIX/lib/libPythia6.so
+
+about:
+  homepage: https://pythia.org/pythia6/
+  repository: https://github.com/SND-LHC/pythia6
+  summary: Pythia6 event generator sources (SND@LHC distribution)
+  description: |
+    Pythia6 is the legacy Fortran version of the Pythia high-energy
+    physics event generator, providing parton showers, multi-parton
+    interactions and hadronisation for hadronic collisions. This
+    repository is the SND@LHC distribution of the sources (originally
+    repackaged for ALICE) used for building Pythia6 as a shared
+    library against ROOT.
+  license: GPL-2.0-or-later
+
+extra:
+  recipe-maintainers:
+    - olantwin

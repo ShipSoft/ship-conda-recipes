@@ -36,3 +36,21 @@ tests:
   - script:
       - test -f $PREFIX/lib/libBaseVGM.a
       - test -d $PREFIX/include/VGM
+
+about:
+  homepage: https://vmc-project.github.io
+  repository: https://github.com/vmc-project/vgm
+  summary: Virtual Geometry Model — Geant4 / ROOT TGeo geometry conversion
+  description: |
+    VGM (Virtual Geometry Model) is a geometry conversion tool that
+    provides bidirectional conversion between the Geant4 and ROOT
+    TGeo geometry models. Its design allows additional geometry
+    models to be integrated by implementing a single sub-module
+    rather than writing bilateral converters between every pair of
+    existing models.
+  license: GPL-3.0-or-later
+  license_file: LICENSE
+
+extra:
+  recipe-maintainers:
+    - olantwin

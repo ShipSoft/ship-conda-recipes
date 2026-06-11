@@ -60,3 +60,20 @@ tests:
       - test -f $PREFIX/lib/libShipData.so
       - test -d $PREFIX/include
       - test -d $PREFIX/share/FairShip/geometry
+
+about:
+  homepage: https://ship.web.cern.ch/
+  repository: https://github.com/ShipSoft/FairShip
+  summary: SHiP experiment software framework based on FairRoot
+  description: |
+    FairShip is the simulation, reconstruction and analysis framework
+    for the SHiP (Search for Hidden Particles) experiment at CERN. It
+    is built on top of FairRoot and provides the SHiP detector
+    description, event generators, digitisation, reconstruction and
+    analysis tools used by the collaboration.
+  license: LGPL-3.0-or-later
+  license_file: LICENSE
+
+extra:
+  recipe-maintainers:
+    - olantwin

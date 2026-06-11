@@ -40,3 +40,21 @@ tests:
   - python:
       imports:
         - ganga
+
+about:
+  homepage: https://ganga.readthedocs.io/
+  repository: https://github.com/ganga-devs/ganga
+  summary: Easy-to-use frontend for job definition and management
+  description: |
+    Ganga is a tool to compose, run and track computing jobs across a
+    variety of backends and application types. It provides a
+    user-friendly command-line and interactive IPython interface that
+    abstracts batch systems, the grid and cloud back-ends behind a
+    uniform Python API, and is widely used in high-energy physics for
+    distributed analysis and production workflows.
+  license: GPL-3.0-or-later
+  license_file: LICENSE_GPL
+
+extra:
+  recipe-maintainers:
+    - olantwin

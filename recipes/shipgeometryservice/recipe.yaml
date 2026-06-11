@@ -39,3 +39,21 @@ tests:
       - test -f $PREFIX/lib/libSHiPGeometryService.so
       - test -f $PREFIX/lib/cmake/SHiPGeometryService/SHiPGeometryServiceConfig.cmake
       - test -f $PREFIX/include/GeometryService/SHiPGeometryService.h
+
+about:
+  homepage: https://github.com/ShipSoft/geometry_service
+  repository: https://github.com/ShipSoft/geometry_service
+  summary: Framework-agnostic C++20 service wrapping the SHiP GeoModel geometry
+  description: |
+    SHiPGeometryService is a framework-agnostic C++20 library that
+    wraps the SHiP GeoModel geometry behind a stable, abstract
+    interface (IGeometryService) inspired by DD4hep's IGeoSvc and
+    ALICE O2's GeometryManager. It supports loading the geometry
+    either from the SHiPGeometry builder or from a GeoModel SQLite
+    file, and lazily converts it to Geant4 logical volumes on demand.
+  license: LGPL-3.0-or-later
+  license_file: LICENSES/LGPL-3.0-or-later.txt
+
+extra:
+  recipe-maintainers:
+    - olantwin

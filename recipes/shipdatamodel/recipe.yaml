@@ -33,3 +33,21 @@ tests:
       - test -f $PREFIX/lib/libSHiPDataModel_rdict.pcm
       - test -f $PREFIX/lib/cmake/SHiPDataModel/SHiPDataModelConfig.cmake
       - test -f $PREFIX/include/SHiP/MCParticle.hpp
+
+about:
+  homepage: https://github.com/ShipSoft/data-model
+  repository: https://github.com/ShipSoft/data-model
+  summary: Event data model for the SHiP experiment
+  description: |
+    SHiPDataModel provides the C++ event data classes for the SHiP
+    experiment, with ROOT dictionary support for I/O via TTree and
+    RNTuple. The classes (MCParticle, SimHit, SimParticle, SimResult)
+    are plain structs with default member initialisers and are
+    consumed by downstream SHiP simulation, digitisation and
+    reconstruction packages.
+  license: LGPL-3.0-or-later
+  license_file: LICENSES/LGPL-3.0-or-later.txt
+
+extra:
+  recipe-maintainers:
+    - olantwin

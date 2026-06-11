@@ -45,3 +45,21 @@ tests:
   - package_contents:
       lib:
         - GeoModelKernel
+
+about:
+  homepage: https://geomodel.web.cern.ch/
+  repository: https://gitlab.cern.ch/GeoModelDev/GeoModel
+  summary: GeoModel libraries and tools for detector geometry description
+  description: |
+    GeoModel is a lightweight, framework-agnostic C++ toolkit for
+    describing detector geometries originally developed for the ATLAS
+    experiment. It provides the core geometry kernel, I/O utilities
+    (SQLite, GDML), conversion tools to Geant4 and a visualization
+    stack, and is used by multiple HEP experiments to share a common
+    geometry representation.
+  license: Apache-2.0
+  license_file: LICENSE
+
+extra:
+  recipe-maintainers:
+    - olantwin

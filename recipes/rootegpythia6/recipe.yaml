@@ -31,3 +31,21 @@ requirements:
 tests:
   - script:
       - test -f $PREFIX/lib/libEGPythia6.so
+
+about:
+  homepage: https://github.com/luketpickering/ROOTEGPythia6
+  repository: https://github.com/luketpickering/ROOTEGPythia6
+  summary: Standalone ROOT EGPythia6 library (extracted from ROOT 6.28)
+  description: |
+    ROOTEGPythia6 packages the EGPythia6 library — ROOT's TGenerator
+    interface to the Pythia6 event generator — as a standalone CMake
+    project. The code was extracted from the ROOT 6.28 source tree
+    after EGPythia6 was removed from ROOT itself in v6.30, allowing
+    downstream experiments to keep using Pythia6 through the familiar
+    TPythia6 interface.
+  license: GPL-3.0-or-later
+  license_file: LICENSE
+
+extra:
+  recipe-maintainers:
+    - olantwin

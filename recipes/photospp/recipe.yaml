@@ -38,3 +38,21 @@ tests:
       - test -f $PREFIX/lib/libPhotospp.so
       - test -f $PREFIX/lib/libPhotosppHepMC3.so
       - test -d $PREFIX/include/Photos
+
+about:
+  homepage: https://photospp.web.cern.ch/
+  repository: https://gitlab.cern.ch/photospp/photospp
+  summary: C++ implementation of the PHOTOS QED radiative-corrections Monte Carlo
+  description: |
+    PHOTOS++ is the C++ implementation of the PHOTOS Monte Carlo
+    algorithm for simulating QED bremsstrahlung corrections in decays
+    of particles and resonances. It is intended to be interfaced to
+    event generators such as Pythia and to event records in
+    HepMC2/HepMC3 format, and is widely used in LHC experiment
+    simulation chains.
+  license: MIT
+  license_file: LICENSE
+
+extra:
+  recipe-maintainers:
+    - olantwin

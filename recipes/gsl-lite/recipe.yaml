@@ -26,3 +26,21 @@ tests:
   - script:
       - test -d $PREFIX/include/gsl-lite
       - test -f $PREFIX/share/cmake/gsl-lite/gsl-liteConfig.cmake
+
+about:
+  homepage: https://gsl-lite.github.io/gsl-lite/
+  repository: https://github.com/gsl-lite/gsl-lite
+  summary: ISO C++ Core Guidelines Support Library implementation (C++98 and later)
+  description: |
+    gsl-lite is a portable, single-file, header-only library
+    implementing the C++ Core Guidelines Support Library (GSL)
+    specification. It targets a wide range of compilers and language
+    standards from C++98 through C++23 (including CUDA) and provides
+    the GSL types and utilities used for defensive programming, such
+    as span, not_null, narrow, and assertion macros.
+  license: MIT
+  license_file: LICENSE
+
+extra:
+  recipe-maintainers:
+    - olantwin
