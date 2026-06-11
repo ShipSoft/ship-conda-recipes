@@ -1,12 +1,12 @@
 context:
-  version: "v6-8"
+  version: "6-8"
 
 package:
   name: geant4-vmc
-  version: ${{ version | replace("v", "") | replace("-", ".") }}
+  version: ${{ version | replace("-", ".") }}
 
 source:
-  url: https://github.com/vmc-project/geant4_vmc/archive/refs/tags/${{ version }}.tar.gz
+  url: https://github.com/vmc-project/geant4_vmc/archive/refs/tags/v${{ version }}.tar.gz
   sha256: 5fc038ef63739bd7a7bf63e43589af020e37dc2154512619d11a6bed31fbe7b8
 
 build:
