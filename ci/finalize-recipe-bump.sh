@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
-# Refresh sha256 and derive context.version after a tag bump in a rattler-build
-# recipe that uses the context.{version, tag} pattern (HEP-style upstream tags
-# like v6-8, v6-7-p1).
+# Refresh sha256 in a rattler-build recipe after Renovate bumps
+# context.version. The recipes use a single context.version field that holds
+# the upstream tag form (e.g. "2-2", "6-8") and a source URL templated as
+# .../v${{ version }}.tar.gz; the dotted package.version is derived via Jinja
+# in the recipe itself, so this script does not touch the version line.
 #
 # Usage: ci/finalize-recipe-bump.sh path/to/recipe.yaml [more.yaml ...]
 #
@@ -14,11 +16,11 @@ for recipe in "$@"; do
     continue
   fi
 
-  tag=$(grep -E '^[[:space:]]+tag:[[:space:]]*"' "$recipe" \
-        | head -1 \
-        | sed -E 's/^[[:space:]]+tag:[[:space:]]*"([^"]+)".*/\1/')
-  if [ -z "$tag" ]; then
-    echo "skip: $recipe (no context.tag field — not a HEP-tag recipe)" >&2
+  version=$(grep -E '^[[:space:]]+version:[[:space:]]*"' "$recipe" \
+            | head -1 \
+            | sed -E 's/^[[:space:]]+version:[[:space:]]*"([^"]+)".*/\1/')
+  if [ -z "$version" ]; then
+    echo "skip: $recipe (no context.version field)" >&2
     continue
   fi
 
@@ -26,16 +28,14 @@ for recipe in "$@"; do
                  | head -1 \
                  | sed -E 's/^[[:space:]]+url:[[:space:]]*//')
   url=$(echo "$url_template" \
-        | sed -E "s|\\\$\\{\\{[[:space:]]*tag[[:space:]]*\\}\\}|$tag|g")
+        | sed -E "s|\\\$\\{\\{[[:space:]]*version[[:space:]]*\\}\\}|$version|g")
 
-  echo "[$recipe] tag=$tag" >&2
+  echo "[$recipe] version=$version" >&2
   echo "[$recipe] url=$url" >&2
 
   new_sha=$(curl -fsSL "$url" | sha256sum | cut -d' ' -f1)
-  new_version=$(echo "$tag" | sed -E 's/^v//; s/-p([0-9]+)/.\1/g; s/-/./g')
 
   sed -i -E "s|^([[:space:]]+sha256:[[:space:]]*)[a-f0-9]+|\\1$new_sha|" "$recipe"
-  sed -i -E "/^[[:space:]]+version:[[:space:]]/s|\"[^\"]+\"|\"$new_version\"|" "$recipe"
 
-  echo "[$recipe] sha256=$new_sha version=$new_version" >&2
+  echo "[$recipe] sha256=$new_sha" >&2
 done
