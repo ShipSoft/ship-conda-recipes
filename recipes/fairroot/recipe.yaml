@@ -60,3 +60,21 @@ tests:
   - script:
       - test -f $PREFIX/lib/libFairTools.so
       - test -d $PREFIX/include
+
+about:
+  homepage: http://fairroot.gsi.de
+  repository: https://github.com/FairRootGroup/FairRoot
+  summary: C++ simulation, reconstruction and analysis framework for particle physics
+  description: |
+    FairRoot is a simulation, reconstruction and analysis framework
+    based on the ROOT system. It supports both Geant3 and Geant4
+    transport engines through the Virtual Monte Carlo interface and
+    provides base classes for detector construction, event generation,
+    digitisation, reconstruction and analysis tasks, including track
+    visualisation and magnetic-field interfaces.
+  license: LGPL-3.0-or-later
+  license_file: LICENSE
+
+extra:
+  recipe-maintainers:
+    - olantwin

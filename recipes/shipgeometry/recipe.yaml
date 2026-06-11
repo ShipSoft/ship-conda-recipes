@@ -45,3 +45,21 @@ tests:
       - test -f $PREFIX/bin/build_geometry
       - test -f $PREFIX/bin/validate_geometry
       - test -f $PREFIX/lib/cmake/SHiPGeometry/SHiPGeometryConfig.cmake
+
+about:
+  homepage: https://github.com/ShipSoft/Geometry
+  repository: https://github.com/ShipSoft/Geometry
+  summary: SHiP detector description implemented in GeoModel
+  description: |
+    This package contains the SHiP experiment detector geometry
+    implemented using the GeoModel toolkit. It provides the cavern,
+    target, muon shield, magnet, decay volume, trackers, calorimeter,
+    upstream tagger and timing detector subsystems as a set of
+    libraries plus executables to build and validate the resulting
+    GeoModel geometry database.
+  license: LGPL-3.0-or-later
+  license_file: LICENSES/LGPL-3.0-or-later.txt
+
+extra:
+  recipe-maintainers:
+    - olantwin

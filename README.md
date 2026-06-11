@@ -9,23 +9,27 @@ on a [prefix.dev](https://prefix.dev) channel.
 
 | Package | Version | Upstream candidate? |
 |---------|---------|---------------------|
-| pythia6 | 6.4.28 | No (SND-LHC fork) |
+| aegir | 0.1.0 | No (SHiP-specific) |
+| fairroot | 19.0.1 | No (carries patch) |
+| fairship | 26.05.7 | No (SHiP-specific) |
 | ganga | 8.7.12 | No (HEP-specific, not in conda-forge today) |
-| gsl-lite | 1.1.0 | No (newer than conda-forge) |
-| mp-units | 2.5.0 | Yes (conda-forge feedstock) |
-| random123 | 1.14.0 | Yes (conda-forge feedstock) |
-| vmc | 2.2 | Yes |
-| vgm | 5.4 | Yes |
-| rootegpythia6 | 0.1 | No (niche) |
-| genfit | 2.3.0 | Yes |
-| photospp | 3.64 | Yes |
-| shipdatamodel | 26.06.0 | No (SHiP-specific) |
 | geant3 | 4.5 | Yes |
 | geant4-vmc | 6.8 | Yes |
+| genfit | 2.3.0 | Yes |
+| geomodel | 6.27.0 | Yes (ATLAS-maintained, candidate for conda-forge) |
+| gsl-lite | 1.1.0 | No (newer than conda-forge) |
+| libjsonnet | 0.22.0 | No (older than conda-forge; pinned for phlex) |
+| mp-units | 2.5.0 | Yes (conda-forge feedstock) |
+| phlex | 0.2.0 | No (Framework-R-D, not yet on conda-forge) |
+| photospp | 3.64 | Yes |
+| pythia6 | 6.4.28 | No (SND-LHC fork) |
+| random123 | 1.14.0 | Yes (conda-forge feedstock) |
+| rootegpythia6 | 0.1 | No (niche) |
+| shipdatamodel | 26.06.0 | No (SHiP-specific) |
 | shipgeometry | 0.1.0 | No (SHiP-specific) |
-| fairroot | 19.0.1 | No (carries patch) |
 | shipgeometryservice | 26.06.0 | No (SHiP-specific) |
-| aegir | 0.1.0 | No (SHiP-specific) |
+| vgm | 5.4 | Yes |
+| vmc | 2.2 | Yes |
 
 ### Upstreamed to conda-forge
 

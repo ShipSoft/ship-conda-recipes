@@ -41,3 +41,20 @@ tests:
       - test -f $PREFIX/lib/libgeant4vmc.so
       - test -f $PREFIX/lib/libg4root.so
       - test -d $PREFIX/include/geant4vmc
+
+about:
+  homepage: https://vmc-project.github.io
+  repository: https://github.com/vmc-project/geant4_vmc
+  summary: Virtual Monte Carlo interface implementation for Geant4
+  description: |
+    Geant4 VMC implements the Virtual Monte Carlo (VMC) interface for
+    the Geant4 simulation toolkit, allowing VMC-based simulation
+    applications to use Geant4 as their transport engine. The package
+    also includes the G4Root module (Geant4 navigation through ROOT
+    TGeo geometries) and a set of VMC example applications.
+  license: GPL-3.0-or-later
+  license_file: LICENSE
+
+extra:
+  recipe-maintainers:
+    - olantwin

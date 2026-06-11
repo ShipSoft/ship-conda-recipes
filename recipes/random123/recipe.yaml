@@ -20,3 +20,22 @@ tests:
   - script:
       - test -f $PREFIX/include/Random123/philox.h
       - test -f $PREFIX/include/Random123/threefry.h
+
+about:
+  homepage: https://www.deshawresearch.com/resources_random123.html
+  repository: https://github.com/DEShawResearch/random123
+  summary: Counter-based random number generators for C, C++ and CUDA
+  description: |
+    Random123 is a collection of fast, high-quality, counter-based
+    pseudo-random number generators (Threefry, Philox, ARS and AES)
+    designed for statistical applications and Monte Carlo simulation
+    on CPUs and GPUs. The generators pass the SmallCrush, Crush and
+    BigCrush TestU01 batteries and are well suited to massively
+    parallel workloads, but are explicitly not intended for
+    cryptographic use.
+  license: BSD-3-Clause
+  license_file: LICENSE
+
+extra:
+  recipe-maintainers:
+    - olantwin

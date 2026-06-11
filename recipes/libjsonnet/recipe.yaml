@@ -36,3 +36,20 @@ tests:
       include:
         - libjsonnet.h
         - libjsonnet++.h
+
+about:
+  homepage: https://jsonnet.org
+  repository: https://github.com/google/jsonnet
+  summary: The data templating language
+  description: |
+    Jsonnet is a data templating language designed for application
+    and configuration management. It extends JSON with variables,
+    functions, conditionals, arithmetic, and object-oriented features
+    while guaranteeing hermetic, side-effect-free evaluation; programs
+    compile down to plain JSON, YAML or other structured formats.
+  license: Apache-2.0
+  license_file: LICENSE
+
+extra:
+  recipe-maintainers:
+    - olantwin

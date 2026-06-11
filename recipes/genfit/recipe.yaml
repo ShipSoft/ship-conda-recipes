@@ -30,3 +30,22 @@ tests:
   - script:
       - test -f $PREFIX/lib/libgenfit2.so
       - test -f $PREFIX/include/AbsFitter.h
+
+about:
+  homepage: https://github.com/GenFit/GenFit
+  repository: https://github.com/GenFit/GenFit
+  summary: Experiment-independent track-fitting toolkit
+  description: |
+    GenFit is a generic, experiment-independent framework for track
+    reconstruction in particle and nuclear physics. It provides three
+    modular components: track-fitting algorithms (Kalman Filter,
+    Deterministic Annealing Filter and others), track representations
+    with material- and field-aware extrapolation, and a flexible
+    measurement interface supporting TPCs, wire chambers and other
+    detector types.
+  license: LGPL-3.0-or-later
+  license_file: LICENSE.md
+
+extra:
+  recipe-maintainers:
+    - olantwin

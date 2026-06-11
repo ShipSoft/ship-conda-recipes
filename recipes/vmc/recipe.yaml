@@ -31,3 +31,22 @@ tests:
   - script:
       - test -f $PREFIX/lib/libVMCLibrary.so
       - test -d $PREFIX/include/vmc
+
+about:
+  homepage: https://vmc-project.github.io
+  repository: https://github.com/vmc-project/vmc
+  summary: The Virtual Monte Carlo core library
+  description: |
+    The Virtual Monte Carlo (VMC) core library defines a detector
+    simulation framework that allows applications to switch between
+    different Monte Carlo transport codes (Geant3, Geant4, FLUKA)
+    without changing the user code, input/output format or geometry
+    definition. This package provides the transport-engine-independent
+    interfaces and base classes against which concrete VMC backends
+    (geant3, geant4-vmc, ...) are implemented.
+  license: GPL-3.0-or-later
+  license_file: LICENSE
+
+extra:
+  recipe-maintainers:
+    - olantwin

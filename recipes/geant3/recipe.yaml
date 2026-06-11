@@ -30,3 +30,20 @@ requirements:
 tests:
   - script:
       - test -f $PREFIX/lib/libgeant321.so || test -f $PREFIX/lib64/libgeant321.so
+
+about:
+  homepage: https://vmc-project.github.io
+  repository: https://github.com/vmc-project/geant3
+  summary: Geant3.21 with the TGeant3 Virtual Monte Carlo interface
+  description: |
+    This package bundles the classic Geant3.21 Monte Carlo transport
+    code together with TGeant3, the implementation of the Virtual
+    Monte Carlo (VMC) interface for Geant3.21. VMC allows simulation
+    applications to switch between different Monte Carlo transport
+    engines (Geant3, Geant4, FLUKA) without changing the user code,
+    input/output format or geometry definition.
+  license: GPL-3.0-or-later
+
+extra:
+  recipe-maintainers:
+    - olantwin
