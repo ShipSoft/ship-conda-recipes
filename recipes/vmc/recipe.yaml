@@ -1,13 +1,12 @@
 context:
-  version: "2.2"
-  tag: "v2-2"
+  version: "v2-2"
 
 package:
   name: vmc
-  version: ${{ version }}
+  version: ${{ version | replace("v", "") | replace("-", ".") }}
 
 source:
-  url: https://github.com/vmc-project/vmc/archive/refs/tags/${{ tag }}.tar.gz
+  url: https://github.com/vmc-project/vmc/archive/refs/tags/${{ version }}.tar.gz
   sha256: 6da6a32352c5a3eb62d07aed92414a0baf2793f6ec0630402e3df7fcb1b73d7b
 
 build:
