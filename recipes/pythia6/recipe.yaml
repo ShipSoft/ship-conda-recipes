@@ -37,6 +37,8 @@ about:
     repository is the SND@LHC distribution of the sources (originally
     repackaged for ALICE) used for building Pythia6 as a shared
     library against ROOT.
+  # Upstream tarball ships no LICENSE; GPL-2.0 is the historical
+  # Pythia 6.4 license per the physics manual (arXiv:hep-ph/0603175).
   license: GPL-2.0-or-later
 
 extra:
