@@ -28,17 +28,6 @@
       "datasourceTemplate": "gitlab-tags",
       "registryUrlTemplate": "https://gitlab.cern.ch",
       "extractVersionTemplate": "^v?(?<version>.+)$"
-    },
-    {
-      "customType": "regex",
-      "description": "Update HEP-style tags in rattler-build recipes (context.tag + templated GitHub URL)",
-      "managerFilePatterns": ["/recipe\\.yaml$/"],
-      "matchStringsStrategy": "combination",
-      "matchStrings": [
-        "tag:\\s*\"(?<currentValue>[^\"]+)\"",
-        "url:\\s*https://github\\.com/(?<packageName>[^/]+/[^/]+)/archive/"
-      ],
-      "datasourceTemplate": "github-tags"
     }
   ],
   "packageRules": [
