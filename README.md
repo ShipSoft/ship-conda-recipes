@@ -27,8 +27,6 @@ on a [prefix.dev](https://prefix.dev) channel.
 | shipdatamodel | 26.06.0 | No (SHiP-specific) |
 | shipgeometry | 0.1.0 | No (SHiP-specific) |
 | shipgeometryservice | 26.06.0 | No (SHiP-specific) |
-| vgm | 5.4 | Yes |
-| vmc | 2.2 | Yes |
 
 ### Upstreamed to conda-forge
 
@@ -38,6 +36,8 @@ Previously packaged here, now consumed directly from conda-forge:
 - [FairCMakeModules](https://github.com/conda-forge/faircmakemodules-feedstock)
 - [cetmodules](https://github.com/conda-forge/cetmodules-feedstock)
 - [libjsonnet](https://github.com/conda-forge/libjsonnet-feedstock)
+- [vmc](https://github.com/conda-forge/vmc-feedstock)
+- [vgm](https://github.com/conda-forge/vgm-feedstock)
 
 ## Building
 
