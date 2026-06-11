@@ -5,7 +5,6 @@ cmake ${CMAKE_ARGS} ${SRC_DIR} \
     -DCMAKE_INSTALL_LIBDIR=lib \
     -DWITH_EXAMPLES=OFF \
     -DWITH_TEST=OFF \
-    -DBUILD_SHARED_LIBS=OFF \
-    -DCMAKE_POLICY_DEFAULT_CMP0074=NEW
+    -DBUILD_SHARED_LIBS=OFF
 cmake --build . -j${CPU_COUNT}
 cmake --install .
