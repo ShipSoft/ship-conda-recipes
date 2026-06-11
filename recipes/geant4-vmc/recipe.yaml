@@ -10,7 +10,7 @@ source:
   sha256: 5fc038ef63739bd7a7bf63e43589af020e37dc2154512619d11a6bed31fbe7b8
 
 build:
-  number: 2
+  number: 3
   script: build.sh
 
 requirements:
@@ -20,19 +20,22 @@ requirements:
     - cmake
     - make
   host:
-    - root 6.40.*
+    - root_base 6.40.*
+    - root_cxx_standard
     - vmc
     - geant4 11.4.*
     - vgm
     - xerces-c
   run:
-    - root 6.40.*
+    - root_base 6.40.*
+    - root_cxx_standard
     - vmc
     - geant4 11.4.*
     - vgm
     - xerces-c
   run_exports:
-    - root 6.40.*
+    - root_base 6.40.*
+    - root_cxx_standard
     - geant4 11.4.*
 
 tests:
