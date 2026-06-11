@@ -50,8 +50,9 @@ about:
     event generators such as Pythia and to event records in
     HepMC2/HepMC3 format, and is widely used in LHC experiment
     simulation chains.
+  # Upstream tarball does not ship a LICENSE file; webpage
+  # (https://photospp.web.cern.ch) declares MIT.
   license: MIT
-  license_file: LICENSE
 
 extra:
   recipe-maintainers:
