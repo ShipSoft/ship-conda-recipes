@@ -17,7 +17,6 @@ on a [prefix.dev](https://prefix.dev) channel.
 | geant4-vmc | 6.8 | Yes |
 | genfit | 2.3.0 | Yes |
 | geomodel | 6.27.0 | Yes (ATLAS-maintained, candidate for conda-forge) |
-| gsl-lite | 1.1.0 | No (newer than conda-forge) |
 | mp-units | 2.5.0 | Yes (conda-forge feedstock) |
 | phlex | 0.2.0 | No (Framework-R-D, not yet on conda-forge) |
 | photospp | 3.64 | Yes |
