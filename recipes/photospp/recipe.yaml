@@ -10,7 +10,7 @@ source:
   sha256: d42cb01eca6eea517dc6a729cd34db515d6894e6f4bab73072cb5a6fa9b93d63
 
 build:
-  number: 1
+  number: 2
   script: build.sh
 
 requirements:
@@ -24,14 +24,12 @@ requirements:
     - make
   host:
     - hepmc3
-    - root
+    - root_base
+    - root_cxx_standard
     - pythia8
     - tauloa
-  run:
-    - hepmc3
-    - root
-    - pythia8
-    - tauloa
+  run_exports:
+    - ${{ pin_subpackage('photospp', upper_bound='x.x') }}
 
 tests:
   - script:

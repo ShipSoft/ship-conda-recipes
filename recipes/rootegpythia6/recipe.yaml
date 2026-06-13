@@ -10,7 +10,7 @@ source:
     - fix-pythia6-private-link.patch
 
 build:
-  number: 5
+  number: 6
   script: build.sh
 
 requirements:
@@ -23,13 +23,8 @@ requirements:
     - root_base 6.40.*
     - root_cxx_standard
     - pythia6
-  run:
-    - root_base 6.40.*
-    - root_cxx_standard
-    - pythia6
   run_exports:
-    - root_base 6.40.*
-    - root_cxx_standard
+    - ${{ pin_subpackage('rootegpythia6', upper_bound='x.x') }}
 
 tests:
   - script:

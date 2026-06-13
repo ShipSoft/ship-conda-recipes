@@ -10,7 +10,7 @@ source:
   sha256: 70659bb8b25078e696165c8a54f317dcbc009a2ef5bde267c5cc8512eefcca6d
 
 build:
-  number: 3
+  number: 4
   script: build.sh
 
 requirements:
@@ -20,30 +20,14 @@ requirements:
     - cmake
     - make
   host:
-    - root
+    - root_base
+    - root_cxx_standard
     - geant4 11.4.*
     - geant4-vmc
     - geant3
     - vmc
     - fairroot
     - faircmakemodules
-    - fairlogger
-    - genfit
-    - rootegpythia6
-    - pythia6
-    - pythia8
-    - evtgen
-    - hepmc2
-    - fmt
-    - gsl
-    - xerces-c
-  run:
-    - root
-    - geant4 11.4.*
-    - geant4-vmc
-    - geant3
-    - vmc
-    - fairroot
     - fairlogger
     - genfit
     - rootegpythia6
