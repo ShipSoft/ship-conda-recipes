@@ -10,7 +10,7 @@ source:
   sha256: d0c366b825943e0e0a51ca4ec1e29ad986ce81be44083d99da5f7b1b9820b409
 
 build:
-  number: 3
+  number: 4
   skip:
     - win
   script: build.sh
@@ -23,12 +23,14 @@ requirements:
     - make
   host:
     - shipgeometry
-    - geomodel
+    - geomodel-core
+    - geomodel-g4
     - geant4 11.4.*
     - mp-units
   run:
     - shipgeometry
-    - geomodel
+    - geomodel-core
+    - geomodel-g4
     - geant4 11.4.*
     - mp-units
   run_exports:
