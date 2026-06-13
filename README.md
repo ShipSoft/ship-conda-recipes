@@ -18,7 +18,6 @@ on a [prefix.dev](https://prefix.dev) channel.
 | genfit | 2.3.0 | Yes |
 | geomodel | 6.27.0 | Yes (ATLAS-maintained, candidate for conda-forge) |
 | mp-units | 2.5.0 | Yes (conda-forge feedstock) |
-| phlex | 0.2.0 | No (Framework-R-D, not yet on conda-forge) |
 | photospp | 3.64 | Yes |
 | pythia6 | 6.4.28 | No (SND-LHC fork) |
 | random123 | 1.14.0 | Yes (conda-forge feedstock) |
@@ -37,6 +36,7 @@ Previously packaged here, now consumed directly from conda-forge:
 - [libjsonnet](https://github.com/conda-forge/libjsonnet-feedstock)
 - [vmc](https://github.com/conda-forge/vmc-feedstock)
 - [vgm](https://github.com/conda-forge/vgm-feedstock)
+- [phlex](https://github.com/conda-forge/phlex-feedstock)
 
 ## Building
 
