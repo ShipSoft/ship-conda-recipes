@@ -63,7 +63,7 @@ about:
     transform module, and an RNTuple-based output observer into a
     multi-threaded simulation workflow.
   license: LGPL-3.0-or-later
-  license_file: LICENSE.md
+  license_file: LICENSES/LGPL-3.0-or-later.txt
 
 extra:
   recipe-maintainers:
