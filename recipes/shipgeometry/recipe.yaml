@@ -12,7 +12,7 @@ source:
     - install-apps-executables.patch
 
 build:
-  number: 2
+  number: 3
   skip:
     - win
   script: build.sh
@@ -24,10 +24,12 @@ requirements:
     - cmake
     - make
   host:
-    - geomodel
+    - geomodel-core
+    - geomodel-tools
     - sqlite
   run:
-    - geomodel
+    - geomodel-core
+    - geomodel-tools
     - sqlite
 
 tests:
@@ -58,7 +60,7 @@ about:
     libraries plus executables to build and validate the resulting
     GeoModel geometry database.
   license: LGPL-3.0-or-later
-  license_file: LICENSES/LGPL-3.0-or-later.txt
+  license_file: LICENCES/LGPL-3.0-or-later.txt
 
 extra:
   recipe-maintainers:
