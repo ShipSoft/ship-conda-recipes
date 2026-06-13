@@ -10,7 +10,7 @@ source:
   sha256: 14b93f2c779454a4706698de59f4f1eb2c19489e3906b333a869bd91aacc7609
 
 build:
-  number: 1
+  number: 2
   skip:
     - win
   script: build.sh
@@ -22,9 +22,10 @@ requirements:
     - cmake
     - make
   host:
-    - root
-  run:
-    - root
+    - root_base
+    - root_cxx_standard
+  run_exports:
+    - ${{ pin_subpackage('shipdatamodel', upper_bound='x.x') }}
 
 tests:
   - script:

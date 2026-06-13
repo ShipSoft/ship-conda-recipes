@@ -10,7 +10,7 @@ source:
   sha256: 5627d89957f4ce4148478d3c3a7a46702210b4ed8974a23977b685f181491ff8
 
 build:
-  number: 3
+  number: 4
   skip:
     - win
   script: build.sh
@@ -25,26 +25,13 @@ requirements:
     - shipdatamodel
     - phlex
     - shipgeometryservice
-    - root
+    - root_base
+    - root_cxx_standard
     - geant4 11.4.*
     - pythia8
     - random123
     - libboost-devel
     - tbb-devel
-    - spdlog
-    - fmt
-    - mp-units
-    - ms-gsl
-  run:
-    - shipdatamodel
-    - phlex
-    - shipgeometryservice
-    - root
-    - geant4 11.4.*
-    - pythia8
-    - random123
-    - libboost-devel
-    - tbb
     - spdlog
     - fmt
     - mp-units

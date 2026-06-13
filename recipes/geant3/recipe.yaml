@@ -7,7 +7,7 @@ source:
   sha256: 0fbfe4a9e50b3bc8af7efc11d2b167c341ba0ec3103ddbdf6d88736fd1f26e23
 
 build:
-  number: 3
+  number: 4
   script: build.sh
 
 requirements:
@@ -22,13 +22,8 @@ requirements:
     - root_base 6.40.*
     - root_cxx_standard
     - vmc
-  run:
-    - root_base 6.40.*
-    - root_cxx_standard
-    - vmc
   run_exports:
-    - root_base 6.40.*
-    - root_cxx_standard
+    - ${{ pin_subpackage('geant3', upper_bound='x.x') }}
 
 tests:
   - script:
