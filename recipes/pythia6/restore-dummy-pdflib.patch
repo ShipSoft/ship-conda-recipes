@@ -1,3 +1,12 @@
+Restore the stock Pythia 6.4.28 PDF dummy subroutine names. SND-LHC's
+fork renamed PDFSET/STRUCTM/STRUCTP to *X variants for their internal
+PDFLIB integration, but those symbols are what ROOT's EGPythia6 wrapper
+and downstream consumers call into. Without this patch, linking against
+libpythia6.so leaves undefined references to PDFSET/STRUCTM/STRUCTP at
+consumer link time.
+
+TODO: open upstream PR against SND-LHC/pythia6 so we can drop this patch.
+
 --- a/pythia-6.4.28.f
 +++ b/pythia-6.4.28.f
 @@ -81353,7 +81353,7 @@ C*********************************************************************
