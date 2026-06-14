@@ -12,7 +12,7 @@ source:
     - install-apps-executables.patch
 
 build:
-  number: 4
+  number: 5
   skip:
     - win
   script: build.sh
