@@ -1,3 +1,13 @@
+Strip ${CMAKE_CURRENT_LIST_DIR} prefixes from the dictionary header
+list. ROOT_GENERATE_DICTIONARY embeds the literal paths into the
+generated *.cxx and *_rdict.pcm, leaking the build host's checkout path
+into the installed package. Pass the headers as bare filenames and add
+inc/ to include_directories so ROOT's dictionary generator can resolve
+them; this keeps the generated dictionary relocatable.
+
+TODO: open upstream PR against luketpickering/ROOTEGPythia6 so we can
+drop this patch.
+
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -43,10 +43,11 @@ else()
