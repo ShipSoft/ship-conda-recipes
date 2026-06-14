@@ -1,15 +1,19 @@
-package:
-  name: pythia6
+context:
   version: "6.4.28"
 
+package:
+  name: pythia6
+  version: ${{ version }}
+
 source:
+  # SND-LHC/pythia6 has no tagged release; pin to the commit.
   url: https://github.com/SND-LHC/pythia6/archive/a918d08839df79965787e1fbf43ea16acc1e443d.tar.gz
   sha256: 3806efdb4fd1e295082f193bd0d03800d3fa904525cb82b0a9540401701711fa
   patches:
     - restore-dummy-pdflib.patch
 
 build:
-  number: 5
+  number: 6
   script: build.sh
 
 requirements:

@@ -1,4 +1,5 @@
-#!/bin/bash -e
+#!/bin/bash
+set -euxo pipefail
 mkdir -p build && cd build
 cmake ${CMAKE_ARGS} ${SRC_DIR} \
     -DCMAKE_BUILD_TYPE=Release \
