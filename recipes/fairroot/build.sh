@@ -1,4 +1,5 @@
-#!/bin/bash -e
+#!/bin/bash
+set -euxo pipefail
 unset SIMPATH
 
 mkdir -p build && cd build

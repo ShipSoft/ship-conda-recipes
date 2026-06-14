@@ -12,7 +12,7 @@ source:
     - fix-boost-serialization.patch
 
 build:
-  number: 9
+  number: 10
   script: build.sh
 
 requirements:
@@ -23,9 +23,9 @@ requirements:
     - cmake
     - make
   host:
-    - root_base 6.40.*
+    - root_base
     - root_cxx_standard
-    - geant4 11.4.*
+    - geant4
     - geant4-vmc
     - geant3
     - vmc
@@ -50,6 +50,7 @@ tests:
 about:
   homepage: http://fairroot.gsi.de
   repository: https://github.com/FairRootGroup/FairRoot
+  documentation: https://fairroot.gsi.de/documentation
   summary: C++ simulation, reconstruction and analysis framework for particle physics
   description: |
     FairRoot is a simulation, reconstruction and analysis framework
