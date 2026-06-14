@@ -6,11 +6,12 @@ package:
   version: ${{ version }}
 
 source:
+  # geometry_service ${{ version }} has no upstream tag yet; pin to the commit.
   url: https://github.com/ShipSoft/geometry_service/archive/fb0576b936d93524e19732c5dbbd73848e0a39ee.tar.gz
   sha256: d0c366b825943e0e0a51ca4ec1e29ad986ce81be44083d99da5f7b1b9820b409
 
 build:
-  number: 5
+  number: 6
   skip:
     - win
   script: build.sh
@@ -25,7 +26,7 @@ requirements:
     - shipgeometry
     - geomodel-core
     - geomodel-g4
-    - geant4 11.4.*
+    - geant4
     - mp-units
   run_exports:
     - ${{ pin_subpackage('shipgeometryservice', upper_bound='x.x') }}
