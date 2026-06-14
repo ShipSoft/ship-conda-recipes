@@ -13,6 +13,9 @@ Demote the link to PRIVATE so libEGPythia6.so still gets the DT_NEEDED for
 libPythia6.so at link time, without leaking the unresolvable target name
 into the exported interface.
 
+TODO: open upstream PR against luketpickering/ROOTEGPythia6 so we can
+drop this patch.
+
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -59,7 +59,7 @@
