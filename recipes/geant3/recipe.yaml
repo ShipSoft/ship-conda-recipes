@@ -1,13 +1,16 @@
-package:
-  name: geant3
+context:
   version: "4.5"
 
+package:
+  name: geant3
+  version: ${{ version }}
+
 source:
-  url: https://github.com/vmc-project/geant3/archive/refs/tags/v4-5.tar.gz
+  url: https://github.com/vmc-project/geant3/archive/refs/tags/v${{ version | replace(".", "-") }}.tar.gz
   sha256: 0fbfe4a9e50b3bc8af7efc11d2b167c341ba0ec3103ddbdf6d88736fd1f26e23
 
 build:
-  number: 4
+  number: 5
   script: build.sh
 
 requirements:
@@ -19,7 +22,7 @@ requirements:
     - cmake
     - make
   host:
-    - root_base 6.40.*
+    - root_base
     - root_cxx_standard
     - vmc
   run_exports:
@@ -40,6 +43,8 @@ about:
     applications to switch between different Monte Carlo transport
     engines (Geant3, Geant4, FLUKA) without changing the user code,
     input/output format or geometry definition.
+  # Upstream tarball ships no LICENSE; Geant3.21 has historically been
+  # distributed under GPL-3.0-or-later (CERN Program Library W5013).
   license: GPL-3.0-or-later
 
 extra:
