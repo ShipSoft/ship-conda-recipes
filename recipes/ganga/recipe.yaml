@@ -10,7 +10,7 @@ source:
   sha256: 9a5966b3eff859b5f9716f7af5f51d3da7c2574c67e99268921dc5fdcf142a53
 
 build:
-  number: 0
+  number: 1
   skip:
     - win
     - osx
@@ -43,8 +43,9 @@ tests:
         - ganga
 
 about:
-  homepage: https://ganga.readthedocs.io/
+  homepage: https://github.com/ganga-devs/ganga
   repository: https://github.com/ganga-devs/ganga
+  documentation: https://ganga.readthedocs.io/
   summary: Easy-to-use frontend for job definition and management
   description: |
     Ganga is a tool to compose, run and track computing jobs across a
