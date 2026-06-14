@@ -10,7 +10,7 @@ source:
   sha256: d42cb01eca6eea517dc6a729cd34db515d6894e6f4bab73072cb5a6fa9b93d63
 
 build:
-  number: 2
+  number: 3
   script: build.sh
 
 requirements:
@@ -26,6 +26,12 @@ requirements:
     - hepmc3
     - root_base
     - root_cxx_standard
+    - pythia8
+    - tauloa
+  run:
+    # Autoconf build, so no upstream run_exports — list runtime deps
+    # explicitly even if root_base / pythia8 also export them.
+    - hepmc3
     - pythia8
     - tauloa
   run_exports:
