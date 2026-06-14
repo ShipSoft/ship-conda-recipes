@@ -6,11 +6,12 @@ package:
   version: ${{ version }}
 
 source:
+  # data-model ${{ version }} has no upstream tag yet; pin to the commit.
   url: https://github.com/ShipSoft/data-model/archive/e709b820219f56663d9985a89e17a5fded3b0892.tar.gz
   sha256: 14b93f2c779454a4706698de59f4f1eb2c19489e3906b333a869bd91aacc7609
 
 build:
-  number: 2
+  number: 3
   skip:
     - win
   script: build.sh
