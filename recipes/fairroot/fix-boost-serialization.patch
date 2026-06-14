@@ -1,3 +1,7 @@
+Add Boost.Serialization to the example-build dependency list when
+BUILD_EXAMPLES=ON. Already merged upstream in FairRootGroup/FairRoot;
+drop this patch after the next FairRoot release.
+
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -227,7 +227,7 @@ endif()
