@@ -1,0 +1,45 @@
+name: Dev build — fairship
+
+# Resolve and build the FairShip master branch against the current
+# ship + conda-forge channel content. The upstream pixi.toml is the
+# source of truth for deps and tasks; we delete any committed
+# pixi.lock so each run gets a fresh dependency resolution. If a
+# new ROOT / Geant4 / etc. release on conda-forge breaks FairShip
+# master, this turns red before anyone tries to bump the recipe.
+
+on:
+  schedule:
+    - cron: '0 5 * * *'
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Upstream ref to build (default: master HEAD)'
+        type: string
+        default: ''
+  pull_request:
+    paths:
+      - '.github/workflows/dev-build-fairship.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Check out FairShip upstream
+        uses: actions/checkout@v6
+        with:
+          repository: ShipSoft/FairShip
+          ref: ${{ inputs.ref || '' }}
+          fetch-depth: 0
+          fetch-tags: true
+      - name: Drop committed lock to force fresh resolve
+        run: rm -f pixi.lock
+      - name: Set up pixi against upstream manifest
+        uses: prefix-dev/setup-pixi@v0.9.6
+        with:
+          cache: false
+      - name: Configure, build, install
+        run: pixi run install

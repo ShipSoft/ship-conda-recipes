@@ -1,0 +1,44 @@
+name: Dev build — aegir
+
+# Resolve and build the aegir main branch against the current ship +
+# conda-forge channel content. The upstream pixi.toml is the source
+# of truth for deps and tasks; we delete any committed pixi.lock so
+# each run gets a fresh dependency resolution. Daily signal for
+# upstream-dev drift before recipe-bump time.
+
+on:
+  schedule:
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Upstream ref to build (default: main HEAD)'
+        type: string
+        default: ''
+  pull_request:
+    paths:
+      - '.github/workflows/dev-build-aegir.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Check out aegir upstream
+        uses: actions/checkout@v6
+        with:
+          repository: ShipSoft/aegir
+          ref: ${{ inputs.ref || '' }}
+          fetch-depth: 0
+          fetch-tags: true
+      - name: Drop committed lock to force fresh resolve
+        run: rm -f pixi.lock
+      - name: Set up pixi against upstream manifest
+        uses: prefix-dev/setup-pixi@v0.9.6
+        with:
+          cache: false
+      - name: Configure, build, install
+        run: pixi run install
