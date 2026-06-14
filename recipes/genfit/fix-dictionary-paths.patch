@@ -1,3 +1,12 @@
+Strip ${CMAKE_CURRENT_SOURCE_DIR} prefixes from the dictionary header
+lists. ROOT_GENERATE_DICTIONARY embeds the literal paths into the
+generated *.cxx and *_rdict.pcm, leaking the build host's checkout path
+into the installed package. Pass the headers as bare filenames and let
+ROOT's include search (--noIncludePaths + the per-target include_dirs)
+locate them; this makes the dictionaries relocatable.
+
+TODO: open upstream PR against GenFit/GenFit so we can drop this patch.
+
 --- a/CMakeLists.txt	2026-05-29 01:55:40.991717180 +0700
 +++ b/CMakeLists.txt	2026-05-29 01:55:40.995155249 +0700
 @@ -136,26 +136,26 @@

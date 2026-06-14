@@ -1,15 +1,20 @@
+context:
+  version: "2.3.0"
+  # Upstream tag format uses zero-padded "MM-mm-pp" instead of SemVer.
+  tag: "02-03-00"
+
 package:
   name: genfit
-  version: "2.3.0"
+  version: ${{ version }}
 
 source:
-  url: https://github.com/GenFit/GenFit/archive/refs/tags/02-03-00.tar.gz
+  url: https://github.com/GenFit/GenFit/archive/refs/tags/${{ tag }}.tar.gz
   sha256: 741eb6cbfccc3403061cd4ccd62083adf3f9b187ea4236453eef777d4824b05e
   patches:
     - fix-dictionary-paths.patch
 
 build:
-  number: 7
+  number: 8
   script: build.sh
 
 requirements:
@@ -19,7 +24,7 @@ requirements:
     - cmake
     - make
   host:
-    - root_base 6.40.*
+    - root_base
     - root_cxx_standard
     - gtest
   run_exports:
