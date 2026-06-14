@@ -1,7 +1,8 @@
 #!/bin/bash
 set -euxo pipefail
-mkdir -p build && cd build
-cp -a "${SRC_DIR}/." .
+
+# Build in-source: rattler-build's ${SRC_DIR} is the work dir and
+# already the CWD when build.sh runs.
 
 # Permit the legacy Fortran sources (non-conforming argument types and
 # BOZ constants) under modern gfortran.
