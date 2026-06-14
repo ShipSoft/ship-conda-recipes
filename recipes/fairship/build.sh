@@ -1,4 +1,5 @@
-#!/bin/bash -e
+#!/bin/bash
+set -euxo pipefail
 unset SIMPATH
 export FAIRROOTPATH="${PREFIX}"
 export ROOT_INCLUDE_PATH="${PREFIX}/include:${PREFIX}/include/geant4vmc:${PREFIX}/include/Geant4:${PREFIX}/include/vmc"

@@ -6,11 +6,12 @@ package:
   version: ${{ version }}
 
 source:
+  # FairShip ${{ version }} has no upstream tag yet; pin to the commit.
   url: https://github.com/ShipSoft/FairShip/archive/ab839844699bf204cf6916819d8f4b929e28c8d2.tar.gz
   sha256: 70659bb8b25078e696165c8a54f317dcbc009a2ef5bde267c5cc8512eefcca6d
 
 build:
-  number: 4
+  number: 5
   script: build.sh
 
 requirements:
@@ -22,7 +23,7 @@ requirements:
   host:
     - root_base
     - root_cxx_standard
-    - geant4 11.4.*
+    - geant4
     - geant4-vmc
     - geant3
     - vmc
@@ -38,6 +39,8 @@ requirements:
     - fmt
     - gsl
     - xerces-c
+  run_exports:
+    - ${{ pin_subpackage('fairship', upper_bound='x.x') }}
 
 tests:
   - script:
