@@ -1,4 +1,5 @@
-#!/bin/bash -e
+#!/bin/bash
+set -euxo pipefail
 
 # Hide every std::__format symbol from the dynamic symbol table of every
 # shared library produced here, including vtables, typeinfo, typeinfo names,

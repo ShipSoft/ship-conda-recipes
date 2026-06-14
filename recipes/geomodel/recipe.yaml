@@ -2,7 +2,7 @@ schema_version: 1
 
 context:
   version: "6.27.0"
-  build_number: 7
+  build_number: 8
 
 recipe:
   name: geomodel-split
@@ -35,7 +35,8 @@ outputs:
         - xerces-c
         - nlohmann_json
         - eigen
-        - geant4 11.4.*
+        - geant4
+        - clhep
         - qt6-main
         - coin3d
         - soqt6
@@ -193,19 +194,17 @@ outputs:
         - include/GeoMaterial2G4/**
         - include/GeoModel2G4/**
         - lib/cmake/GeoModelG4/**
-      dynamic_linking:
-        missing_dso_allowlist:
-          - lib/libCLHEP*
     requirements:
       build:
         - ${{ compiler('cxx') }}
         - sysroot_linux-64 2.17.*
       host:
         - ${{ pin_subpackage('geomodel-core', exact=True) }}
-        - geant4 11.4.*
+        - geant4
+        - clhep
       run:
         - ${{ pin_subpackage('geomodel-core', exact=True) }}
-        - geant4 11.4.*
+        - clhep
       run_exports:
         weak:
           - ${{ pin_subpackage('geomodel-g4', upper_bound='x.x') }}
@@ -248,10 +247,6 @@ outputs:
         - share/man/man1/gmclash.1
         - share/man/man1/gmgeantino.1
         - share/man/man1/gmmasscalc.1
-      dynamic_linking:
-        missing_dso_allowlist:
-          - lib/libCLHEP*
-          - lib/libz.so*
     requirements:
       build:
         - ${{ compiler('cxx') }}
@@ -260,14 +255,17 @@ outputs:
         - ${{ pin_subpackage('geomodel-core', exact=True) }}
         - ${{ pin_subpackage('geomodel-g4', exact=True) }}
         - ${{ pin_subpackage('geomodel-tools', exact=True) }}
-        - geant4 11.4.*
+        - geant4
+        - clhep
+        - zlib
         - xerces-c
         - nlohmann_json
       run:
         - ${{ pin_subpackage('geomodel-core', exact=True) }}
         - ${{ pin_subpackage('geomodel-g4', exact=True) }}
         - ${{ pin_subpackage('geomodel-tools', exact=True) }}
-        - geant4 11.4.*
+        - clhep
+        - zlib
       run_exports:
         weak:
           - ${{ pin_subpackage('geomodel-fullsimlight', upper_bound='x.x') }}
@@ -309,9 +307,6 @@ outputs:
         - lib/cmake/GeoModelVisualization/**
         - share/gmex/**
         - share/man/man1/gmex.1
-      dynamic_linking:
-        missing_dso_allowlist:
-          - lib/libhdf5*
     requirements:
       build:
         - ${{ compiler('cxx') }}
