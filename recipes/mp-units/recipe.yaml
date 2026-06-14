@@ -10,7 +10,7 @@ source:
   sha256: a6bd48bee699f11f0ed5b04b8c5006d15f76e6d898e058db3880554d2e47a400
 
 build:
-  number: 4
+  number: 5
   skip:
     - win
   script: build.sh
@@ -36,6 +36,7 @@ tests:
 about:
   homepage: https://mpusz.github.io/mp-units/
   repository: https://github.com/mpusz/mp-units
+  documentation: https://mpusz.github.io/mp-units/
   summary: Domain-correct C++ quantities and units library (ISO 80000)
   description: |
     mp-units is a modern C++ (C++20 and later) library providing

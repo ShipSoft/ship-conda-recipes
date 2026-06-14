@@ -1,4 +1,5 @@
-#!/bin/bash -e
+#!/bin/bash
+set -euxo pipefail
 cmake ${CMAKE_ARGS} -S ${SRC_DIR}/src -B build \
     -DCMAKE_CXX_STANDARD=20 \
     -DCMAKE_INSTALL_LIBDIR=lib \
