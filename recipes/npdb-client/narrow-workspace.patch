@@ -1,0 +1,25 @@
+Narrow the cargo workspace to the client-side members only.
+
+Upstream's monorepo workspace at npdb-0.2.10/Cargo.toml lists four members
+(npdb-client, npdb-core, npdb-loadtests, npdb-server). When this recipe
+runs `cargo build` from npdb-client/, cargo walks up, finds the workspace,
+and resolves Cargo.lock for ALL members - which means fetching the full
+server-side dependency graph (axum, sqlx, tokio, tower, ...). That is ~100+
+crates we never link against, and a transient SSL flake on one of them
+fails the build.
+
+Dropping the two server-side members shrinks the resolved graph to just
+what npdb-client needs (about 30-40 crates). The on-disk npdb-server/ and
+npdb-loadtests/ directories stay untouched - cargo simply ignores them now
+that they're not listed.
+
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -1,6 +1,6 @@
+ [workspace]
+ resolver = "3"
+-members = ["npdb-client","npdb-core", "npdb-loadtests", "npdb-server"]
++members = ["npdb-client", "npdb-core"]
+
+ [workspace.package]
+ authors = ["Ole Martin Ruud <ole.martin.ruud@cern.ch>"]
