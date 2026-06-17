@@ -18,6 +18,7 @@ on a [prefix.dev](https://prefix.dev) channel.
 | genfit | 2.3.0 | Yes |
 | geomodel | 6.27.0 | Yes (split recipe, staging for conda-forge) |
 | mp-units | 2.5.0 | Yes (conda-forge feedstock) |
+| npdb-client | 0.2.10 | No (SHiP-specific, split recipe with `python-npdb-client`) |
 | photospp | 3.64 | Yes |
 | pythia6 | 6.4.28 | No (SND-LHC fork) |
 | random123 | 1.14.0 | Yes (conda-forge feedstock) |

@@ -1,0 +1,98 @@
+schema_version: 1
+
+context:
+  version: "0.2.10"
+  build_number: 0
+
+recipe:
+  name: npdb-client-split
+  version: ${{ version }}
+
+source:
+  url: https://gitlab.cern.ch/ship/computing/npdb/-/archive/${{ version }}/npdb-${{ version }}.tar.gz
+  sha256: 3453a3d996034cfe957721cfcacc76f95335c6ed2e71d326d52f06219b836d26
+
+build:
+  number: ${{ build_number }}
+  skip:
+    - win
+    - osx
+
+outputs:
+
+  # ---- C++ static lib + headers ------------------------------------------
+  - package:
+      name: npdb-client
+      version: ${{ version }}
+    build:
+      script: build_cpp.sh
+    requirements:
+      build:
+        - ${{ compiler('c') }}
+        - ${{ compiler('cxx') }}
+        - sysroot_linux-64 2.17.*
+        - cmake
+        - make
+        - rust
+      run_exports:
+        weak:
+          - ${{ pin_subpackage('npdb-client', upper_bound='x.x') }}
+    tests:
+      - package_contents:
+          include:
+            - npdb-client.h
+            - npdb-bridge.h
+            - cxx.h
+          files:
+            - lib/libnpdb_client_bridge.a
+            - lib/libnpdb_client.a
+    about:
+      homepage: https://gitlab.cern.ch/ship/computing/npdb
+      repository: https://gitlab.cern.ch/ship/computing/npdb
+      summary: C++ client library for the SHiP npdb conditions DB REST API
+      description: |
+        npdb-client provides a static C++ library (libnpdb_client_bridge)
+        and headers for talking to the npdb conditions-DB REST service.
+        The library is a Rust core (npdb-client) exposed via the cxx
+        crate. Consumers link against libnpdb_client_bridge.a and
+        libnpdb_client.a and include npdb-client.h.
+      license: Apache-2.0
+      license_file: LICENSE
+
+  # ---- Python bindings (PyO3 + maturin) ----------------------------------
+  - package:
+      name: python-npdb-client
+      version: ${{ version }}
+    build:
+      script: build_py.sh
+    requirements:
+      build:
+        - ${{ compiler('c') }}
+        - ${{ compiler('cxx') }}
+        - sysroot_linux-64 2.17.*
+        - rust
+      host:
+        - python
+        - pip
+        - maturin >=1.0,<2.0
+      run:
+        - python
+    tests:
+      - python:
+          imports:
+            - npdb_client
+          pip_check: false
+    about:
+      homepage: https://gitlab.cern.ch/ship/computing/npdb
+      repository: https://gitlab.cern.ch/ship/computing/npdb
+      summary: Python bindings for the SHiP npdb conditions DB client
+      description: |
+        Python bindings for the npdb conditions-DB client, generated
+        with PyO3 and built with maturin. Exposes the same Rust core
+        (npdb-client) as the C++ bindings. Importable as `npdb_client`.
+      license: Apache-2.0
+      license_file: LICENSE
+
+extra:
+  recipe-maintainers:
+    - olantwin
