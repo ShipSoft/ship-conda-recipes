@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -euxo pipefail
 
+export CARGO_NET_RETRY=10
+export CARGO_HTTP_TIMEOUT=120
+
 cd "${SRC_DIR}/npdb-client"
 
 cmake ${CMAKE_ARGS} -S . -B build \

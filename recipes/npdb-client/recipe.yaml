@@ -11,6 +11,8 @@ recipe:
 source:
   url: https://gitlab.cern.ch/ship/computing/npdb/-/archive/${{ version }}/npdb-${{ version }}.tar.gz
   sha256: 3453a3d996034cfe957721cfcacc76f95335c6ed2e71d326d52f06219b836d26
+  patches:
+    - narrow-workspace.patch
 
 build:
   number: ${{ build_number }}
