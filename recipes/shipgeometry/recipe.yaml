@@ -1,5 +1,5 @@
 context:
-  version: "0.1.0"
+  version: "0.2.0"
 
 package:
   name: shipgeometry
@@ -7,12 +7,10 @@ package:
 
 source:
   url: https://github.com/ShipSoft/Geometry/archive/refs/tags/v${{ version }}.tar.gz
-  sha256: 081fdd9654f032b91ab703ff74f28c087a6e96868c67c9df23fba25b6651e03c
-  patches:
-    - install-apps-executables.patch
+  sha256: ec3d50390369abb151de03fd7c5d8e5d944242ea0e05f8a35f95cdb8a60ab459
 
 build:
-  number: 5
+  number: 0
   skip:
     - win
   script: build.sh
@@ -27,6 +25,7 @@ requirements:
     - geomodel-core
     - geomodel-tools
     - sqlite
+    - tomlplusplus
   run_exports:
     - ${{ pin_subpackage('shipgeometry', upper_bound='x.x') }}
 
@@ -42,6 +41,7 @@ tests:
       - test -f $PREFIX/lib/libCalorimeter.so
       - test -f $PREFIX/lib/libUpstreamTagger.so
       - test -f $PREFIX/lib/libTimingDetector.so
+      - test -f $PREFIX/lib/libNeutrinoDetector.so
       - test -f $PREFIX/bin/build_geometry
       - test -f $PREFIX/bin/validate_geometry
       - test -f $PREFIX/lib/cmake/SHiPGeometry/SHiPGeometryConfig.cmake
@@ -58,7 +58,7 @@ about:
     libraries plus executables to build and validate the resulting
     GeoModel geometry database.
   license: LGPL-3.0-or-later
-  license_file: LICENCES/LGPL-3.0-or-later.txt
+  license_file: LICENSES/LGPL-3.0-or-later.txt
 
 extra:
   recipe-maintainers:
