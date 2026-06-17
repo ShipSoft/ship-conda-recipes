@@ -45,6 +45,8 @@ tests:
       - test -f $PREFIX/bin/build_geometry
       - test -f $PREFIX/bin/validate_geometry
       - test -f $PREFIX/lib/cmake/SHiPGeometry/SHiPGeometryConfig.cmake
+      - test -f $PREFIX/share/SHiPGeometry/sbt.toml
+      - test -f $PREFIX/share/SHiPGeometry/calo.toml
 
 about:
   homepage: https://github.com/ShipSoft/Geometry
