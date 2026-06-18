@@ -41,7 +41,6 @@
       "matchPackageNames": [
         "luketpickering/ROOTEGPythia6",
         "SND-LHC/pythia6",
-        "ShipSoft/FairShip",
         "ShipSoft/data-model",
         "ShipSoft/field_service",
         "ShipSoft/geometry_service",

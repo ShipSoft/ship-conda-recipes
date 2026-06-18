@@ -11,7 +11,7 @@ on a [prefix.dev](https://prefix.dev) channel.
 |---------|---------|---------------------|
 | aegir | 0.1.0 | No (SHiP-specific) |
 | fairroot | 19.0.1 | No (carries patch) |
-| fairship | 26.05.7 | No (SHiP-specific) |
+| fairship | 26.06 | No (SHiP-specific) |
 | ganga | 8.7.12 | No (HEP-specific, not in conda-forge today) |
 | geant3 | 4.5 | Yes |
 | geant4-vmc | 6.8 | Yes |

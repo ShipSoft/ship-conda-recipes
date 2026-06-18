@@ -1,17 +1,16 @@
 context:
-  version: "26.05.7"
+  version: "26.06"
 
 package:
   name: fairship
   version: ${{ version }}
 
 source:
-  # FairShip ${{ version }} has no upstream tag yet; pin to the commit.
-  url: https://github.com/ShipSoft/FairShip/archive/ab839844699bf204cf6916819d8f4b929e28c8d2.tar.gz
-  sha256: 70659bb8b25078e696165c8a54f317dcbc009a2ef5bde267c5cc8512eefcca6d
+  url: https://github.com/ShipSoft/FairShip/archive/refs/tags/${{ version }}.tar.gz
+  sha256: 2f4469ae667b8ddce63e1fee4080ea9f35765789e1c006b07a4653ff5a1a443a
 
 build:
-  number: 5
+  number: 0
   script: build.sh
 
 requirements:
