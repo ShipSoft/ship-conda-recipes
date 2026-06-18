@@ -1,5 +1,5 @@
 context:
-  version: "0.1.0.dev0"
+  version: "0.15.6"
 
 recipe:
   name: field-service
