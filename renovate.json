@@ -43,7 +43,9 @@
         "SND-LHC/pythia6",
         "ShipSoft/FairShip",
         "ShipSoft/data-model",
-        "ShipSoft/geometry_service"
+        "ShipSoft/field_service",
+        "ShipSoft/geometry_service",
+        "acts-project/covfie"
       ],
       "enabled": false
     }
