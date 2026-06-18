@@ -1,17 +1,16 @@
 context:
-  version: "26.06.0"
+  version: "0.1.0"
 
 package:
   name: shipgeometryservice
   version: ${{ version }}
 
 source:
-  # geometry_service ${{ version }} has no upstream tag yet; pin to the commit.
-  url: https://github.com/ShipSoft/geometry_service/archive/fb0576b936d93524e19732c5dbbd73848e0a39ee.tar.gz
-  sha256: d0c366b825943e0e0a51ca4ec1e29ad986ce81be44083d99da5f7b1b9820b409
+  url: https://github.com/ShipSoft/geometry_service/archive/refs/tags/v${{ version }}.tar.gz
+  sha256: b93837a8e9d5515e20078f7eee25d49f03f96091462c85fa2a29cb44126634a0
 
 build:
-  number: 7
+  number: 0
   skip:
     - win
   script: build.sh
