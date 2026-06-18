@@ -7,16 +7,16 @@ recipe:
 
 source:
   # field_service main has no tag yet; pin to the commit.
-  - url: https://github.com/ShipSoft/field_service/archive/78e4d990c5a622869bec879d11f10a32f29b6461.tar.gz
-    sha256: 1fe3515fbd4d084fcd74a64c59e890ca3ddf923dfb8d3a56c77a14f3d5d79409
+  - url: https://github.com/ShipSoft/field_service/archive/99b408d48fbb081b9f1573742fee8217d38d58c6.tar.gz
+    sha256: bed1eec2b1c2cb6b0ad4f679a26c155c1663b864bc5eaf13b06b040396b874a7
   # covfie is FetchContent'd by upstream CMake; vendor it so the build
   # stays offline. Pinned to the same tag the CMakeLists.txt uses.
-  - url: https://github.com/acts-project/covfie/archive/refs/tags/v0.13.0.tar.gz
-    sha256: e9cd0546c7bc9539f440273bbad303c97215ccd87403cedb4aa387a313938d57
+  - url: https://github.com/acts-project/covfie/archive/refs/tags/v0.15.6.tar.gz
+    sha256: ed22408f981692398408ffe04ff8e6230c022288552a83dbc2ad34b96003a84e
     target_directory: covfie_src
 
 build:
-  number: 2
+  number: 3
 
 outputs:
   - staging:
