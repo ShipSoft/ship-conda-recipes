@@ -7,7 +7,7 @@ package:
 
 source:
   url: https://github.com/ShipSoft/aegir/archive/refs/tags/v${{ version }}.tar.gz
-  sha256: 5627d89957f4ce4148478d3c3a7a46702210b4ed8974a23977b685f181491ff8
+  sha256: d19f2731a0d0c45167397a30068b3291cff388be47ac9c55afdd6713bfb2bf1d
 
 build:
   number: 6
