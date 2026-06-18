@@ -25,7 +25,7 @@ on a [prefix.dev](https://prefix.dev) channel.
 | rootegpythia6 | 0.1 | No (niche) |
 | shipdatamodel | 26.06.0 | No (SHiP-specific) |
 | shipgeometry | 0.2.0 | No (SHiP-specific) |
-| shipgeometryservice | 26.06.0 | No (SHiP-specific) |
+| shipgeometryservice | 0.1.0 | No (SHiP-specific) |
 
 ### Upstreamed to conda-forge
 
