@@ -24,9 +24,23 @@ for recipe in "$@"; do
     continue
   fi
 
-  url_template=$(grep -E '^[[:space:]]+url:[[:space:]]*http' "$recipe" \
+  # Multi-source recipes (YAML `source:` list with `- url:` entries) need
+  # one sha256 per URL; this script only refreshes the first sha256 line,
+  # so it would cross-contaminate the others. Bail out cleanly — those
+  # recipes are expected to be on Renovate's disabled list anyway.
+  url_count=$(grep -cE '^[[:space:]]+(- )?url:[[:space:]]*http' "$recipe" || true)
+  if [ "$url_count" -gt 1 ]; then
+    echo "skip: $recipe (multi-source recipe; refresh sha256s manually)" >&2
+    continue
+  fi
+
+  url_template=$(grep -E '^[[:space:]]+(- )?url:[[:space:]]*http' "$recipe" \
                  | head -1 \
-                 | sed -E 's/^[[:space:]]+url:[[:space:]]*//')
+                 | sed -E 's/^[[:space:]]+(- )?url:[[:space:]]*//') || true
+  if [ -z "$url_template" ]; then
+    echo "skip: $recipe (no source URL matched)" >&2
+    continue
+  fi
   url=$(echo "$url_template" \
         | sed -E "s|\\\$\\{\\{[[:space:]]*version[[:space:]]*\\}\\}|$version|g")
 
