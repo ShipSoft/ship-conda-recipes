@@ -1,5 +1,5 @@
 context:
-  version: "0.2.0"
+  version: "0.2.1"
 
 package:
   name: shipgeometry
@@ -7,7 +7,7 @@ package:
 
 source:
   url: https://github.com/ShipSoft/Geometry/archive/refs/tags/v${{ version }}.tar.gz
-  sha256: ec3d50390369abb151de03fd7c5d8e5d944242ea0e05f8a35f95cdb8a60ab459
+  sha256: 54c12d59d19d6161fb9bc29129c1e7cded4200c39f0db5e374e14fd70398cd08
 
 build:
   number: 0
@@ -47,6 +47,7 @@ tests:
       - test -f $PREFIX/lib/cmake/SHiPGeometry/SHiPGeometryConfig.cmake
       - test -f $PREFIX/share/SHiPGeometry/sbt.toml
       - test -f $PREFIX/share/SHiPGeometry/calo.toml
+      - test -f $PREFIX/share/SHiPGeometry/TimingDetector/timing_detector.gmx
 
 about:
   homepage: https://github.com/ShipSoft/Geometry
