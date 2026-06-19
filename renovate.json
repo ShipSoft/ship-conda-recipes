@@ -42,7 +42,6 @@
         "luketpickering/ROOTEGPythia6",
         "SND-LHC/pythia6",
         "ShipSoft/data-model",
-        "ShipSoft/field_service",
         "acts-project/covfie"
       ],
       "enabled": false
