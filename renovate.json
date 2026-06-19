@@ -41,7 +41,6 @@
       "matchPackageNames": [
         "luketpickering/ROOTEGPythia6",
         "SND-LHC/pythia6",
-        "ShipSoft/data-model",
         "acts-project/covfie"
       ],
       "enabled": false
