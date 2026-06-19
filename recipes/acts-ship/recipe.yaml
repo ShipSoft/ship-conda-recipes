@@ -1,0 +1,99 @@
+context:
+  version: "0.0.0.dev20260608+fcf8bbe"
+  # HEAD of webbjm/acts shipdist-build as of 2026-06-08. The branch has
+  # no release tag; the fork's version_number file is the sentinel
+  # "999.999.999", so the conda version is a date-based snapshot.
+  # Bumping: edit commit + sha256, set version to 0.0.0.dev<YYYYMMDD>+<sha7>,
+  # and reset build.number to 0.
+  commit: "fcf8bbe23e7d11c0b0953ce88ef6345723e9c0f5"
+
+package:
+  name: acts-ship
+  version: ${{ version }}
+
+source:
+  url: https://github.com/webbjm/acts/archive/${{ commit }}.tar.gz
+  sha256: d9ee165108ab2f89bb696a7301fe3cead27afd8c0441034796bb359bceb7a1bf
+  patches:
+    # The shipdist-build branch references several SHiP-fork files that
+    # were never committed (SNDBuilder.{cpp,hpp}, RootSHiPParticleReader.hpp,
+    # RootParticleReader2.hpp, SHiPTrackWriter2.hpp). Drop those references
+    # so the build can complete.
+    # TODO: drop this patch once webbjm/acts fixes it upstream.
+    - patches/0001-drop-orphan-references.patch
+
+build:
+  number: 0
+  skip: win
+  script: build.sh
+
+requirements:
+  build:
+    - ${{ compiler('cxx') }}
+    - sysroot_linux-64 2.17.*
+    - cmake
+    - make
+    # Python codegen at build time (mirrors conda-forge acts-feedstock).
+    - python 3.13.*
+    - hatchling
+    - numpy
+    - sympy
+    - particle
+  host:
+    - libboost-devel
+    # ACTS requests `find_package(Eigen3 3.4.0 REQUIRED CONFIG)`; conda-forge
+    # `eigen` jumped to 5.0.1 which rejects the 3.4.0 request (SameMajorVersion).
+    - eigen 3.4.*
+    - nlohmann_json
+    - pybind11
+    - python 3.13.*
+    # find_package(HepMC3 3.2.4 REQUIRED CONFIG) at root CMakeLists.txt when
+    # ACTS_BUILD_EXAMPLES=ON.
+    - hepmc3
+    # find_package(TBB REQUIRED) at Examples/Framework/CMakeLists.txt.
+    - tbb-devel
+    # ACTS_BUILD_EXAMPLES=ON cascades ACTS_BUILD_PLUGIN_ROOT ON, and the
+    # SHiP examples module calls root_generate_dictionary.
+    - root_base
+    - root_cxx_standard
+  run:
+    # Needed for `import acts` at runtime; other runtime libs (ROOT,
+    # HepMC3, TBB, boost) come in via the host packages' run_exports.
+    - python 3.13.*
+  run_exports:
+    - ${{ pin_subpackage('acts-ship', upper_bound='x.x') }}
+  ignore_run_exports:
+    from_package:
+      - hatchling
+      - numpy
+      - sympy
+      - particle
+
+tests:
+  - script:
+      - test -f $PREFIX/lib/libActsCore.so
+      - test -f $PREFIX/lib/libActsPluginRoot.so
+      - test -f $PREFIX/lib/libActsExamplesSHiP.so
+      - test -f $PREFIX/lib/cmake/Acts/ActsConfig.cmake
+      - python -c "import acts"
+
+about:
+  homepage: https://github.com/webbjm/acts/tree/shipdist-build
+  repository: https://github.com/webbjm/acts
+  summary: SHiP fork of ACTS (shipdist-build branch) with SHiP-specific
+    examples and Python bindings.
+  description: |
+    ACTS is an experiment-independent toolkit for charged-particle track
+    reconstruction. This recipe packages the SHiP fork at
+    webbjm/acts@shipdist-build, which adds SHiP-specific detector
+    builders (Straw tracker, MTC, SiT, HGC), a SHiP track writer, an
+    initial seeder, and SHiP-side RecoTrack / RecoVertex classes under
+    Examples/Algorithms/SHiP/. It also patches the magnetic-field
+    interpolator. The vanilla acts-core package on conda-forge does not
+    ship any of this.
+  license: MPL-2.0
+  license_file: LICENSE
+
+extra:
+  recipe-maintainers:
+    - olantwin

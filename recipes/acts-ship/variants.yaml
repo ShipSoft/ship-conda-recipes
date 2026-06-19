@@ -1,0 +1,3 @@
+root_cxx_standard:
+  - "20"
+  - "23"

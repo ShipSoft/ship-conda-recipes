@@ -41,7 +41,8 @@
       "matchPackageNames": [
         "luketpickering/ROOTEGPythia6",
         "SND-LHC/pythia6",
-        "acts-project/covfie"
+        "acts-project/covfie",
+        "webbjm/acts"
       ],
       "enabled": false
     }
