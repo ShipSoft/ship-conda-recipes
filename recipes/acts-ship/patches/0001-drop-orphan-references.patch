@@ -1,0 +1,107 @@
+Subject: Drop orphan SHiP-fork references whose source/header files
+ were never committed
+
+The shipdist-build branch of webbjm/acts references four SHiP-specific
+files that were never committed to the tree, breaking the build:
+
+  * src/SNDBuilder.cpp in Examples/Detectors/TGeoDetector/CMakeLists.txt
+  * ActsExamples/TGeoDetector/SNDBuilder.hpp in Examples/Python/src/Detector.cpp
+    (and the corresponding py::class_<SNDBuilder> Python binding block)
+  * ActsExamples/Io/Root/RootSHiPParticleReader.hpp in Examples/Python/src/RootInput.cpp
+    (the matching ACTS_PYTHON_DECLARE_READER call is already commented
+    out upstream, so only the include needs to go)
+  * ActsExamples/Io/Root/RootParticleReader2.hpp in Examples/Python/src/RootInput.cpp
+    (and the corresponding ACTS_PYTHON_DECLARE_READER call)
+  * ActsExamples/Io/Root/SHiPTrackWriter2.hpp in Examples/Python/src/RootOutput.cpp
+    (and the corresponding ACTS_PYTHON_DECLARE_WRITER call)
+
+Drop all of them. None of these symbols are referenced anywhere else in
+the tree. The Strawtube classes were moved to Examples/Algorithms/SHiP/.
+
+Remove this patch once the upstream fork either commits the missing
+files or drops these references itself.
+---
+--- a/Examples/Detectors/TGeoDetector/CMakeLists.txt
++++ b/Examples/Detectors/TGeoDetector/CMakeLists.txt
+@@ -4,7 +4,6 @@
+     src/AlignedTGeoDetectorElement.cpp
+     src/ShipDetectorElement.cpp
+     src/SiTargetBuilder.cpp
+-    src/SNDBuilder.cpp
+     #    src/StrawtubeBuilder.cpp
+     src/MTCBuilder.cpp
+     src/TGeoDetector.cpp
+--- a/Examples/Python/src/Detector.cpp
++++ b/Examples/Python/src/Detector.cpp
+@@ -21,7 +21,6 @@
+ #include "ActsExamples/TGeoDetector/TGeoDetector.hpp"
+ #include "ActsExamples/TGeoDetector/SiTargetBuilder.hpp"
+ #include "ActsExamples/TGeoDetector/MTCBuilder.hpp"
+-#include "ActsExamples/TGeoDetector/SNDBuilder.hpp"
+ #include "ActsExamples/TGeoDetector/StrawtubeBuilder.hpp"
+ #include "ActsExamples/TelescopeDetector/TelescopeDetector.hpp"
+ #include "ActsExamples/Utilities/Options.hpp"
+@@ -176,20 +175,6 @@
+
+     ACTS_PYTHON_STRUCT(c, surfaceLogLevel, layerLogLevel, volumeLogLevel,
+                        fileName
+-                       );
+-
+-    patchKwargsConstructor(c);
+-
+-  }
+-  {
+-    auto d = py::class_<SNDBuilder, Detector, std::shared_ptr<SNDBuilder>>(
+-                 mex, "SNDBuilder")
+-                 .def(py::init<const SNDBuilder::Config&>());
+-
+-    auto c = py::class_<SNDBuilder::Config>(d, "Config").def(py::init<>());
+-
+-    ACTS_PYTHON_STRUCT(c, surfaceLogLevel, layerLogLevel, volumeLogLevel,
+-                       fileName
+                        );
+
+     patchKwargsConstructor(c);
+--- a/Examples/Python/src/RootInput.cpp
++++ b/Examples/Python/src/RootInput.cpp
+@@ -11,9 +11,7 @@
+ #include "ActsExamples/Io/Root/RootAthenaNTupleReader.hpp"
+ #include "ActsExamples/Io/Root/RootMaterialDecorator.hpp"
+ #include "ActsExamples/Io/Root/RootMaterialTrackReader.hpp"
+-#include "ActsExamples/Io/Root/RootSHiPParticleReader.hpp"
+ #include "ActsExamples/Io/Root/RootParticleReader.hpp"
+-#include "ActsExamples/Io/Root/RootParticleReader2.hpp"
+ #include "ActsExamples/Io/Root/RootSimHitReader.hpp"
+ #include "ActsExamples/Io/Root/RootTrackSummaryReader.hpp"
+ #include "ActsExamples/Io/Root/RootVertexReader.hpp"
+@@ -35,9 +33,6 @@
+                              "RootParticleReader", outputParticles, treeName,
+                              filePath);
+
+-  ACTS_PYTHON_DECLARE_READER(ActsExamples::RootParticleReader2, mex,
+-                             "RootParticleReader2", outputParticles, particleArr
+-                             );
+
+ //  ACTS_PYTHON_DECLARE_READER(ActsExamples::RootSHiPParticleReader, mex,
+ //                             "RootSHiPParticleReader", outputParticles, treeName,
+--- a/Examples/Python/src/RootOutput.cpp
++++ b/Examples/Python/src/RootOutput.cpp
+@@ -24,7 +24,6 @@
+ #include "ActsExamples/Io/Root/RootTrackSummaryWriter.hpp"
+ #include "ActsExamples/Io/Root/RootVertexWriter.hpp"
+ #include "ActsExamples/Io/Root/SHiPTrackWriter.hpp"
+-#include "ActsExamples/Io/Root/SHiPTrackWriter2.hpp"
+ #include "ActsExamples/Io/Root/SHiPVertexWriter.hpp"
+ #include "ActsExamples/Io/Root/TrackFinderNTupleWriter.hpp"
+ #include "ActsExamples/Io/Root/TrackFinderPerformanceWriter.hpp"
+@@ -219,10 +218,6 @@
+       inputTracks, inputParticles, inputTrackParticleMatching, filePath,
+       treeName, fileMode, writeCovMat, writeGsfSpecific, writeGx2fSpecific);
+
+-  ACTS_PYTHON_DECLARE_WRITER(
+-      ActsExamples::SHiPTrackWriter2, mex, "SHiPTrackWriter2",
+-      inputTracks, inputParticles, inputTrackParticleMatching, filePath,
+-      treeName, fileMode, writeCovMat, writeGsfSpecific, writeGx2fSpecific);
+   /*
+   ACTS_PYTHON_DECLARE_WRITER(
+       ActsExamples::SHiPVertexWriter, mex, "SHiPVertexWriter",
