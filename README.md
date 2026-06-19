@@ -23,7 +23,7 @@ on a [prefix.dev](https://prefix.dev) channel.
 | pythia6 | 6.4.28 | No (SND-LHC fork) |
 | random123 | 1.14.0 | Yes (conda-forge feedstock) |
 | rootegpythia6 | 0.1 | No (niche) |
-| shipdatamodel | 26.06.0 | No (SHiP-specific) |
+| shipdatamodel | 0.1.0 | No (SHiP-specific) |
 | shipgeometry | 0.2.0 | No (SHiP-specific) |
 | shipgeometryservice | 0.1.0 | No (SHiP-specific) |
 
