@@ -10,7 +10,7 @@ source:
   sha256: d19f2731a0d0c45167397a30068b3291cff388be47ac9c55afdd6713bfb2bf1d
 
 build:
-  number: 6
+  number: 0
   skip:
     - win
   script: build.sh
@@ -25,6 +25,8 @@ requirements:
     - shipdatamodel
     - phlex
     - shipgeometryservice
+    - field-service-core
+    - field-service-g4
     - root_base
     - root_cxx_standard
     - geant4
@@ -49,6 +51,8 @@ tests:
       - test -f $PREFIX/lib/libgeometry_builtin_provider.so
       - test -f $PREFIX/lib/libgeometry_gdml_provider.so
       - test -f $PREFIX/lib/libgeometry_geomodel_provider.so
+      - test -f $PREFIX/lib/libfield_covfie_provider.so
+      - test -f $PREFIX/lib/libfield_null_provider.so
       - test -f $PREFIX/lib/libgeant4_module.so
       - test -f $PREFIX/lib/libsim_output_module.so
       - test -f $PREFIX/bin/pythia8_benchmark
