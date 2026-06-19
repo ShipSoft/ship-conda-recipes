@@ -10,7 +10,7 @@ source:
   sha256: d19f2731a0d0c45167397a30068b3291cff388be47ac9c55afdd6713bfb2bf1d
 
 build:
-  number: 0
+  number: 1
   skip:
     - win
   script: build.sh
@@ -22,9 +22,13 @@ requirements:
     - cmake
     - make
   host:
-    - shipdatamodel
+    # Pin <1 to exclude the legacy 26.06.0 builds still on the ship
+    # channel; without this, conda's resolver maximises version at
+    # build time and picks 26.06.0, baking the wrong run_export pin
+    # into aegir.
+    - shipdatamodel <1
     - phlex
-    - shipgeometryservice
+    - shipgeometryservice <1
     - field-service-core
     - field-service-g4
     - root_base
