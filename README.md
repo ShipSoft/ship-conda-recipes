@@ -17,7 +17,6 @@ on a [prefix.dev](https://prefix.dev) channel.
 | geant3 | 4.5 | Yes |
 | geant4-vmc | 6.8 | Yes |
 | genfit | 2.3.0 | Yes |
-| geomodel | 6.27.0 | Yes (split recipe, staging for conda-forge) |
 | mp-units | 2.5.0 | Yes (conda-forge feedstock) |
 | npdb-client | 0.2.10 | No (SHiP-specific, split recipe with `python-npdb-client`) |
 | photospp | 3.64 | Yes |
@@ -39,18 +38,7 @@ Previously packaged here, now consumed directly from conda-forge:
 - [vmc](https://github.com/conda-forge/vmc-feedstock)
 - [vgm](https://github.com/conda-forge/vgm-feedstock)
 - [phlex](https://github.com/conda-forge/phlex-feedstock)
-
-The `recipes/geomodel` recipe is a multi-output rattler-build recipe
-that produces:
-
-- `geomodel-core` — kernel + I/O (always pulled in by consumers)
-- `geomodel-tools` — XML/JSON parsers and `gmcat` / `gmstatistics` CLIs
-- `geomodel-g4` — GeoModel → Geant4 conversion libraries
-- `geomodel-fullsimlight` — FullSimLight Geant4 simulation driver
-- `geomodel-visualization` — VP1-based 3D visualization + `gmex` (opt-in,
-  pulls in Qt6 / Coin3D / SoQt / HDF5)
-- `geomodel` — convenience metapackage covering core + tools + g4 +
-  fullsimlight (does **not** pull in visualization)
+- [GeoModel](https://github.com/conda-forge/geomodel-feedstock)
 
 ## Building
 
