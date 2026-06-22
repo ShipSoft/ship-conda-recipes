@@ -1,21 +1,55 @@
 # prefix.dev/ship channel snapshot
 
-_Updated: 2026-06-15_
+_Updated: 2026-06-22_
 
 ## linux-64
 
 | Package | Version | Build | Build number | Uploaded |
 |---------|---------|-------|--------------|----------|
-| aegir | 0.1.0 | `hb0f4dca_0` | 0 | 2026-06-05 |
-| aegir | 0.1.0 | `hb0f4dca_1` | 1 | 2026-06-05 |
-| aegir | 0.1.0 | `hb0f4dca_2` | 2 | 2026-06-09 |
-| aegir | 0.1.0 | `hb0f4dca_3` | 3 | 2026-06-10 |
-| aegir | 0.1.0 | `hb0f4dca_4` | 4 | 2026-06-13 |
-| aegir | 0.1.0 | `hb0f4dca_5` | 5 | 2026-06-14 |
+| acts-ship | 0.0.0.dev20260608+fcf8bbe | `h0566472_0` | 0 | 2026-06-19 |
+| acts-ship | 0.0.0.dev20260608+fcf8bbe | `hc97bc57_0` | 0 | 2026-06-19 |
+| aegir | 0.2.0 | `hb0f4dca_1` | 1 | 2026-06-19 |
 | fairroot | 19.0.1 | `hb0f4dca_9` | 9 | 2026-06-13 |
 | fairroot | 19.0.1 | `hb0f4dca_10` | 10 | 2026-06-14 |
 | fairship | 26.05.7 | `hb0f4dca_4` | 4 | 2026-06-13 |
 | fairship | 26.05.7 | `hb0f4dca_5` | 5 | 2026-06-14 |
+| fairship | 26.06 | `hb0f4dca_0` | 0 | 2026-06-18 |
+| field-service | 0.1.0 | `h83dfeff_0` | 0 | 2026-06-19 |
+| field-service | 0.1.0 | `hb9574b7_0` | 0 | 2026-06-19 |
+| field-service | 0.1.0.dev0 | `h1e2445f_0` | 0 | 2026-06-17 |
+| field-service | 0.1.0.dev0 | `h76de79a_1` | 1 | 2026-06-18 |
+| field-service | 0.1.0.dev0 | `he732624_1` | 1 | 2026-06-18 |
+| field-service | 0.1.0.dev0 | `h7076cdb_2` | 2 | 2026-06-18 |
+| field-service | 0.1.0.dev0 | `hf774abd_2` | 2 | 2026-06-18 |
+| field-service | 0.1.0.dev0 | `hb2dd60d_3` | 3 | 2026-06-18 |
+| field-service | 0.1.0.dev0 | `hd1b55c3_3` | 3 | 2026-06-18 |
+| field-service-core | 0.1.0 | `h0566472_0` | 0 | 2026-06-19 |
+| field-service-core | 0.1.0 | `hc97bc57_0` | 0 | 2026-06-19 |
+| field-service-core | 0.1.0.dev0 | `hb0f4dca_0` | 0 | 2026-06-17 |
+| field-service-core | 0.1.0.dev0 | `h0566472_1` | 1 | 2026-06-18 |
+| field-service-core | 0.1.0.dev0 | `hc97bc57_1` | 1 | 2026-06-18 |
+| field-service-core | 0.1.0.dev0 | `h0566472_2` | 2 | 2026-06-18 |
+| field-service-core | 0.1.0.dev0 | `hc97bc57_2` | 2 | 2026-06-18 |
+| field-service-core | 0.1.0.dev0 | `h0566472_3` | 3 | 2026-06-18 |
+| field-service-core | 0.1.0.dev0 | `hc97bc57_3` | 3 | 2026-06-18 |
+| field-service-g4 | 0.1.0 | `hc496693_0` | 0 | 2026-06-19 |
+| field-service-g4 | 0.1.0 | `hf4ec559_0` | 0 | 2026-06-19 |
+| field-service-g4 | 0.1.0.dev0 | `hbeae973_0` | 0 | 2026-06-17 |
+| field-service-g4 | 0.1.0.dev0 | `h52839a3_1` | 1 | 2026-06-18 |
+| field-service-g4 | 0.1.0.dev0 | `ha0b064d_1` | 1 | 2026-06-18 |
+| field-service-g4 | 0.1.0.dev0 | `h354bf56_2` | 2 | 2026-06-18 |
+| field-service-g4 | 0.1.0.dev0 | `h4953c98_2` | 2 | 2026-06-18 |
+| field-service-g4 | 0.1.0.dev0 | `h8c1c234_3` | 3 | 2026-06-18 |
+| field-service-g4 | 0.1.0.dev0 | `he69e5d4_3` | 3 | 2026-06-18 |
+| field-service-tools | 0.1.0 | `hc496693_0` | 0 | 2026-06-19 |
+| field-service-tools | 0.1.0 | `hf4ec559_0` | 0 | 2026-06-19 |
+| field-service-tools | 0.1.0.dev0 | `hbeae973_0` | 0 | 2026-06-17 |
+| field-service-tools | 0.1.0.dev0 | `h52839a3_1` | 1 | 2026-06-18 |
+| field-service-tools | 0.1.0.dev0 | `ha0b064d_1` | 1 | 2026-06-18 |
+| field-service-tools | 0.1.0.dev0 | `h354bf56_2` | 2 | 2026-06-18 |
+| field-service-tools | 0.1.0.dev0 | `h4953c98_2` | 2 | 2026-06-18 |
+| field-service-tools | 0.1.0.dev0 | `h8c1c234_3` | 3 | 2026-06-18 |
+| field-service-tools | 0.1.0.dev0 | `he69e5d4_3` | 3 | 2026-06-18 |
 | geant3 | 4.5 | `hb0f4dca_4` | 4 | 2026-06-13 |
 | geant3 | 4.5 | `hb0f4dca_5` | 5 | 2026-06-14 |
 | geant4-vmc | 6.8 | `hb0f4dca_4` | 4 | 2026-06-13 |
@@ -49,6 +83,7 @@ _Updated: 2026-06-15_
 | mp-units | 2.5.0 | `hb0f4dca_1` | 1 | 2026-06-10 |
 | mp-units | 2.5.0 | `hb0f4dca_4` | 4 | 2026-06-13 |
 | mp-units | 2.5.0 | `hb0f4dca_5` | 5 | 2026-06-14 |
+| npdb-client | 0.2.10 | `hb0f4dca_0` | 0 | 2026-06-17 |
 | phlex | 0.2.0 | `hb0f4dca_0` | 0 | 2026-06-04 |
 | phlex | 0.2.0 | `hb0f4dca_1` | 1 | 2026-06-05 |
 | phlex | 0.2.0 | `hb0f4dca_2` | 2 | 2026-06-08 |
@@ -64,6 +99,7 @@ _Updated: 2026-06-15_
 | pythia6 | 6.4.28 | `hb0f4dca_4` | 4 | 2026-06-10 |
 | pythia6 | 6.4.28 | `hb0f4dca_5` | 5 | 2026-06-13 |
 | pythia6 | 6.4.28 | `hb0f4dca_6` | 6 | 2026-06-14 |
+| python-npdb-client | 0.2.10 | `hb0f4dca_0` | 0 | 2026-06-17 |
 | rootegpythia6 | 0.1 | `hb0f4dca_0` | 0 | 2026-05-26 |
 | rootegpythia6 | 0.1 | `hb0f4dca_1` | 1 | 2026-06-08 |
 | rootegpythia6 | 0.1 | `hb0f4dca_2` | 2 | 2026-06-08 |
@@ -72,23 +108,18 @@ _Updated: 2026-06-15_
 | rootegpythia6 | 0.1 | `hb0f4dca_5` | 5 | 2026-06-11 |
 | rootegpythia6 | 0.1 | `hb0f4dca_6` | 6 | 2026-06-13 |
 | rootegpythia6 | 0.1 | `hb0f4dca_7` | 7 | 2026-06-14 |
-| shipdatamodel | 26.06.0 | `hb0f4dca_0` | 0 | 2026-06-05 |
-| shipdatamodel | 26.06.0 | `hb0f4dca_1` | 1 | 2026-06-10 |
-| shipdatamodel | 26.06.0 | `hb0f4dca_2` | 2 | 2026-06-13 |
-| shipdatamodel | 26.06.0 | `hb0f4dca_3` | 3 | 2026-06-14 |
+| shipdatamodel | 0.1.0 | `hb0f4dca_0` | 0 | 2026-06-19 |
+| shipdatamodel | 0.1.0 | `h0566472_1` | 1 | 2026-06-19 |
+| shipdatamodel | 0.1.0 | `hc97bc57_1` | 1 | 2026-06-19 |
 | shipgeometry | 0.1.0 | `hb0f4dca_0` | 0 | 2026-06-05 |
 | shipgeometry | 0.1.0 | `hb0f4dca_1` | 1 | 2026-06-05 |
 | shipgeometry | 0.1.0 | `hb0f4dca_2` | 2 | 2026-06-10 |
 | shipgeometry | 0.1.0 | `hb0f4dca_3` | 3 | 2026-06-13 |
 | shipgeometry | 0.1.0 | `hb0f4dca_4` | 4 | 2026-06-13 |
 | shipgeometry | 0.1.0 | `hb0f4dca_5` | 5 | 2026-06-14 |
-| shipgeometryservice | 26.06.0 | `hb0f4dca_0` | 0 | 2026-06-05 |
-| shipgeometryservice | 26.06.0 | `hb0f4dca_1` | 1 | 2026-06-05 |
-| shipgeometryservice | 26.06.0 | `hb0f4dca_2` | 2 | 2026-06-09 |
-| shipgeometryservice | 26.06.0 | `hb0f4dca_3` | 3 | 2026-06-10 |
-| shipgeometryservice | 26.06.0 | `hb0f4dca_4` | 4 | 2026-06-13 |
-| shipgeometryservice | 26.06.0 | `hb0f4dca_5` | 5 | 2026-06-13 |
-| shipgeometryservice | 26.06.0 | `hb0f4dca_6` | 6 | 2026-06-14 |
+| shipgeometry | 0.2.0 | `hb0f4dca_0` | 0 | 2026-06-17 |
+| shipgeometry | 0.2.1 | `hb0f4dca_0` | 0 | 2026-06-18 |
+| shipgeometryservice | 0.1.0 | `hb0f4dca_0` | 0 | 2026-06-18 |
 
 ## noarch
 
