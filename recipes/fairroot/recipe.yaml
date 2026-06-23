@@ -12,7 +12,7 @@ source:
     - fix-boost-serialization.patch
 
 build:
-  number: 10
+  number: 11
   script: build.sh
 
 requirements:
