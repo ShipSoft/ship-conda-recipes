@@ -15,7 +15,7 @@ source:
     target_directory: covfie_src
 
 build:
-  number: 0
+  number: 1
 
 outputs:
   - staging:
@@ -40,10 +40,7 @@ outputs:
       host:
       - mp-units
       - geant4
-      # Pin ROOT to the 6.40 series so the cxx23 variant picks the same
-      # major.minor as the cxx20 one (otherwise the solver drops to
-      # 6.36 cxx23, which would force consumers to downgrade ROOT).
-      - root_base >=6.40
+      - root_base
       - root_cxx_standard
 
   - package:

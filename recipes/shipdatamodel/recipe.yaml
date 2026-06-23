@@ -10,7 +10,7 @@ source:
   sha256: 7389604a7945abdf4edda51aee7b06bb56a6d6b2366e137a9288b0367cbe8a1c
 
 build:
-  number: 1
+  number: 2
   skip:
     - win
   script: build.sh
@@ -22,10 +22,7 @@ requirements:
     - cmake
     - make
   host:
-    # Pin ROOT to the 6.40 series so the cxx23 variant picks the same
-    # major.minor as the cxx20 one (otherwise the solver drops to
-    # 6.36 cxx23, which would force consumers to downgrade ROOT).
-    - root_base >=6.40
+    - root_base
     - root_cxx_standard
   run_exports:
     - ${{ pin_subpackage('shipdatamodel', upper_bound='x.x') }}
