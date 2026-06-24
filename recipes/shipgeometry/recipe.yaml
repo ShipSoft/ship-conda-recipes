@@ -26,6 +26,12 @@ requirements:
     - geomodel-tools
     - sqlite
     - tomlplusplus
+    # GeoModelCoreConfig.cmake does find_dependency(Eigen3); per
+    # conda-forge eigen-feedstock README case B, consumers of a
+    # library that exposes Eigen in public headers must list
+    # eigen-abi-devel in host. Remove once conda-forge
+    # geomodel-feedstock ships -devel outputs (case C).
+    - eigen-abi-devel
   run_exports:
     - ${{ pin_subpackage('shipgeometry', upper_bound='x.x') }}
 
