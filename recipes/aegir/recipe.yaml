@@ -42,6 +42,12 @@ requirements:
     - fmt
     - mp-units
     - ms-gsl
+    # GeoModelCoreConfig.cmake does find_dependency(Eigen3); per
+    # conda-forge eigen-feedstock README case B, consumers of a
+    # library that exposes Eigen in public headers must list
+    # eigen-abi-devel in host. Remove once conda-forge
+    # geomodel-feedstock ships -devel outputs (case C).
+    - eigen-abi-devel
     # GeoModelToolsConfig.cmake does find_dependency(nlohmann_json
     # 3.12.0). conda-forge geomodel-tools keeps nlohmann_json in
     # host only (no run / no run_exports) and nlohmann_json has no
