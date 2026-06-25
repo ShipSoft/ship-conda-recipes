@@ -42,6 +42,15 @@ requirements:
     - fmt
     - mp-units
     - ms-gsl
+    # GeoModelToolsConfig.cmake does find_dependency(nlohmann_json
+    # 3.12.0). conda-forge geomodel-tools keeps nlohmann_json in
+    # host only (no run / no run_exports) and nlohmann_json has no
+    # run_exports of its own, so any package whose Config triggers
+    # find_dependency(GeoModelTools) at configure time forces
+    # consumers to list nlohmann_json in host. Remove once
+    # conda-forge geomodel-feedstock adds nlohmann_json to
+    # geomodel-tools' run:.
+    - nlohmann_json
   run:
     # Header-only libraries with no run_exports.
     - ms-gsl
