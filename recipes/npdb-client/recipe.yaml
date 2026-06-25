@@ -1,7 +1,7 @@
 schema_version: 1
 
 context:
-  version: "0.2.10"
+  version: "0.3.0"
   build_number: 0
 
 recipe:
@@ -10,7 +10,7 @@ recipe:
 
 source:
   url: https://gitlab.cern.ch/ship/computing/npdb/-/archive/${{ version }}/npdb-${{ version }}.tar.gz
-  sha256: 3453a3d996034cfe957721cfcacc76f95335c6ed2e71d326d52f06219b836d26
+  sha256: b814bca8a456f5e1a0ddac5904a992c6e14f873a6e7181816c179adddce61bd9
   patches:
     - narrow-workspace.patch
 
@@ -22,7 +22,7 @@ build:
 
 outputs:
 
-  # ---- C++ static lib + headers ------------------------------------------
+  # ---- C++ shared lib + headers ------------------------------------------
   - package:
       name: npdb-client
       version: ${{ version }}
@@ -42,22 +42,22 @@ outputs:
     tests:
       - package_contents:
           include:
-            - npdb-client.h
-            - npdb-bridge.h
-            - cxx.h
+            - npdb/client.h
           files:
-            - lib/libnpdb_client_bridge.a
-            - lib/libnpdb_client.a
+            - lib/cmake/npdb/NPDBConfig.cmake
+            - lib/cmake/npdb/NPDBConfigVersion.cmake
+            - lib/cmake/npdb/NPDBTargets.cmake
+            - lib/libnpdb_client_cxx.so
     about:
       homepage: https://gitlab.cern.ch/ship/computing/npdb
       repository: https://gitlab.cern.ch/ship/computing/npdb
       summary: C++ client library for the SHiP npdb conditions DB REST API
       description: |
-        npdb-client provides a static C++ library (libnpdb_client_bridge)
+        npdb-client provides a shared C++ library (libnpdb_client_cxx)
         and headers for talking to the npdb conditions-DB REST service.
         The library is a Rust core (npdb-client) exposed via the cxx
-        crate. Consumers link against libnpdb_client_bridge.a and
-        libnpdb_client.a and include npdb-client.h.
+        crate. Consumers link against libnpdb_client_cxx.so and
+        and include npdb/client.h.
       license: Apache-2.0
       license_file: LICENSE
 
