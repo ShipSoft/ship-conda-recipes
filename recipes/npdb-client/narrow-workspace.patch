@@ -1,17 +1,20 @@
 Narrow the cargo workspace to the client-side members only.
 
-Upstream's monorepo workspace at npdb-0.2.10/Cargo.toml lists four members
+Upstream's monorepo workspace at npdb-0.3.0/Cargo.toml lists four members
 (npdb-client, npdb-core, npdb-loadtests, npdb-server). When this recipe
-runs `cargo build` from npdb-client/, cargo walks up, finds the workspace,
-and resolves Cargo.lock for ALL members - which means fetching the full
-server-side dependency graph (axum, sqlx, tokio, tower, ...). That is ~100+
-crates we never link against, and a transient SSL flake on one of them
-fails the build.
+builds the python client, maturin automatically downloads and resolves
+Cargo.lock for ALL members - which means fetching the full server-side
+dependency graph (axum, sqlx, tokio, tower, ...). That is ~100+ crates we never
+link against, and a transient SSL flake on one of them fails the build.
 
 Dropping the two server-side members shrinks the resolved graph to just
 what npdb-client needs (about 30-40 crates). The on-disk npdb-server/ and
 npdb-loadtests/ directories stay untouched - cargo simply ignores them now
 that they're not listed.
+
+Hopefully some fixes will land in maturin, the python package builder, to
+prevent this explicit downloading, as it is e.g. not done by cargo build
+and similar.
 
 --- a/Cargo.toml
 +++ b/Cargo.toml
