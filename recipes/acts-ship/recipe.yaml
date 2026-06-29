@@ -23,7 +23,7 @@ source:
     - patches/0001-drop-orphan-references.patch
 
 build:
-  number: 2
+  number: 3
   skip: win
   script: build.sh
 
@@ -55,7 +55,14 @@ requirements:
     - python 3.13.*
     # find_package(HepMC3 3.2.4 REQUIRED CONFIG) at root CMakeLists.txt when
     # ACTS_BUILD_EXAMPLES=ON.
-    - hepmc3
+    #
+    # Cap HepMC3 below 3.3.1 for the same reason as the Boost pin above:
+    # conda-forge `photos` (pulled in by `evtgen`, a fairroot runtime dep) is
+    # still built against hepmc3 3.3.0 and pins `hepmc3 <3.3.1`. An
+    # unpinned acts-ship picks up hepmc3 3.3.1 and conflicts with the rest of
+    # the SHiP stack. Track conda-forge's hepmc3 until photos/evtgen migrate
+    # to 3.3.1, then drop this pin.
+    - hepmc3 <3.3.1
     # find_package(TBB REQUIRED) at Examples/Framework/CMakeLists.txt.
     - tbb-devel
     # ACTS_BUILD_EXAMPLES=ON cascades ACTS_BUILD_PLUGIN_ROOT ON, and the
@@ -63,9 +70,15 @@ requirements:
     - root_base
     - root_cxx_standard
   run:
-    # Needed for `import acts` at runtime; other runtime libs (ROOT,
-    # HepMC3, TBB, boost) come in via the host packages' run_exports.
+    # Needed for `import acts` at runtime; ROOT, TBB and Boost come in via the
+    # host packages' run_exports.
     - python 3.13.*
+    # HepMC3 must be listed explicitly: the capped hepmc3 3.3.0 (see host) has
+    # no run_exports.json, unlike 3.3.1, so nothing would otherwise pull it
+    # into the runtime/test env and `import acts` fails on libHepMC3.so. Match
+    # the host cap. Drop this (and the host pin) once photos/evtgen migrate to
+    # hepmc3 3.3.1.
+    - hepmc3 <3.3.1
   run_exports:
     - ${{ pin_subpackage('acts-ship', upper_bound='x.x') }}
   ignore_run_exports:
