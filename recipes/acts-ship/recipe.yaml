@@ -23,7 +23,7 @@ source:
     - patches/0001-drop-orphan-references.patch
 
 build:
-  number: 1
+  number: 2
   skip: win
   script: build.sh
 
@@ -40,7 +40,13 @@ requirements:
     - sympy
     - particle
   host:
-    - libboost-devel
+    # Cap Boost below 1.91: conda-forge `geant4` (and thus the geant4-vmc /
+    # fairroot / fairship stack) is still built against libboost 1.90, so its
+    # run_export pins libboost <1.91. An unpinned acts-ship picks up the newer
+    # 1.91 and becomes co-installable-incompatible with the rest of the SHiP
+    # stack. Track geant4's Boost until conda-forge migrates it to 1.91, then
+    # drop this pin.
+    - libboost-devel <1.91
     # ACTS requests `find_package(Eigen3 3.4.0 REQUIRED CONFIG)`; conda-forge
     # `eigen` jumped to 5.0.1 which rejects the 3.4.0 request (SameMajorVersion).
     - eigen 3.4.*
