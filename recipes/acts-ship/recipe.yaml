@@ -1,11 +1,11 @@
 context:
-  version: "0.0.0.dev20260608+fcf8bbe"
-  # HEAD of webbjm/acts shipdist-build as of 2026-06-08. The branch has
+  version: "0.0.0.dev20260622+f5bb9fc"
+  # HEAD of webbjm/acts shipdist-build as of 2026-06-22. The branch has
   # no release tag; the fork's version_number file is the sentinel
   # "999.999.999", so the conda version is a date-based snapshot.
   # Bumping: edit commit + sha256, set version to 0.0.0.dev<YYYYMMDD>+<sha7>,
   # and reset build.number to 0.
-  commit: "fcf8bbe23e7d11c0b0953ce88ef6345723e9c0f5"
+  commit: "f5bb9fcb02cd2b762112b12333878c75a196ad82"
 
 package:
   name: acts-ship
@@ -13,17 +13,10 @@ package:
 
 source:
   url: https://github.com/webbjm/acts/archive/${{ commit }}.tar.gz
-  sha256: d9ee165108ab2f89bb696a7301fe3cead27afd8c0441034796bb359bceb7a1bf
-  patches:
-    # The shipdist-build branch references several SHiP-fork files that
-    # were never committed (SNDBuilder.{cpp,hpp}, RootSHiPParticleReader.hpp,
-    # RootParticleReader2.hpp, SHiPTrackWriter2.hpp). Drop those references
-    # so the build can complete.
-    # TODO: drop this patch once webbjm/acts fixes it upstream.
-    - patches/0001-drop-orphan-references.patch
+  sha256: a6e9bdcfeb4da1f0fd4d4dda1feb7c61d2c6e13e7085479a8f06577883ae268a
 
 build:
-  number: 3
+  number: 0
   skip: win
   script: build.sh
 
