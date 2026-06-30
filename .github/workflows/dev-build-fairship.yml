@@ -38,7 +38,7 @@ jobs:
       - name: Drop committed lock to force fresh resolve
         run: rm -f pixi.lock
       - name: Set up pixi against upstream manifest
-        uses: prefix-dev/setup-pixi@v0.9.6
+        uses: prefix-dev/setup-pixi@v0.10.0
         with:
           cache: false
       - name: Configure, build, install
