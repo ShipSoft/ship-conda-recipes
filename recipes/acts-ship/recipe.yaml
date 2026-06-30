@@ -1,11 +1,11 @@
 context:
-  version: "0.0.0.dev20260622+f5bb9fc"
-  # HEAD of webbjm/acts shipdist-build as of 2026-06-22. The branch has
+  version: "0.0.0.dev20260630+bedcaae"
+  # HEAD of webbjm/acts shipdist-build as of 2026-06-30. The branch has
   # no release tag; the fork's version_number file is the sentinel
   # "999.999.999", so the conda version is a date-based snapshot.
   # Bumping: edit commit + sha256, set version to 0.0.0.dev<YYYYMMDD>+<sha7>,
   # and reset build.number to 0.
-  commit: "f5bb9fcb02cd2b762112b12333878c75a196ad82"
+  commit: "bedcaae62d426dca3985fc24c38846e044fcb248"
 
 package:
   name: acts-ship
@@ -13,7 +13,7 @@ package:
 
 source:
   url: https://github.com/webbjm/acts/archive/${{ commit }}.tar.gz
-  sha256: a6e9bdcfeb4da1f0fd4d4dda1feb7c61d2c6e13e7085479a8f06577883ae268a
+  sha256: 0f145f9dbc2a9bd5b1e15f3a7ea93034d7f4de13f75d0b3193c48ec9fecf5daa
 
 build:
   number: 0
