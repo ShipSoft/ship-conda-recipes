@@ -1,0 +1,10 @@
+# commitizen configuration for `cz check` (see .pre-commit-config.yaml and the
+# commit-check CI workflow). Conventional Commits, extended with this repo's
+# established `recipes` and `metadata` types (previously accepted by
+# crate-ci/committed). The alternation mirrors commitizen's default conventional
+# schema_pattern with those two types added.
+[tool.commitizen]
+name = "cz_customize"
+
+[tool.commitizen.customize]
+schema_pattern = "(?s)(build|bump|chore|ci|docs|feat|fix|perf|recipes|metadata|refactor|revert|style|test)(\\(\\S+\\))?!?: ([^\\n\\r]+)((\\n\\n.*)|(\\s*))?$"
