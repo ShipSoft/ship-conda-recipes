@@ -37,7 +37,9 @@ jobs:
                 | map(.value)
                 | sort_by(.name, .version, (.build_number // 0))
                 | .[]
-                | "| \(.name) | \(.version) | `\(.build)` | \(.build_number // 0) | \(((.timestamp // 0) / 1000) | strftime("%Y-%m-%d")) |"
+                | ("| \(.name) | \(.version) | `\(.build)` | "
+                   + "\(.build_number // 0) | "
+                   + "\(((.timestamp // 0) / 1000) | strftime("%Y-%m-%d")) |")
               '
             done
           } > channel-snapshot.md
