@@ -1,0 +1,56 @@
+context:
+  version: "0.1.0"
+
+package:
+  name: ship-ci-metrics
+  version: ${{ version }}
+
+source:
+  url: https://github.com/ShipSoft/ship-ci-metrics/archive/refs/tags/v${{ version }}.tar.gz
+  sha256: b16382bc743dbe93a346401acca2043d6de635f0b679d87204e0c2816b6c7ec0
+
+build:
+  number: 0
+  noarch: python
+  script: python -m pip install . -vv --no-deps --no-build-isolation
+  python:
+    entry_points:
+      - ship-metrics-extract = ship_ci_metrics.extract:main
+      - ship-metrics-compare = ship_ci_metrics.compare:main
+      - ship-metrics-render = ship_ci_metrics.render:main
+      - ship-metrics-pr-comment = ship_ci_metrics.pr_comment:main
+
+requirements:
+  host:
+    - python >=3.11
+    - pip
+    - hatchling
+  run:
+    - python >=3.11
+    - pyyaml
+
+tests:
+  - python:
+      imports:
+        - ship_ci_metrics
+  - script:
+      - ship-metrics-compare --help
+
+about:
+  homepage: https://github.com/ShipSoft/ship-ci-metrics
+  repository: https://github.com/ShipSoft/ship-ci-metrics
+  summary: Physics-metrics extraction, comparison and plotting for SHiP CI
+  description: |
+    Command-line tools used by SHiP continuous integration to extract
+    physics metrics (histogram statistics, tree entries, fit
+    parameters) from ROOT files, compare them against stored
+    references, render validation plots and summarise the comparison
+    for pull-request comments. The extraction and rendering commands
+    require PyROOT at runtime, which consumers provide through their
+    own ROOT pin.
+  license: LGPL-3.0-or-later
+  license_file: LICENSES/LGPL-3.0-or-later.txt
+
+extra:
+  recipe-maintainers:
+    - olantwin
