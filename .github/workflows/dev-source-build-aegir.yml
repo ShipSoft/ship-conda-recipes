@@ -1,0 +1,73 @@
+name: Dev source build — aegir
+
+# Exercise the multi-package dev workflow documented in the Developer
+# Guide: build aegir's dev environment with shipdatamodel, shipgeometry
+# and shipgeometryservice as pixi source dependencies from sibling
+# checkouts of their main branches. Complements dev-build-aegir.yml
+# (binary-channel drift signal): this job is the tripwire for pixi /
+# build-backend regressions in the preview pixi-build feature, which is
+# why pixi is pinned here (bump deliberately) while regular CI floats.
+
+on:
+  schedule:
+    - cron: '0 7 * * *'
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'aegir ref to build (default: main HEAD)'
+        type: string
+        default: ''
+  pull_request:
+    paths:
+      - '.github/workflows/dev-source-build-aegir.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Check out aegir upstream
+        uses: actions/checkout@v7
+        with:
+          repository: ShipSoft/aegir
+          ref: ${{ inputs.ref || '' }}
+          path: aegir
+      - name: Check out source dependencies as siblings
+        uses: actions/checkout@v7
+        with:
+          repository: ShipSoft/data-model
+          path: data-model
+      - uses: actions/checkout@v7
+        with:
+          repository: ShipSoft/Geometry
+          path: geometry
+      - uses: actions/checkout@v7
+        with:
+          repository: ShipSoft/geometry_service
+          path: geometry_service
+      - name: Enable the dev environment
+        # Uncomment the opt-in multi-package block shipped (commented) in
+        # aegir's pixi.toml; drop the local-channel line (no field-service /
+        # phlex dev builds here) and the committed lock (fresh resolve).
+        run: |
+          cd aegir
+          sed -i -e 's/^# \[feature\.dev/[feature.dev/' \
+                 -e 's/^# \(shipdatamodel\|shipgeometry\|shipgeometryservice\) = { path/\1 = { path/' \
+                 -e 's/^# dev = { features = \["dev"\] }.*/dev = { features = ["dev"] }/' \
+                 pixi.toml
+          rm -f pixi.lock
+          grep -A4 '\[feature.dev' pixi.toml
+      - name: Set up pixi (pinned — preview-feature tripwire)
+        uses: prefix-dev/setup-pixi@v0.10.0
+        with:
+          pixi-version: v0.68.1
+          cache: false
+          manifest-path: aegir/pixi.toml
+      - name: Build, install, smoke (dev environment)
+        working-directory: aegir
+        run: |
+          pixi run -e dev install
+          pixi run -e dev smoke
