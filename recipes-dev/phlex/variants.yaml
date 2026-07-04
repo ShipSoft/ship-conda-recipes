@@ -1,0 +1,26 @@
+# Single variant for dev builds: the C++23 ROOT build the SHiP stack uses.
+root_cxx_standard:
+  - "23"
+
+# ${{ stdlib('c') }} in the recipe needs these; on feedstock CI they come
+# from the conda-forge global pinning. Values match conda-forge linux-64.
+c_stdlib:
+  - sysroot
+c_stdlib_version:
+  - "2.17"
+
+# On feedstock CI the conda-forge global pinning keeps the host environment
+# coherent; without it the free solve can pick incompatible combinations
+# (e.g. an old spdlog with a new fmt). Pin the ABI-relevant packages to what
+# the SHiP stack (aegir's pixi.lock) currently uses — that is the environment
+# the PR build will be loaded into. Refresh when the stack moves.
+root_base:
+  - "6.40"
+spdlog:
+  - "1.17"
+fmt:
+  - "12"
+python:
+  - "3.13"
+libboost-devel:
+  - "1.90"

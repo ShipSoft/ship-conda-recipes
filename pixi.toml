@@ -18,6 +18,11 @@ build-all = "rattler-build build --recipe-dir recipes/ --skip-existing=all --cha
 # --channel https://prefix.dev/ship --channel conda-forge
 build-aegir = "rattler-build build --recipe recipes/aegir --channel https://prefix.dev/ship --channel conda-forge"
 
+# Build the phlex package from an upstream PR (or any git ref) into the local
+# dev channel ../ship-local-channel for consumption by downstream dev
+# environments. Usage: pixi run build-phlex-pr <pr-number|branch|sha>
+build-phlex-pr = "scripts/build-phlex-pr.sh"
+
 # Linting / formatting toolchain. prek orchestrates the hooks; the tools come
 # from this environment so versions are tracked in pixi.lock and run identically
 # everywhere (including NixOS). See .pre-commit-config.yaml.
