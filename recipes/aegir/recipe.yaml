@@ -10,7 +10,7 @@ source:
   sha256: d19f2731a0d0c45167397a30068b3291cff388be47ac9c55afdd6713bfb2bf1d
 
 build:
-  number: 2
+  number: 3
   skip:
     - win
   script: build.sh
@@ -57,11 +57,6 @@ requirements:
     # conda-forge geomodel-feedstock adds nlohmann_json to
     # geomodel-tools' run:.
     - nlohmann_json
-  run:
-    # Header-only libraries with no run_exports.
-    - ms-gsl
-    - random123
-
 tests:
   - script:
       - test -f $PREFIX/lib/libparticle_gun_source.so
