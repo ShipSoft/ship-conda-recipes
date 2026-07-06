@@ -1,0 +1,87 @@
+context:
+  # Version tracks the genie package the splines were generated with;
+  # bump build_number for spline-configuration changes.
+  version: "3.06.02"
+  tune: G18_02a_02_11b
+  # ------------------------------------------------------------------
+  # SMOKE configuration (current): one neutrino flavor pair, one SHiP
+  # target nucleus, few knots, low max energy, and — crucially — only
+  # the CCDIS process (spline_gen_list below). This finishes in a few
+  # minutes and still exercises the runtime stack that matters here:
+  # tune loading, the GRV98lo PDF grid from $GENIE/data (genie-data),
+  # the LHAPDF6/GRV98 DIS cross-section path, and XML spline output.
+  #
+  # NB: the resonance (RES) cross-section cache that gmkspl builds for
+  # the *full* process list is energy-range independent and takes
+  # ~30-45 min *per interaction channel* regardless of -n/-e; that is
+  # why the smoke config restricts the process list to CCDIS. Dropping
+  # --event-generator-list (i.e. "Default") is what makes the full
+  # build expensive, not the knot count or the max energy.
+  # ------------------------------------------------------------------
+  spline_pdgs: "14,-14"
+  spline_targets: "1000260560"
+  spline_knots: "10"
+  spline_emax: "10"
+  spline_gen_list: "CCDIS"
+  # ------------------------------------------------------------------
+  # FULL production configuration (swap in for the smoke block above,
+  # bump build_number, and expect O(hours) of CPU): all SHiP neutrino
+  # flavors on the SHiP target/absorber nuclei W, Fe, Pb, up to
+  # 400 GeV, with the complete process list. ~120 knots; tune to taste.
+  # For production, split the gmkspl runs per flavor x target (and
+  # optionally per process list) and merge with gspladd to parallelize;
+  # a single "Default" run over all channels is dominated by the RES
+  # cache noted above.
+  # ------------------------------------------------------------------
+  # spline_pdgs: "12,-12,14,-14,16,-16"
+  # spline_targets: "1000741840,1000260560,1000822080"
+  # spline_knots: "120"
+  # spline_emax: "400"
+  # spline_gen_list: "Default"
+
+package:
+  name: genie-splines-ship
+  version: ${{ version }}
+
+build:
+  number: 0
+  noarch: generic
+  script:
+    file: build.sh
+    env:
+      GENIE_TUNE: ${{ tune }}
+      SPLINE_PDGS: ${{ spline_pdgs }}
+      SPLINE_TARGETS: ${{ spline_targets }}
+      SPLINE_KNOTS: ${{ spline_knots }}
+      SPLINE_EMAX: ${{ spline_emax }}
+      SPLINE_GEN_LIST: ${{ spline_gen_list }}
+
+requirements:
+  build:
+    # gmkspl runs on the build machine. Pin the pythia6 variant: the G18
+    # tunes hardwire Pythia6 algorithms. Pulls in genie-data (run dep of
+    # genie), which provides the GRV98lo_patched PDF grid the default
+    # tune reads from $GENIE/data — no LHAPDF set download is needed
+    # (LHAPDF6 upstream ships no GRV98lo; GENIE bundles its own copy).
+    - genie ==${{ version }} pythia6_*
+
+tests:
+  - script:
+      - test -f $PREFIX/share/genie-splines-ship/gxspl-ship.xml
+      - grep -q "<genie_xsec_spline_list" $PREFIX/share/genie-splines-ship/gxspl-ship.xml
+
+about:
+  homepage: https://github.com/ShipSoft/ship-conda-recipes
+  summary: GENIE cross-section splines for SHiP target nuclei
+  description: |
+    Pre-computed GENIE cross-section splines (gmkspl output, tune
+    ${{ tune }}) for the SHiP target/absorber nuclei, for use with
+    gevgen --cross-sections / $GENIE_XSEC_FILE.
+    NOTE: currently built in a smoke configuration (reduced flavors,
+    targets, knots and energy range) to validate the recipe mechanics;
+    see recipe.yaml for the full production configuration.
+  license: GPL-3.0-or-later
+
+extra:
+  recipe-maintainers:
+    - olantwin
