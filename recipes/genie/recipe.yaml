@@ -11,7 +11,13 @@ source:
 
 build:
   number: 0
-  script: build.sh
+  # Make the hadronization backend visible in the build string
+  # (e.g. genie-3.06.02-pythia6_h1234567_0).
+  string: ${{ genie_hadronization }}_${{ hash }}_${{ build_number }}
+  script:
+    file: build.sh
+    env:
+      GENIE_HADRONIZATION: ${{ genie_hadronization }}
 
 requirements:
   build:
@@ -23,15 +29,23 @@ requirements:
   host:
     - root_base
     - root_cxx_standard
-    # TPythia6 interface: conda-forge ROOT is built without pythia6, so the
-    # standalone rootegpythia6 package provides libEGPythia6 + headers.
-    - rootegpythia6
-    - pythia6
+    - if: genie_hadronization == "pythia6"
+      then:
+        # TPythia6 interface: conda-forge ROOT is built without pythia6,
+        # so the standalone rootegpythia6 package provides libEGPythia6 +
+        # headers.
+        - rootegpythia6
+        - pythia6
+      else:
+        - pythia8
     - lhapdf
     - log4cpp
     - libxml2
     - gsl
   run:
+    # Runtime data tables ($GENIE/data), split out because they dominate
+    # the package size and are identical for all build variants.
+    - genie-data ==${{ version }}
     # conda-forge's log4cpp package is missing its libnsl run dependency
     # (liblog4cpp.so.5 has DT_NEEDED libnsl.so.3 but the package only
     # depends on libgcc/libstdcxx); pull it in ourselves until that is
@@ -51,13 +65,19 @@ tests:
       - test -f $PREFIX/lib/libGTlFlx-${{ version }}.so
       - test -d $PREFIX/include/GENIE/Framework
       - test -d $PREFIX/share/genie/config
+      # Provided by the genie-data run dependency, into the same
+      # $GENIE=share/genie tree.
       - test -d $PREFIX/share/genie/data
       # genie-config needs $GENIE, exported by the activation script
       - genie-config --version
       - genie-config --libs
       # Loads all GENIE libraries and the full tune/config XML chain from
       # $GENIE/config, so it smoke-tests the runtime setup end to end.
-      - gconfigdump --tune G18_02a_02_11b
+      # The G18 tunes hardwire Pythia6 algorithms (Pythia6Decayer2023 in
+      # AGKYLowW2019/UnstableParticleDecayer), so this only works on the
+      # pythia6 variant.
+      - if: genie_hadronization == "pythia6"
+        then: gconfigdump --tune G18_02a_02_11b
 
 about:
   homepage: http://www.genie-mc.org
@@ -67,10 +87,11 @@ about:
     GENIE (Generates Events for Neutrino Interaction Experiments) is a
     neutrino Monte Carlo event generator simulating neutrino
     interactions over all energy scales relevant to accelerator and
-    atmospheric neutrino experiments. This build enables the PYTHIA6
-    hadronization/decay path (via the standalone rootegpythia6 TPythia6
-    interface), LHAPDF6, the built-in flux and geometry drivers, and
-    the FNAL-experiment and atmospheric event generation apps.
+    atmospheric neutrino experiments. This build enables LHAPDF6, the
+    built-in flux and geometry drivers, and the FNAL-experiment and
+    atmospheric event generation apps. Two hadronization/decay variants
+    are built: pythia6 (production; TPythia6 via the standalone
+    rootegpythia6 package) and pythia8 (upstream-experimental).
   # Upstream ships no LICENSE file; the GENIE copyright page states the
   # code is (partially) GPLv3, so GPL-3.0-or-later is our best estimate.
   license: GPL-3.0-or-later

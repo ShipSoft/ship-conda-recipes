@@ -1,0 +1,45 @@
+context:
+  version: "3.06.02"
+
+package:
+  name: genie-data
+  version: ${{ version }}
+
+source:
+  url: https://github.com/GENIE-MC/Generator/archive/refs/tags/R-${{ version | replace(".", "_") }}.tar.gz
+  sha256: 5770346d888bbac7a80872e7aa01953437ab867e335e39cc7412c9b83a0b4e2a
+
+build:
+  number: 0
+  noarch: generic
+  script:
+    # Ship only the data/ tree from the GENIE source tarball. The genie
+    # package installs config/ etc. into the same share/genie prefix and
+    # depends on this package, so $GENIE/data resolves at runtime.
+    - mkdir -p $PREFIX/share/genie
+    - cp -r data $PREFIX/share/genie/
+
+tests:
+  - script:
+      - test -d $PREFIX/share/genie/data/evgen
+      - test -d $PREFIX/share/genie/data/flux
+      # The default tune's PDF model (genie::GRV98LO) reads this grid
+      # file directly from $GENIE/data.
+      - test -f $PREFIX/share/genie/data/evgen/pdfs/GRV98lo_patched.LHgrid
+
+about:
+  homepage: http://www.genie-mc.org
+  repository: https://github.com/GENIE-MC/Generator
+  summary: Runtime data files for the GENIE neutrino event generator
+  description: |
+    The share/genie/data tree from the GENIE source distribution
+    (cross-section tables, form factors, PDF grids, decay tables,
+    fluxes, ...), split out of the genie package because it dominates
+    the package size and is identical for all genie build variants.
+  # Upstream ships no LICENSE file; the GENIE copyright page states the
+  # code is (partially) GPLv3, so GPL-3.0-or-later is our best estimate.
+  license: GPL-3.0-or-later
+
+extra:
+  recipe-maintainers:
+    - olantwin
