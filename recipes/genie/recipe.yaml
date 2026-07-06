@@ -1,0 +1,80 @@
+context:
+  version: "3.06.02"
+
+package:
+  name: genie
+  version: ${{ version }}
+
+source:
+  url: https://github.com/GENIE-MC/Generator/archive/refs/tags/R-${{ version | replace(".", "_") }}.tar.gz
+  sha256: 5770346d888bbac7a80872e7aa01953437ab867e335e39cc7412c9b83a0b4e2a
+
+build:
+  number: 0
+  script: build.sh
+
+requirements:
+  build:
+    - ${{ compiler('cxx') }}
+    - sysroot_linux-64 2.17.*
+    - make
+    # GENIE's configure is a hand-rolled perl script, not autoconf.
+    - perl
+  host:
+    - root_base
+    - root_cxx_standard
+    # TPythia6 interface: conda-forge ROOT is built without pythia6, so the
+    # standalone rootegpythia6 package provides libEGPythia6 + headers.
+    - rootegpythia6
+    - pythia6
+    - lhapdf
+    - log4cpp
+    - libxml2
+    - gsl
+  run:
+    # conda-forge's log4cpp package is missing its libnsl run dependency
+    # (liblog4cpp.so.5 has DT_NEEDED libnsl.so.3 but the package only
+    # depends on libgcc/libstdcxx); pull it in ourselves until that is
+    # fixed upstream.
+    - libnsl
+  run_exports:
+    - ${{ pin_subpackage('genie', upper_bound='x.x') }}
+
+tests:
+  - script:
+      - test -f $PREFIX/bin/gevgen
+      - test -f $PREFIX/bin/gevgen_fnal
+      - test -f $PREFIX/bin/gevgen_atmo
+      - test -f $PREFIX/bin/gmkspl
+      - test -f $PREFIX/bin/gntpc
+      - test -f $PREFIX/lib/libGFwEG-${{ version }}.so
+      - test -f $PREFIX/lib/libGTlFlx-${{ version }}.so
+      - test -d $PREFIX/include/GENIE/Framework
+      - test -d $PREFIX/share/genie/config
+      - test -d $PREFIX/share/genie/data
+      # genie-config needs $GENIE, exported by the activation script
+      - genie-config --version
+      - genie-config --libs
+      # Loads all GENIE libraries and the full tune/config XML chain from
+      # $GENIE/config, so it smoke-tests the runtime setup end to end.
+      - gconfigdump --tune G18_02a_02_11b
+
+about:
+  homepage: http://www.genie-mc.org
+  repository: https://github.com/GENIE-MC/Generator
+  summary: GENIE neutrino Monte Carlo event generator
+  description: |
+    GENIE (Generates Events for Neutrino Interaction Experiments) is a
+    neutrino Monte Carlo event generator simulating neutrino
+    interactions over all energy scales relevant to accelerator and
+    atmospheric neutrino experiments. This build enables the PYTHIA6
+    hadronization/decay path (via the standalone rootegpythia6 TPythia6
+    interface), LHAPDF6, the built-in flux and geometry drivers, and
+    the FNAL-experiment and atmospheric event generation apps.
+  # Upstream ships no LICENSE file; the GENIE copyright page states the
+  # code is (partially) GPLv3, so GPL-3.0-or-later is our best estimate.
+  license: GPL-3.0-or-later
+
+extra:
+  recipe-maintainers:
+    - olantwin
