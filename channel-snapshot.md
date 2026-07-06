@@ -1,6 +1,6 @@
 # prefix.dev/ship channel snapshot
 
-_Updated: 2026-06-29_
+_Updated: 2026-07-06_
 
 ## linux-64
 
@@ -10,8 +10,19 @@ _Updated: 2026-06-29_
 | acts-ship | 0.0.0.dev20260608+fcf8bbe | `hc97bc57_0` | 0 | 2026-06-19 |
 | acts-ship | 0.0.0.dev20260608+fcf8bbe | `h0566472_1` | 1 | 2026-06-26 |
 | acts-ship | 0.0.0.dev20260608+fcf8bbe | `hc97bc57_1` | 1 | 2026-06-26 |
+| acts-ship | 0.0.0.dev20260608+fcf8bbe | `h0566472_2` | 2 | 2026-06-29 |
+| acts-ship | 0.0.0.dev20260608+fcf8bbe | `hc97bc57_2` | 2 | 2026-06-29 |
+| acts-ship | 0.0.0.dev20260608+fcf8bbe | `h0566472_3` | 3 | 2026-06-29 |
+| acts-ship | 0.0.0.dev20260608+fcf8bbe | `hc97bc57_3` | 3 | 2026-06-29 |
+| acts-ship | 0.0.0.dev20260622+f5bb9fc | `h0566472_0` | 0 | 2026-06-30 |
+| acts-ship | 0.0.0.dev20260622+f5bb9fc | `hc97bc57_0` | 0 | 2026-06-30 |
+| acts-ship | 0.0.0.dev20260630+bedcaae | `h0566472_0` | 0 | 2026-06-30 |
+| acts-ship | 0.0.0.dev20260630+bedcaae | `hc97bc57_0` | 0 | 2026-06-30 |
+| acts-ship | 0.0.0.dev20260701+a7e5566 | `h0566472_0` | 0 | 2026-07-01 |
+| acts-ship | 0.0.0.dev20260701+a7e5566 | `hc97bc57_0` | 0 | 2026-07-01 |
 | aegir | 0.2.0 | `hb0f4dca_1` | 1 | 2026-06-19 |
 | aegir | 0.2.0 | `hb0f4dca_2` | 2 | 2026-06-26 |
+| aegir | 0.2.0 | `hb0f4dca_3` | 3 | 2026-07-04 |
 | fairroot | 19.0.1 | `hb0f4dca_9` | 9 | 2026-06-13 |
 | fairroot | 19.0.1 | `hb0f4dca_10` | 10 | 2026-06-14 |
 | fairroot | 19.0.1 | `hb0f4dca_11` | 11 | 2026-06-26 |
@@ -136,3 +147,4 @@ _Updated: 2026-06-29_
 | ganga | 8.7.12 | `pyh4616a5c_1` | 1 | 2026-06-14 |
 | random123 | 1.14.0 | `h4616a5c_0` | 0 | 2026-06-05 |
 | random123 | 1.14.0 | `h4616a5c_1` | 1 | 2026-06-14 |
+| ship-ci-metrics | 0.1.0 | `pyh4616a5c_0` | 0 | 2026-07-03 |
