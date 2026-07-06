@@ -1,0 +1,6 @@
+# Build against both ROOT C++ standard variants: cxx20 for consumers on
+# the default ROOT builds (e.g. FairShip), cxx23 for the phlex/aegir
+# stack (phlex pins root_cxx_standard ==23; genie inherits it).
+root_cxx_standard:
+  - "20"
+  - "23"
