@@ -14,7 +14,7 @@ source:
     - fix-pythia6-private-link.patch
 
 build:
-  number: 8
+  number: 9
   script: build.sh
 
 requirements:
@@ -24,7 +24,9 @@ requirements:
     - cmake
     - make
   host:
-    - root_base
+    # >=6.40: an unconstrained cxx23 solve drifts down to root 6.36,
+    # whose run_export then conflicts with the phlex/aegir stack.
+    - root_base >=6.40
     - root_cxx_standard
     - pythia6
   run_exports:
