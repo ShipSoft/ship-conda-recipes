@@ -4,12 +4,36 @@ set -euxo pipefail
 # GENIE's build system requires $GENIE to point at the source tree.
 export GENIE="${SRC_DIR}"
 
+# Hadronization/decay backend, selected by the genie_hadronization
+# variant (see variants.yaml) and passed in via the script env.
+case "${GENIE_HADRONIZATION}" in
+    pythia6)
+        hadronization_flags=(
+            --enable-pythia6
+            --with-pythia6-lib="${PREFIX}/lib"
+            --disable-pythia8
+        )
+        ;;
+    pythia8)
+        # Upstream-experimental path.
+        hadronization_flags=(
+            --disable-pythia6
+            --enable-pythia8
+            --with-pythia8-inc="${PREFIX}/include"
+            --with-pythia8-lib="${PREFIX}/lib"
+        )
+        ;;
+    *)
+        echo "unknown GENIE_HADRONIZATION: ${GENIE_HADRONIZATION}" >&2
+        exit 1
+        ;;
+esac
+
 # configure is a hand-rolled perl script (not autoconf); invoke it via the
 # build environment's perl (there is no /usr/bin/perl on e.g. NixOS).
 perl ./configure \
     --prefix="${PREFIX}" \
-    --enable-pythia6 \
-    --with-pythia6-lib="${PREFIX}/lib" \
+    "${hadronization_flags[@]}" \
     --disable-lhapdf5 \
     --enable-lhapdf6 \
     --with-lhapdf6-inc="${PREFIX}/include" \
@@ -41,14 +65,14 @@ make install "${MAKE_OVERRIDES[@]}"
 # the genie-config/genie scripts are left in $GENIE/bin.
 install -m 755 "${GENIE}"/bin/* "${PREFIX}/bin/"
 
-# GENIE needs its config and data XML/tables at runtime ($GENIE/config,
-# $GENIE/data) but 'make install' does not ship them. genie-config
-# additionally sources $GENIE/src/make/Make.config_no_paths and reads
-# $GENIE/VERSION. Stage all of that under share/genie and point $GENIE
-# there via an activation script.
+# GENIE needs its config XML at runtime ($GENIE/config) but 'make install'
+# does not ship it. genie-config additionally sources
+# $GENIE/src/make/Make.config_no_paths and reads $GENIE/VERSION. Stage all
+# of that under share/genie and point $GENIE there via an activation
+# script. The (much larger, variant-independent) $GENIE/data tree is
+# shipped by the genie-data package into the same share/genie prefix.
 mkdir -p "${PREFIX}/share/genie/src/make"
 cp -r "${GENIE}/config" "${PREFIX}/share/genie/"
-cp -r "${GENIE}/data" "${PREFIX}/share/genie/"
 cp "${GENIE}/VERSION" "${PREFIX}/share/genie/"
 cp "${GENIE}"/src/make/Make.config* "${PREFIX}/share/genie/src/make/"
 

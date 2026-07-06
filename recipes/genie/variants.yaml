@@ -1,0 +1,6 @@
+# Hadronization/decay backend variants. pythia6 is the production
+# backend (matches upstream defaults and all G18 tunes); pythia8 is the
+# experimental upstream path (gated by --enable-pythia8).
+genie_hadronization:
+  - pythia6
+  - pythia8
