@@ -84,9 +84,10 @@ jobs:
           BUILD_NUMBER: ${{ inputs.build-number }}
         run: |
           # Fail fast before the multi-hour stage1/stage2 compute if the
-          # build number is below the production floor.
+          # build number is below the production floor (>= 100 so
+          # production packages win solver tie-breaks over smoke builds).
           if [ "$BUILD_NUMBER" -lt 100 ]; then
-            echo "::error::build-number must be >= 100 so production packages win solver tie-breaks over smoke builds (got $BUILD_NUMBER)."
+            echo "::error::build-number must be >= 100 (production floor); got $BUILD_NUMBER."
             exit 1
           fi
       - name: Balance nuclide batches by mass number
