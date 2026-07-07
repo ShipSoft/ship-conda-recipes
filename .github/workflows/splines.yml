@@ -66,6 +66,12 @@ on:
 permissions:
   contents: read
 
+# Only one production splines run at a time; do not interrupt an
+# in-flight run (hours of expensive spline generation).
+concurrency:
+  group: production-splines
+  cancel-in-progress: false
+
 jobs:
   plan:
     name: Plan nuclide batches
@@ -73,6 +79,16 @@ jobs:
     outputs:
       batches: ${{ steps.plan.outputs.batches }}
     steps:
+      - name: Validate build number
+        env:
+          BUILD_NUMBER: ${{ inputs.build-number }}
+        run: |
+          # Fail fast before the multi-hour stage1/stage2 compute if the
+          # build number is below the production floor.
+          if [ "$BUILD_NUMBER" -lt 100 ]; then
+            echo "::error::build-number must be >= 100 so production packages win solver tie-breaks over smoke builds (got $BUILD_NUMBER)."
+            exit 1
+          fi
       - name: Balance nuclide batches by mass number
         id: plan
         env:
@@ -213,6 +229,10 @@ jobs:
         shell: bash -leo pipefail {0}
     steps:
       - uses: actions/checkout@v6
+        with:
+          # Read-only checkout; do not persist the GITHUB_TOKEN into the
+          # workspace alongside PREFIX_DEV_API_KEY handling and uploads.
+          persist-credentials: false
       - uses: prefix-dev/setup-pixi@v0.10.0
         with:
           locked: true
@@ -264,6 +284,7 @@ jobs:
       - name: Build genie-splines-ship with the merged splines
         env:
           GENIE_SPLINES_PREBUILT: ${{ github.workspace }}/prebuilt/gxspl-ship.xml
+          GENIE_SPLINES_PREBUILT_PROVENANCE: ${{ github.workspace }}/prebuilt/gxspl-ship.provenance
           GENIE_SPLINES_BUILD_NUMBER: ${{ inputs.build-number }}
         run: |
           pixi run rattler-build build --recipe recipes/genie-splines-ship \

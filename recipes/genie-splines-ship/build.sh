@@ -6,11 +6,12 @@ share_dir="${PREFIX}/share/genie-splines-ship"
 if [ -n "${GENIE_SPLINES_PREBUILT:-}" ]; then
     # Production path: the splines workflow
     # (.github/workflows/splines.yml) generated the full spline set on
-    # CI runners, merged it with gspladd, and injects the result (plus
-    # a provenance file written next to it) via GENIE_SPLINES_PREBUILT.
+    # CI runners, merged it with gspladd, and injects the merged XML via
+    # GENIE_SPLINES_PREBUILT and its provenance file via
+    # GENIE_SPLINES_PREBUILT_PROVENANCE.
     install -D -m 644 "${GENIE_SPLINES_PREBUILT}" \
         "${share_dir}/gxspl-ship.xml"
-    install -D -m 644 "${GENIE_SPLINES_PREBUILT%.xml}.provenance" \
+    install -D -m 644 "${GENIE_SPLINES_PREBUILT_PROVENANCE}" \
         "${share_dir}/PROVENANCE"
 else
     # Smoke path (local / PR CI): generate a reduced spline set with

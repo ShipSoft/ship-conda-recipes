@@ -23,6 +23,7 @@ context:
   #   the smoke build fast, not the knot count or the max energy.
   # ------------------------------------------------------------------
   prebuilt_xml: ${{ env.get("GENIE_SPLINES_PREBUILT", default="") }}
+  prebuilt_provenance: ${{ env.get("GENIE_SPLINES_PREBUILT_PROVENANCE", default="") }}
   spline_source: ${{ "production" if prebuilt_xml else "smoke" }}
   spline_pdgs: "14,-14"
   spline_targets: "1000260560"
@@ -46,6 +47,7 @@ build:
     file: build.sh
     env:
       GENIE_SPLINES_PREBUILT: ${{ prebuilt_xml }}
+      GENIE_SPLINES_PREBUILT_PROVENANCE: ${{ prebuilt_provenance }}
       GENIE_TUNE: ${{ tune }}
       SPLINE_PDGS: ${{ spline_pdgs }}
       SPLINE_TARGETS: ${{ spline_targets }}
@@ -55,20 +57,23 @@ build:
 
 requirements:
   build:
-    # gmkspl runs on the build machine (smoke path only; the production
-    # workflow generates its XML with the same published genie
-    # package). Pin the pythia6 variant: the G18 tunes hardwire Pythia6
-    # algorithms. Pulls in genie-data (run dep of genie), which
+    # gmkspl runs on the build machine for the smoke path only; the
+    # production path just installs the prebuilt XML and needs no genie
+    # at build time. Pin the pythia6 variant: the G18 tunes hardwire
+    # Pythia6 algorithms. Pulls in genie-data (run dep of genie), which
     # provides the GRV98lo_patched PDF grid the default tune reads from
     # $GENIE/data — no LHAPDF set download is needed (LHAPDF6 upstream
     # ships no GRV98lo; GENIE bundles its own copy).
-    - genie ==${{ version }} pythia6_*
+    - if: not prebuilt_xml
+      then:
+        - genie ==${{ version }} pythia6_*
 
 tests:
   - script:
       - test -f $PREFIX/share/genie-splines-ship/gxspl-ship.xml
       - grep -q "<genie_xsec_spline_list" $PREFIX/share/genie-splines-ship/gxspl-ship.xml
       - test -f $PREFIX/share/genie-splines-ship/PROVENANCE
+      - grep -q "^source: ${{ spline_source }}" $PREFIX/share/genie-splines-ship/PROVENANCE
 
 about:
   homepage: https://github.com/ShipSoft/ship-conda-recipes
@@ -77,11 +82,12 @@ about:
     Pre-computed GENIE cross-section splines (gmkspl output, tune
     ${{ tune }}) for the SHiP target/absorber nuclei, for use with
     gevgen --cross-sections / $GENIE_XSEC_FILE. The installed
-    PROVENANCE file records how the splines were produced. Production
-    packages (build string production_*, built by the splines.yml
-    workflow) cover all neutrino flavours on the SHiP nuclide list up
-    to 400 GeV; smoke packages (build string smoke_*, from regular
-    recipe CI) contain a reduced validation set only.
+    PROVENANCE file records how the splines were produced, including the
+    maximum neutrino energy. Production packages (build string
+    production_*, built by the splines.yml workflow) cover all neutrino
+    flavours on the SHiP nuclide list up to the maximum energy recorded
+    in the PROVENANCE file; smoke packages (build string smoke_*, from
+    regular recipe CI) contain a reduced validation set only.
   license: GPL-3.0-or-later
 
 extra:
