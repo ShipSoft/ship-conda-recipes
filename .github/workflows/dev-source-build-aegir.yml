@@ -32,20 +32,24 @@ jobs:
       - name: Check out aegir upstream
         uses: actions/checkout@v7
         with:
+          persist-credentials: false
           repository: ShipSoft/aegir
           ref: ${{ inputs.ref || '' }}
           path: aegir
       - name: Check out source dependencies as siblings
         uses: actions/checkout@v7
         with:
+          persist-credentials: false
           repository: ShipSoft/data-model
           path: data-model
       - uses: actions/checkout@v7
         with:
+          persist-credentials: false
           repository: ShipSoft/Geometry
           path: geometry
       - uses: actions/checkout@v7
         with:
+          persist-credentials: false
           repository: ShipSoft/geometry_service
           path: geometry_service
       - name: Enable the dev environment
