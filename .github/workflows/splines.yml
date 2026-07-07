@@ -1,0 +1,287 @@
+name: Production GENIE splines
+
+# Generates the production genie-splines-ship package in three phases:
+#
+#   stage1  (6 jobs, ~100 min each): free proton+neutron splines per
+#           neutrino flavour — the expensive full-process-list part.
+#   stage2  (6 flavours x ~5 batches, ~2.5-3 h each): nuclear targets
+#           derived from the stage1 splines via --input-cross-sections
+#           (~3x faster than direct nuclear generation; cost scales
+#           roughly with the mass number A). The `plan` job balances
+#           the nuclide list into batches by sum-of-A.
+#   merge   merges all partial XMLs with gspladd, builds the
+#           genie-splines-ship recipe with the merged XML injected
+#           (see recipes/genie-splines-ship/build.sh), and uploads the
+#           package to prefix.dev/ship.
+#
+# Calibration (genie 3.06.02 pythia6, tune G18_02a_02_11b, 250 knots,
+# Emax 400 GeV, single-threaded): free nucleons 98 min/flavour; one
+# derived nuclide 28 min for A=184. Default target list: ~ΣA=4634 →
+# ~705 min of nuclear work per flavour → 5 batches of ~140 min.
+
+on:
+  workflow_dispatch:
+    inputs:
+      tune:
+        description: GENIE tune
+        type: string
+        default: G18_02a_02_11b
+      knots:
+        description: Number of spline knots per channel
+        type: string
+        default: '250'
+      emax:
+        description: Maximum neutrino energy [GeV]
+        type: string
+        default: '400'
+      targets:
+        description: Comma-separated nuclide PDG codes (whitespace ignored)
+        type: string
+        default: >-
+          1000010010,1000010020,1000020030,1000020040,1000060120,
+          1000060130,1000070140,1000070150,1000080160,1000080170,
+          1000080180,1000130270,1000140280,1000140290,1000140300,
+          1000180360,1000180380,1000180400,1000200400,1000200420,
+          1000200430,1000200440,1000200460,1000200480,1000220460,
+          1000220470,1000220480,1000220490,1000220500,1000240500,
+          1000240520,1000240530,1000240540,1000250550,1000260540,
+          1000260560,1000260570,1000260580,1000280580,1000280600,
+          1000280610,1000280620,1000280640,1000290630,1000290650,
+          1000410930,1000420920,1000420940,1000420950,1000420960,
+          1000420970,1000420980,1000421000,1000731800,1000731810,
+          1000741800,1000741820,1000741830,1000741840,1000741860,
+          1000822040,1000822060,1000822070,1000822080
+      build-number:
+        description: >-
+          Package build number. Keep >= 100 so production packages beat
+          the smoke builds (number 1) in solver tie-breaks; bump to
+          re-upload for the same genie version.
+        type: string
+        default: '100'
+      upload:
+        description: Upload the built package to prefix.dev/ship
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+jobs:
+  plan:
+    name: Plan nuclide batches
+    runs-on: ubuntu-latest
+    outputs:
+      batches: ${{ steps.plan.outputs.batches }}
+    steps:
+      - name: Balance nuclide batches by mass number
+        id: plan
+        env:
+          TARGETS: ${{ inputs.targets }}
+        run: |
+          python3 - <<'EOF' >> "$GITHUB_OUTPUT"
+          import json
+          import math
+          import os
+
+          raw = os.environ["TARGETS"]
+          targets = [int(t) for t in "".join(raw.split()).split(",") if t]
+          # Nuclear PDG code 10LZZZAAAI: mass number A = digits 7-9.
+          mass = {t: (t // 10) % 1000 for t in targets}
+          # Calibration: deriving one nuclide from free-nucleon splines
+          # costs ~28 min at A=184, roughly proportional to A. Cap a
+          # batch at ~170 min of gmkspl work so a job stays well under
+          # the 6 h limit including setup and spline-loading overhead.
+          per_a = 28.0 / 184.0
+          cap_a = 170.0 / per_a
+          n = max(1, math.ceil(sum(mass.values()) / cap_a))
+          batches = [[] for _ in range(n)]
+          loads = [0] * n
+          # Greedy longest-processing-time balancing.
+          for t in sorted(targets, key=lambda t: -mass[t]):
+              i = loads.index(min(loads))
+              batches[i].append(t)
+              loads[i] += mass[t]
+          out = [
+              {"id": i, "targets": ",".join(map(str, b))}
+              for i, b in enumerate(batches)
+              if b
+          ]
+          print("batches=" + json.dumps(out))
+          EOF
+
+  stage1:
+    name: Free-nucleon splines (flavour ${{ matrix.flavour }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    strategy:
+      fail-fast: false
+      matrix:
+        flavour: ['12', '-12', '14', '-14', '16', '-16']
+    defaults:
+      run:
+        shell: bash -leo pipefail {0}
+    steps:
+      - name: Install GENIE from the ship channel
+        uses: mamba-org/setup-micromamba@v2
+        with:
+          environment-name: genie
+          # Keep the version in sync with recipes/genie and
+          # recipes/genie-splines-ship.
+          create-args: >-
+            genie=3.06.02=pythia6_*
+            genie-data
+          condarc: |
+            channels:
+              - https://prefix.dev/ship
+              - conda-forge
+      - name: Generate free-nucleon splines
+        env:
+          FLAVOUR: ${{ matrix.flavour }}
+          TUNE: ${{ inputs.tune }}
+          KNOTS: ${{ inputs.knots }}
+          EMAX: ${{ inputs.emax }}
+        run: |
+          # Free proton and neutron only; nuclear targets are derived
+          # from these in stage 2. $GENIE is set by the genie package's
+          # activation script.
+          gmkspl -p "$FLAVOUR" -t 1000010010,1000000010 \
+                 -n "$KNOTS" -e "$EMAX" --tune "$TUNE" \
+                 -o "gxspl-freenuc-${FLAVOUR}.xml"
+      - name: Upload free-nucleon splines
+        uses: actions/upload-artifact@v4
+        with:
+          name: splines-freenuc-${{ matrix.flavour }}
+          path: gxspl-freenuc-${{ matrix.flavour }}.xml
+          if-no-files-found: error
+
+  stage2:
+    name: Nuclear splines (flavour ${{ matrix.flavour }}, batch ${{ matrix.batch.id }})
+    needs: [plan, stage1]
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    strategy:
+      fail-fast: false
+      matrix:
+        flavour: ['12', '-12', '14', '-14', '16', '-16']
+        batch: ${{ fromJSON(needs.plan.outputs.batches) }}
+    defaults:
+      run:
+        shell: bash -leo pipefail {0}
+    steps:
+      - name: Install GENIE from the ship channel
+        uses: mamba-org/setup-micromamba@v2
+        with:
+          environment-name: genie
+          create-args: >-
+            genie=3.06.02=pythia6_*
+            genie-data
+          condarc: |
+            channels:
+              - https://prefix.dev/ship
+              - conda-forge
+      - name: Download free-nucleon splines
+        uses: actions/download-artifact@v4
+        with:
+          name: splines-freenuc-${{ matrix.flavour }}
+      - name: Derive nuclear splines from free-nucleon splines
+        env:
+          FLAVOUR: ${{ matrix.flavour }}
+          BATCH_ID: ${{ matrix.batch.id }}
+          BATCH_TARGETS: ${{ matrix.batch.targets }}
+          TUNE: ${{ inputs.tune }}
+          KNOTS: ${{ inputs.knots }}
+          EMAX: ${{ inputs.emax }}
+        run: |
+          gmkspl -p "$FLAVOUR" -t "$BATCH_TARGETS" \
+                 -n "$KNOTS" -e "$EMAX" --tune "$TUNE" \
+                 --input-cross-sections "gxspl-freenuc-${FLAVOUR}.xml" \
+                 -o "gxspl-partial-${FLAVOUR}-${BATCH_ID}.xml"
+      - name: Upload partial splines
+        uses: actions/upload-artifact@v4
+        with:
+          name: splines-partial-${{ matrix.flavour }}-${{ matrix.batch.id }}
+          path: gxspl-partial-${{ matrix.flavour }}-${{ matrix.batch.id }}.xml
+          if-no-files-found: error
+
+  merge:
+    name: Merge, package and upload
+    needs: [plan, stage2]
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    defaults:
+      run:
+        shell: bash -leo pipefail {0}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: prefix-dev/setup-pixi@v0.10.0
+        with:
+          locked: true
+      - name: Install GENIE from the ship channel
+        uses: mamba-org/setup-micromamba@v2
+        with:
+          environment-name: genie
+          create-args: >-
+            genie=3.06.02=pythia6_*
+            genie-data
+          condarc: |
+            channels:
+              - https://prefix.dev/ship
+              - conda-forge
+      - name: Download partial splines
+        uses: actions/download-artifact@v4
+        with:
+          pattern: splines-partial-*
+          path: partials
+          merge-multiple: true
+      - name: Merge partial splines with gspladd
+        run: |
+          # gspladd de-duplicates the free-nucleon splines that every
+          # partial carries over from its --input-cross-sections file.
+          files=$(printf '%s,' partials/*.xml)
+          gspladd -f "${files%,}" -o gxspl-ship.xml
+          echo "Merged $(grep -c '<spline' gxspl-ship.xml) splines."
+      - name: Write provenance
+        env:
+          TUNE: ${{ inputs.tune }}
+          KNOTS: ${{ inputs.knots }}
+          EMAX: ${{ inputs.emax }}
+          TARGETS: ${{ inputs.targets }}
+        run: |
+          mkdir -p prebuilt
+          mv gxspl-ship.xml prebuilt/
+          {
+            echo "source: production (splines.yml workflow)"
+            echo "run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            echo "tune: $TUNE"
+            echo "knots: $KNOTS"
+            echo "emax-gev: $EMAX"
+            echo "flavours: 12,-12,14,-14,16,-16"
+            echo "free-nucleon-targets: 1000010010,1000000010"
+            echo "targets: $(echo "$TARGETS" | tr -d '[:space:]')"
+            micromamba list 2>/dev/null \
+              | awk '$1 == "genie" || $1 == "genie-data" {print $1 ": " $2 " " $3}'
+          } > prebuilt/gxspl-ship.provenance
+      - name: Build genie-splines-ship with the merged splines
+        env:
+          GENIE_SPLINES_PREBUILT: ${{ github.workspace }}/prebuilt/gxspl-ship.xml
+          GENIE_SPLINES_BUILD_NUMBER: ${{ inputs.build-number }}
+        run: |
+          pixi run rattler-build build --recipe recipes/genie-splines-ship \
+            --channel https://prefix.dev/ship --channel conda-forge
+      - name: Upload package artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: genie-splines-ship-package
+          path: output/noarch/*.conda
+          if-no-files-found: error
+      - name: Upload to prefix.dev
+        if: ${{ inputs.upload }}
+        env:
+          PREFIX_DEV_API_KEY: ${{ secrets.PREFIX_DEV_API_KEY }}
+        run: |
+          shopt -s nullglob
+          for pkg in output/noarch/*.conda; do
+            pixi run rattler-build upload prefix \
+              --api-key "$PREFIX_DEV_API_KEY" \
+              -c ship --skip-existing "$pkg"
+          done
