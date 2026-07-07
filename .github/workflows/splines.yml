@@ -2,22 +2,29 @@ name: Production GENIE splines
 
 # Generates the production genie-splines-ship package in three phases:
 #
-#   stage1  (6 jobs, ~100 min each): free proton+neutron splines per
+#   stage1  (6 jobs, ~2 h each): free proton+neutron splines per
 #           neutrino flavour — the expensive full-process-list part.
-#   stage2  (6 flavours x ~5 batches, ~2.5-3 h each): nuclear targets
+#           Skipped entirely when stage1-run-id reuses earlier
+#           artifacts.
+#   stage2  (6 flavours x ~7 batches, ~3-3.5 h each): nuclear targets
 #           derived from the stage1 splines via --input-cross-sections
-#           (~3x faster than direct nuclear generation; cost scales
-#           roughly with the mass number A). The `plan` job balances
-#           the nuclide list into batches by sum-of-A.
+#           (~3x faster than direct nuclear generation). The `plan`
+#           job balances the nuclide list into batches by predicted
+#           cost.
 #   merge   merges all partial XMLs with gspladd, builds the
 #           genie-splines-ship recipe with the merged XML injected
 #           (see recipes/genie-splines-ship/build.sh), and uploads the
 #           package to prefix.dev/ship.
 #
 # Calibration (genie 3.06.02 pythia6, tune G18_02a_02_11b, 250 knots,
-# Emax 400 GeV, single-threaded): free nucleons 98 min/flavour; one
-# derived nuclide 28 min for A=184. Default target list: ~ΣA=4634 →
-# ~705 min of nuclear work per flavour → 5 batches of ~140 min.
+# Emax 400 GeV, single-threaded): free nucleons 98 min/flavour local,
+# ~113-127 min on CI runners. One derived nuclide has a large fixed
+# component on top of a mass-proportional one (measured):
+#   cost_local(nuclide) ≈ 10 + 0.1*A minutes   (W-184: 28 min;
+#   A≈16: ~11-12 min), CI ≈ 1.25x local.
+# Default 64-nuclide list: ~1380 CI-min of stage-2 work per flavour →
+# 7 batches of ≤200 CI-min each (see the plan job log for the
+# per-batch predictions).
 
 on:
   workflow_dispatch:
@@ -62,9 +69,19 @@ on:
         description: Upload the built package to prefix.dev/ship
         type: boolean
         default: true
+      stage1-run-id:
+        description: >-
+          Reuse the free-nucleon spline artifacts (splines-freenuc-*)
+          from this earlier workflow run ID and skip stage 1. Leave
+          empty to regenerate them.
+        type: string
+        default: ''
 
 permissions:
   contents: read
+  # Needed by actions/download-artifact to fetch stage-1 artifacts from
+  # an earlier run (stage1-run-id).
+  actions: read
 
 # Only one production splines run at a time; do not interrupt an
 # in-flight run (hours of expensive spline generation).
@@ -90,12 +107,12 @@ jobs:
             echo "::error::build-number must be >= 100 (production floor); got $BUILD_NUMBER."
             exit 1
           fi
-      - name: Balance nuclide batches by mass number
+      - name: Balance nuclide batches by predicted cost
         id: plan
         env:
           TARGETS: ${{ inputs.targets }}
         run: |
-          python3 - <<'EOF' >> "$GITHUB_OUTPUT"
+          python3 - <<'EOF'
           import json
           import math
           import os
@@ -104,30 +121,45 @@ jobs:
           targets = [int(t) for t in "".join(raw.split()).split(",") if t]
           # Nuclear PDG code 10LZZZAAAI: mass number A = digits 7-9.
           mass = {t: (t // 10) % 1000 for t in targets}
-          # Calibration: deriving one nuclide from free-nucleon splines
-          # costs ~28 min at A=184, roughly proportional to A. Cap a
-          # batch at ~170 min of gmkspl work so a job stays well under
-          # the 6 h limit including setup and spline-loading overhead.
-          per_a = 28.0 / 184.0
-          cap_a = 170.0 / per_a
-          n = max(1, math.ceil(sum(mass.values()) / cap_a))
+          # Measured cost of deriving one nuclide from free-nucleon
+          # splines: a large fixed per-nuclide component plus a
+          # mass-proportional one, cost_local ≈ 10 + 0.1*A minutes
+          # (W-184: 28 min; A≈16: ~11-12 min). CI runners are ~1.25x
+          # slower. Cap a batch at ~200 CI-minutes of gmkspl work,
+          # leaving headroom for the ~10 min environment setup within
+          # the 355-min stage-2 timeout.
+          ci_factor = 1.25
+          cost = {t: ci_factor * (10.0 + 0.1 * a) for t, a in mass.items()}
+          cap = 200.0
+          n = max(1, math.ceil(sum(cost.values()) / cap))
           batches = [[] for _ in range(n)]
-          loads = [0] * n
+          loads = [0.0] * n
           # Greedy longest-processing-time balancing.
-          for t in sorted(targets, key=lambda t: -mass[t]):
+          for t in sorted(targets, key=lambda t: -cost[t]):
               i = loads.index(min(loads))
               batches[i].append(t)
-              loads[i] += mass[t]
+              loads[i] += cost[t]
           out = [
               {"id": i, "targets": ",".join(map(str, b))}
               for i, b in enumerate(batches)
               if b
           ]
-          print("batches=" + json.dumps(out))
+          with open(os.environ["GITHUB_OUTPUT"], "a") as fh:
+              fh.write("batches=" + json.dumps(out) + "\n")
+          print(f"{len(targets)} nuclides, "
+                f"{sum(cost.values()):.0f} predicted CI-min per flavour, "
+                f"{len(out)} batches:")
+          for b in out:
+              ids = b["targets"].split(",")
+              minutes = sum(cost[int(t)] for t in ids)
+              print(f"  batch {b['id']}: {len(ids):2d} nuclides, "
+                    f"predicted {minutes:.0f} CI-min: {b['targets']}")
           EOF
 
   stage1:
     name: Free-nucleon splines (flavour ${{ matrix.flavour }})
+    # Skipped when reusing the artifacts of an earlier run.
+    if: inputs.stage1-run-id == ''
     runs-on: ubuntu-latest
     timeout-minutes: 240
     strategy:
@@ -174,8 +206,12 @@ jobs:
   stage2:
     name: Nuclear splines (flavour ${{ matrix.flavour }}, batch ${{ matrix.batch.id }})
     needs: [plan, stage1]
+    # Run also when stage1 was skipped in favour of reused artifacts.
+    if: >-
+      ${{ !cancelled() && needs.plan.result == 'success' &&
+          (needs.stage1.result == 'success' || needs.stage1.result == 'skipped') }}
     runs-on: ubuntu-latest
-    timeout-minutes: 350
+    timeout-minutes: 355
     strategy:
       fail-fast: false
       matrix:
@@ -200,6 +236,10 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: splines-freenuc-${{ matrix.flavour }}
+          # When stage1-run-id is set, stage 1 was skipped and the
+          # artifacts come from that earlier run (needs actions: read).
+          run-id: ${{ inputs.stage1-run-id || github.run_id }}
+          github-token: ${{ github.token }}
       - name: Derive nuclear splines from free-nucleon splines
         env:
           FLAVOUR: ${{ matrix.flavour }}
@@ -267,12 +307,16 @@ jobs:
           KNOTS: ${{ inputs.knots }}
           EMAX: ${{ inputs.emax }}
           TARGETS: ${{ inputs.targets }}
+          STAGE1_RUN_ID: ${{ inputs.stage1-run-id }}
         run: |
           mkdir -p prebuilt
           mv gxspl-ship.xml prebuilt/
           {
             echo "source: production (splines.yml workflow)"
             echo "run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            if [ -n "$STAGE1_RUN_ID" ]; then
+              echo "stage1-artifacts-reused-from-run: $STAGE1_RUN_ID"
+            fi
             echo "tune: $TUNE"
             echo "knots: $KNOTS"
             echo "emax-gev: $EMAX"
