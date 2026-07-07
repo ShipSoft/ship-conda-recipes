@@ -1,24 +1,44 @@
 #!/bin/bash
 set -euxo pipefail
 
-# genie lives in the build environment (gmkspl runs at build time);
-# its activation script may not have run here, so set $GENIE (config +
-# data tree) explicitly.
-export GENIE="${BUILD_PREFIX}/share/genie"
+share_dir="${PREFIX}/share/genie-splines-ship"
 
-# Spline configuration comes from the recipe context via the script env
-# (see recipe.yaml; currently the smoke configuration).
-gmkspl \
-    -p "${SPLINE_PDGS}" \
-    -t "${SPLINE_TARGETS}" \
-    -n "${SPLINE_KNOTS}" \
-    -e "${SPLINE_EMAX}" \
-    --event-generator-list "${SPLINE_GEN_LIST}" \
-    --tune "${GENIE_TUNE}" \
-    -o gxspl-ship.xml
+if [ -n "${GENIE_SPLINES_PREBUILT:-}" ]; then
+    # Production path: the splines workflow
+    # (.github/workflows/splines.yml) generated the full spline set on
+    # CI runners, merged it with gspladd, and injects the result (plus
+    # a provenance file written next to it) via GENIE_SPLINES_PREBUILT.
+    install -D -m 644 "${GENIE_SPLINES_PREBUILT}" \
+        "${share_dir}/gxspl-ship.xml"
+    install -D -m 644 "${GENIE_SPLINES_PREBUILT%.xml}.provenance" \
+        "${share_dir}/PROVENANCE"
+else
+    # Smoke path (local / PR CI): generate a reduced spline set with
+    # the genie package from the build environment. gmkspl needs
+    # $GENIE for config and data; the activation script may not have
+    # run here, so set it explicitly.
+    export GENIE="${BUILD_PREFIX}/share/genie"
 
-install -D -m 644 gxspl-ship.xml \
-    "${PREFIX}/share/genie-splines-ship/gxspl-ship.xml"
+    gmkspl \
+        -p "${SPLINE_PDGS}" \
+        -t "${SPLINE_TARGETS}" \
+        -n "${SPLINE_KNOTS}" \
+        -e "${SPLINE_EMAX}" \
+        --event-generator-list "${SPLINE_GEN_LIST}" \
+        --tune "${GENIE_TUNE}" \
+        -o gxspl-ship.xml
+
+    install -D -m 644 gxspl-ship.xml "${share_dir}/gxspl-ship.xml"
+    {
+        echo "source: smoke (generated at package build time)"
+        echo "tune: ${GENIE_TUNE}"
+        echo "flavours: ${SPLINE_PDGS}"
+        echo "targets: ${SPLINE_TARGETS}"
+        echo "knots: ${SPLINE_KNOTS}"
+        echo "emax-gev: ${SPLINE_EMAX}"
+        echo "event-generator-list: ${SPLINE_GEN_LIST}"
+    } > "${share_dir}/PROVENANCE"
+fi
 
 # Convention used by several GENIE-based frameworks to locate the
 # spline file.
