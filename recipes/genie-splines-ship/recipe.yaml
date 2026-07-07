@@ -73,7 +73,8 @@ tests:
       - test -f $PREFIX/share/genie-splines-ship/gxspl-ship.xml
       - grep -q "<genie_xsec_spline_list" $PREFIX/share/genie-splines-ship/gxspl-ship.xml
       - test -f $PREFIX/share/genie-splines-ship/PROVENANCE
-      - grep -q "^source: ${{ spline_source }}" $PREFIX/share/genie-splines-ship/PROVENANCE
+      # Single-quoted so the "source: " colon-space stays inside one scalar.
+      - 'grep -q "^source: ${{ spline_source }}" $PREFIX/share/genie-splines-ship/PROVENANCE'
 
 about:
   homepage: https://github.com/ShipSoft/ship-conda-recipes
