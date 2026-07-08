@@ -209,7 +209,7 @@ jobs:
                  -n "$KNOTS" -e "$EMAX" --tune "$TUNE" \
                  -o "gxspl-freenuc-${FLAVOUR}.xml"
       - name: Upload free-nucleon splines
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: splines-freenuc-${{ matrix.flavour }}
           path: gxspl-freenuc-${{ matrix.flavour }}.xml
@@ -245,7 +245,7 @@ jobs:
               - https://prefix.dev/ship
               - conda-forge
       - name: Download free-nucleon splines
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: splines-freenuc-${{ matrix.flavour }}
           # When stage1-run-id is set, stage 1 was skipped and the
@@ -266,7 +266,7 @@ jobs:
                  --input-cross-sections "gxspl-freenuc-${FLAVOUR}.xml" \
                  -o "gxspl-partial-${FLAVOUR}-${BATCH_ID}.xml"
       - name: Upload partial splines
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: splines-partial-${{ matrix.flavour }}-${{ matrix.batch.id }}
           path: gxspl-partial-${{ matrix.flavour }}-${{ matrix.batch.id }}.xml
@@ -301,7 +301,7 @@ jobs:
               - https://prefix.dev/ship
               - conda-forge
       - name: Download partial splines
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           pattern: splines-partial-*
           path: partials
@@ -347,7 +347,7 @@ jobs:
           pixi run rattler-build build --recipe recipes/genie-splines-ship \
             --channel https://prefix.dev/ship --channel conda-forge
       - name: Upload package artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: genie-splines-ship-package
           path: output/noarch/*.conda
