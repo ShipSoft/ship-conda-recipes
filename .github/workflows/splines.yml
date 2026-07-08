@@ -281,7 +281,7 @@ jobs:
       run:
         shell: bash -leo pipefail {0}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           # Read-only checkout; do not persist the GITHUB_TOKEN into the
           # workspace alongside PREFIX_DEV_API_KEY handling and uploads.
