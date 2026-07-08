@@ -6,7 +6,7 @@ name: Production GENIE splines
 #           neutrino flavour — the expensive full-process-list part.
 #           Skipped entirely when stage1-run-id reuses earlier
 #           artifacts.
-#   stage2  (6 flavours x ~7 batches, ~3-3.5 h each): nuclear targets
+#   stage2  (6 flavours x ~14 batches, ~2.5-3 h each): nuclear targets
 #           derived from the stage1 splines via --input-cross-sections
 #           (~3x faster than direct nuclear generation). The `plan`
 #           job balances the nuclide list into batches by predicted
@@ -22,9 +22,18 @@ name: Production GENIE splines
 # component on top of a mass-proportional one (measured):
 #   cost_local(nuclide) ≈ 10 + 0.1*A minutes   (W-184: 28 min;
 #   A≈16: ~11-12 min), CI ≈ 1.25x local.
-# Default 64-nuclide list: ~1380 CI-min of stage-2 work per flavour →
-# 7 batches of ≤200 CI-min each (see the plan job log for the
-# per-batch predictions).
+#
+# Prediction quality: in the 2026-07 production runs, stage-2 batches
+# uniformly took ~1.6x the model's prediction on CI runners (4h40m-
+# 5h50m against a ~3.3 h prediction) — the local-fit cost model
+# underestimates CI gmkspl across the board, it is not runner
+# variance. Don't trust the predictions to better than ~2x; the
+# per-batch cap below therefore includes a ~2x safety margin.
+#
+# Default 64-nuclide list: ~1380 predicted CI-min of stage-2 work per
+# flavour → ~14 batches of ≤100 predicted CI-min each (≈2.7 h actual
+# at the observed 1.6x; see the plan job log for the per-batch
+# predictions).
 
 on:
   workflow_dispatch:
@@ -125,12 +134,15 @@ jobs:
           # splines: a large fixed per-nuclide component plus a
           # mass-proportional one, cost_local ≈ 10 + 0.1*A minutes
           # (W-184: 28 min; A≈16: ~11-12 min). CI runners are ~1.25x
-          # slower. Cap a batch at ~200 CI-minutes of gmkspl work,
-          # leaving headroom for the ~10 min environment setup within
-          # the 355-min stage-2 timeout.
+          # slower. In production, actual CI durations came out a
+          # uniform ~1.6x above these predictions (see the header
+          # note), so the cap carries a ~2x safety margin: 100
+          # predicted CI-minutes ≈ 2.7 h actual, safe within the
+          # 355-min stage-2 timeout even at 2x plus the ~10 min
+          # environment setup.
           ci_factor = 1.25
           cost = {t: ci_factor * (10.0 + 0.1 * a) for t, a in mass.items()}
-          cap = 200.0
+          cap = 100.0
           n = max(1, math.ceil(sum(cost.values()) / cap))
           batches = [[] for _ in range(n)]
           loads = [0.0] * n
