@@ -192,7 +192,7 @@ jobs:
         shell: bash -leo pipefail {0}
     steps:
       - name: Install GENIE from the ship channel
-        uses: mamba-org/setup-micromamba@v2
+        uses: mamba-org/setup-micromamba@v3
         with:
           environment-name: genie
           # Keep the version in sync with recipes/genie and
@@ -245,7 +245,7 @@ jobs:
         shell: bash -leo pipefail {0}
     steps:
       - name: Install GENIE from the ship channel
-        uses: mamba-org/setup-micromamba@v2
+        uses: mamba-org/setup-micromamba@v3
         with:
           environment-name: genie
           create-args: >-
@@ -311,7 +311,7 @@ jobs:
         with:
           locked: true
       - name: Install GENIE from the ship channel
-        uses: mamba-org/setup-micromamba@v2
+        uses: mamba-org/setup-micromamba@v3
         with:
           environment-name: genie
           create-args: >-
