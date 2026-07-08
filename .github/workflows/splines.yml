@@ -85,6 +85,14 @@ on:
           empty to regenerate them.
         type: string
         default: ''
+      stage2-run-id:
+        description: >-
+          Reuse the partial nuclear spline artifacts (splines-partial-*)
+          from this earlier workflow run ID and skip stages 1 and 2,
+          running only the merge/package/upload. Leave empty to
+          generate them.
+        type: string
+        default: ''
 
 permissions:
   contents: read
@@ -170,8 +178,9 @@ jobs:
 
   stage1:
     name: Free-nucleon splines (flavour ${{ matrix.flavour }})
-    # Skipped when reusing the artifacts of an earlier run.
-    if: inputs.stage1-run-id == ''
+    # Skipped when reusing the artifacts of an earlier run (directly,
+    # or implicitly via stage-2 reuse).
+    if: inputs.stage1-run-id == '' && inputs.stage2-run-id == ''
     runs-on: ubuntu-latest
     timeout-minutes: 240
     strategy:
@@ -218,9 +227,11 @@ jobs:
   stage2:
     name: Nuclear splines (flavour ${{ matrix.flavour }}, batch ${{ matrix.batch.id }})
     needs: [plan, stage1]
-    # Run also when stage1 was skipped in favour of reused artifacts.
+    # Run also when stage1 was skipped in favour of reused artifacts;
+    # skipped entirely when reusing stage-2 artifacts.
     if: >-
-      ${{ !cancelled() && needs.plan.result == 'success' &&
+      ${{ !cancelled() && inputs.stage2-run-id == '' &&
+          needs.plan.result == 'success' &&
           (needs.stage1.result == 'success' || needs.stage1.result == 'skipped') }}
     runs-on: ubuntu-latest
     timeout-minutes: 355
@@ -275,6 +286,16 @@ jobs:
   merge:
     name: Merge, package and upload
     needs: [plan, stage2]
+    # An explicit condition is required: a skipped ancestor (stage1
+    # under artifact reuse) propagates "skipped" through the default
+    # success() check even when all direct needs succeeded — this is
+    # exactly how run 28924118285 completed 84/84 stage-2 batches and
+    # then skipped the merge. Accept a skipped stage2 only when its
+    # artifacts are reused from an earlier run.
+    if: >-
+      ${{ !cancelled() && needs.plan.result == 'success' &&
+          (needs.stage2.result == 'success' ||
+           (needs.stage2.result == 'skipped' && inputs.stage2-run-id != '')) }}
     runs-on: ubuntu-latest
     timeout-minutes: 120
     defaults:
@@ -306,6 +327,10 @@ jobs:
           pattern: splines-partial-*
           path: partials
           merge-multiple: true
+          # When stage2-run-id is set, stage 2 was skipped and the
+          # partials come from that earlier run (needs actions: read).
+          run-id: ${{ inputs.stage2-run-id || github.run_id }}
+          github-token: ${{ github.token }}
       - name: Merge partial splines with gspladd
         run: |
           # gspladd de-duplicates the free-nucleon splines that every
@@ -320,6 +345,7 @@ jobs:
           EMAX: ${{ inputs.emax }}
           TARGETS: ${{ inputs.targets }}
           STAGE1_RUN_ID: ${{ inputs.stage1-run-id }}
+          STAGE2_RUN_ID: ${{ inputs.stage2-run-id }}
         run: |
           mkdir -p prebuilt
           mv gxspl-ship.xml prebuilt/
@@ -328,6 +354,9 @@ jobs:
             echo "run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
             if [ -n "$STAGE1_RUN_ID" ]; then
               echo "stage1-artifacts-reused-from-run: $STAGE1_RUN_ID"
+            fi
+            if [ -n "$STAGE2_RUN_ID" ]; then
+              echo "stage2-artifacts-reused-from-run: $STAGE2_RUN_ID"
             fi
             echo "tune: $TUNE"
             echo "knots: $KNOTS"
