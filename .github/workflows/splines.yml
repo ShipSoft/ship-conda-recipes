@@ -189,21 +189,16 @@ jobs:
         flavour: ['12', '-12', '14', '-14', '16', '-16']
     defaults:
       run:
-        shell: bash -leo pipefail {0}
+        shell: bash -eo pipefail {0}
     steps:
-      - name: Install GENIE from the ship channel
-        uses: mamba-org/setup-micromamba@v3
+      - uses: actions/checkout@v7
         with:
-          environment-name: genie
-          # Keep the version in sync with recipes/genie and
-          # recipes/genie-splines-ship.
-          create-args: >-
-            genie=3.06.02=pythia6_*
-            genie-data
-          condarc: |
-            channels:
-              - https://prefix.dev/ship
-              - conda-forge
+          persist-credentials: false
+      - name: Install GENIE from the ship channel
+        uses: prefix-dev/setup-pixi@v0.10.0
+        with:
+          locked: true
+          environments: genie
       - name: Generate free-nucleon splines
         env:
           FLAVOUR: ${{ matrix.flavour }}
@@ -213,8 +208,8 @@ jobs:
         run: |
           # Free proton and neutron only; nuclear targets are derived
           # from these in stage 2. $GENIE is set by the genie package's
-          # activation script.
-          gmkspl -p "$FLAVOUR" -t 1000010010,1000000010 \
+          # activation script (run via pixi run -e genie).
+          pixi run -e genie gmkspl -p "$FLAVOUR" -t 1000010010,1000000010 \
                  -n "$KNOTS" -e "$EMAX" --tune "$TUNE" \
                  -o "gxspl-freenuc-${FLAVOUR}.xml"
       - name: Upload free-nucleon splines
@@ -242,19 +237,16 @@ jobs:
         batch: ${{ fromJSON(needs.plan.outputs.batches) }}
     defaults:
       run:
-        shell: bash -leo pipefail {0}
+        shell: bash -eo pipefail {0}
     steps:
-      - name: Install GENIE from the ship channel
-        uses: mamba-org/setup-micromamba@v3
+      - uses: actions/checkout@v7
         with:
-          environment-name: genie
-          create-args: >-
-            genie=3.06.02=pythia6_*
-            genie-data
-          condarc: |
-            channels:
-              - https://prefix.dev/ship
-              - conda-forge
+          persist-credentials: false
+      - name: Install GENIE from the ship channel
+        uses: prefix-dev/setup-pixi@v0.10.0
+        with:
+          locked: true
+          environments: genie
       - name: Download free-nucleon splines
         uses: actions/download-artifact@v8
         with:
@@ -272,7 +264,7 @@ jobs:
           KNOTS: ${{ inputs.knots }}
           EMAX: ${{ inputs.emax }}
         run: |
-          gmkspl -p "$FLAVOUR" -t "$BATCH_TARGETS" \
+          pixi run -e genie gmkspl -p "$FLAVOUR" -t "$BATCH_TARGETS" \
                  -n "$KNOTS" -e "$EMAX" --tune "$TUNE" \
                  --input-cross-sections "gxspl-freenuc-${FLAVOUR}.xml" \
                  -o "gxspl-partial-${FLAVOUR}-${BATCH_ID}.xml"
@@ -300,27 +292,20 @@ jobs:
     timeout-minutes: 120
     defaults:
       run:
-        shell: bash -leo pipefail {0}
+        shell: bash -eo pipefail {0}
     steps:
       - uses: actions/checkout@v7
         with:
           # Read-only checkout; do not persist the GITHUB_TOKEN into the
           # workspace alongside PREFIX_DEV_API_KEY handling and uploads.
           persist-credentials: false
+      # default env: rattler-build (build/upload). genie env: gspladd merge.
       - uses: prefix-dev/setup-pixi@v0.10.0
         with:
           locked: true
-      - name: Install GENIE from the ship channel
-        uses: mamba-org/setup-micromamba@v3
-        with:
-          environment-name: genie
-          create-args: >-
-            genie=3.06.02=pythia6_*
-            genie-data
-          condarc: |
-            channels:
-              - https://prefix.dev/ship
-              - conda-forge
+          environments: >-
+            default
+            genie
       - name: Download partial splines
         uses: actions/download-artifact@v8
         with:
@@ -336,7 +321,7 @@ jobs:
           # gspladd de-duplicates the free-nucleon splines that every
           # partial carries over from its --input-cross-sections file.
           files=$(printf '%s,' partials/*.xml)
-          gspladd -f "${files%,}" -o gxspl-ship.xml
+          pixi run -e genie gspladd -f "${files%,}" -o gxspl-ship.xml
           echo "Merged $(grep -c '<spline' gxspl-ship.xml) splines."
       - name: Write provenance
         env:
@@ -364,7 +349,7 @@ jobs:
             echo "flavours: 12,-12,14,-14,16,-16"
             echo "free-nucleon-targets: 1000010010,1000000010"
             echo "targets: $(echo "$TARGETS" | tr -d '[:space:]')"
-            micromamba list 2>/dev/null \
+            pixi list -e genie 2>/dev/null \
               | awk '$1 == "genie" || $1 == "genie-data" {print $1 ": " $2 " " $3}'
           } > prebuilt/gxspl-ship.provenance
       - name: Build genie-splines-ship with the merged splines
