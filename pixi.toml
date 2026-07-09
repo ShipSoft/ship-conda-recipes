@@ -42,5 +42,20 @@ for h in pre-commit commit-msg; do
 done
 '''
 
+# GENIE toolchain for the production splines workflow (.github/workflows/
+# splines.yml): gmkspl to generate cross-section splines, gspladd to merge
+# them. Own channels so genie resolves from the ship channel first; its own
+# environment so local `pixi install` / `pixi run build-all` stay lean and
+# don't pull ROOT.
+[feature.genie]
+channels = ["https://prefix.dev/ship", "conda-forge"]
+platforms = ["linux-64"]
+
+[feature.genie.dependencies]
+# Keep the version in sync with recipes/genie and recipes/genie-splines-ship.
+genie = { version = "==3.06.02", build = "pythia6_*" }
+genie-data = "*"
+
 [environments]
 lint = { features = ["lint"] }
+genie = { features = ["genie"] }
