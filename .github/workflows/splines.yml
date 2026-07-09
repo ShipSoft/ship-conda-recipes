@@ -30,10 +30,14 @@ name: Production GENIE splines
 # variance. Don't trust the predictions to better than ~2x; the
 # per-batch cap below therefore includes a ~2x safety margin.
 #
-# Default 64-nuclide list: ~1380 predicted CI-min of stage-2 work per
-# flavour → ~14 batches of ≤100 predicted CI-min each (≈2.7 h actual
+# Default 66-nuclide list: ~1420 predicted CI-min of stage-2 work per
+# flavour → ~15 batches of ≤100 predicted CI-min each (≈2.7 h actual
 # at the observed 1.6x; see the plan job log for the per-batch
-# predictions).
+# predictions). The list is the union of the geometry's isotope
+# expansion and the averaged-A nuclide per element (Ni-59, Cu-64):
+# GENIE's ROOTGeomAnalyzer requests the latter — gevgen_fnal aborts
+# on an fUseSplines assertion if they are missing (see aegir's
+# scripts/gdml_target_nuclei.py, which generates the list).
 
 on:
   workflow_dispatch:
@@ -61,8 +65,8 @@ on:
           1000200430,1000200440,1000200460,1000200480,1000220460,
           1000220470,1000220480,1000220490,1000220500,1000240500,
           1000240520,1000240530,1000240540,1000250550,1000260540,
-          1000260560,1000260570,1000260580,1000280580,1000280600,
-          1000280610,1000280620,1000280640,1000290630,1000290650,
+          1000260560,1000260570,1000260580,1000280580,1000280590,1000280600,
+          1000280610,1000280620,1000280640,1000290630,1000290640,1000290650,
           1000410930,1000420920,1000420940,1000420950,1000420960,
           1000420970,1000420980,1000421000,1000731800,1000731810,
           1000741800,1000741820,1000741830,1000741840,1000741860,
