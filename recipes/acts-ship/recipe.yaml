@@ -13,7 +13,7 @@ package:
 
 source:
   url: https://github.com/webbjm/acts/archive/${{ commit }}.tar.gz
-  sha256: 904466122859009140930a08e318b58aa6a0b6256b223846a2bfaad0d2c43475
+  sha256: bff2635edd52da235dd8ed59199b254ac1d5b286255868c0347d0b52a8870db0
 
 build:
   number: 0
