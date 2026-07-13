@@ -1,6 +1,6 @@
 # prefix.dev/ship channel snapshot
 
-_Updated: 2026-07-06_
+_Updated: 2026-07-13_
 
 ## linux-64
 
@@ -87,6 +87,8 @@ _Updated: 2026-07-06_
 | genfit | 2.3.0 | `hb0f4dca_7` | 7 | 2026-06-13 |
 | genfit | 2.3.0 | `hb0f4dca_8` | 8 | 2026-06-14 |
 | genfit | 2.3.0 | `hb0f4dca_9` | 9 | 2026-06-26 |
+| genie | 3.06.02 | `pythia6_253f86f_0` | 0 | 2026-07-06 |
+| genie | 3.06.02 | `pythia8_211fdef_0` | 0 | 2026-07-06 |
 | libjsonnet | 0.22.0 | `hb0f4dca_0` | 0 | 2026-06-09 |
 | libjsonnet | 0.22.0 | `hb0f4dca_1` | 1 | 2026-06-10 |
 | mp-units | 2.5.0 | `hb0f4dca_0` | 0 | 2026-06-05 |
@@ -122,6 +124,8 @@ _Updated: 2026-07-06_
 | rootegpythia6 | 0.1 | `hb0f4dca_6` | 6 | 2026-06-13 |
 | rootegpythia6 | 0.1 | `hb0f4dca_7` | 7 | 2026-06-14 |
 | rootegpythia6 | 0.1 | `hb0f4dca_8` | 8 | 2026-06-26 |
+| rootegpythia6 | 0.1 | `h0566472_9` | 9 | 2026-07-06 |
+| rootegpythia6 | 0.1 | `hc97bc57_9` | 9 | 2026-07-06 |
 | shipdatamodel | 0.1.0 | `hb0f4dca_0` | 0 | 2026-06-19 |
 | shipdatamodel | 0.1.0 | `h0566472_1` | 1 | 2026-06-19 |
 | shipdatamodel | 0.1.0 | `hc97bc57_1` | 1 | 2026-06-19 |
@@ -145,6 +149,11 @@ _Updated: 2026-07-06_
 |---------|---------|-------|--------------|----------|
 | ganga | 8.7.12 | `pyh4616a5c_0` | 0 | 2026-06-04 |
 | ganga | 8.7.12 | `pyh4616a5c_1` | 1 | 2026-06-14 |
+| genie-data | 3.06.02 | `h4616a5c_0` | 0 | 2026-07-06 |
+| genie-splines-ship | 3.06.02 | `h4616a5c_0` | 0 | 2026-07-06 |
+| genie-splines-ship | 3.06.02 | `smoke_4616a5c_1` | 1 | 2026-07-07 |
+| genie-splines-ship | 3.06.02 | `production_4616a5c_100` | 100 | 2026-07-08 |
+| genie-splines-ship | 3.06.02 | `production_4616a5c_101` | 101 | 2026-07-10 |
 | random123 | 1.14.0 | `h4616a5c_0` | 0 | 2026-06-05 |
 | random123 | 1.14.0 | `h4616a5c_1` | 1 | 2026-06-14 |
 | ship-ci-metrics | 0.1.0 | `pyh4616a5c_0` | 0 | 2026-07-03 |
