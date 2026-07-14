@@ -15,7 +15,6 @@ on a [prefix.dev](https://prefix.dev) channel.
 | fairship | 26.06 | No (SHiP-specific) |
 | ganga | 8.7.12 | No (HEP-specific, not in conda-forge today) |
 | geant3 | 4.5 | Yes |
-| geant4-vmc | 6.8 | Yes |
 | genfit | 2.3.0 | Yes |
 | mp-units | 2.5.0 | Yes (conda-forge feedstock) |
 | npdb-client | 0.3.0 | No (SHiP-specific, split recipe with `python-npdb-client`) |
@@ -39,6 +38,7 @@ Previously packaged here, now consumed directly from conda-forge:
 - [vgm](https://github.com/conda-forge/vgm-feedstock)
 - [phlex](https://github.com/conda-forge/phlex-feedstock)
 - [GeoModel](https://github.com/conda-forge/geomodel-feedstock)
+- [geant4-vmc](https://github.com/conda-forge/geant4-vmc-feedstock)
 
 ## Building
 
