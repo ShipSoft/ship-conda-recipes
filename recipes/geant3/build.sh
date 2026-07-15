@@ -9,9 +9,10 @@ if [ "${FVERSION}" -ge 10 ]; then
 fi
 
 mkdir -p build && cd build
+# shellcheck disable=SC2154  # root_cxx_standard is injected by the build environment
 cmake ${CMAKE_ARGS} ${SRC_DIR} \
     -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_CXX_STANDARD=20 \
+    -DCMAKE_CXX_STANDARD=${root_cxx_standard} \
     -DCMAKE_SKIP_RPATH=TRUE \
     -DCMAKE_POLICY_DEFAULT_CMP0074=NEW \
     -DCMAKE_C_FLAGS="${CFLAGS} -std=gnu17" \

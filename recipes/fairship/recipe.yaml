@@ -10,7 +10,7 @@ source:
   sha256: 2f4469ae667b8ddce63e1fee4080ea9f35765789e1c006b07a4653ff5a1a443a
 
 build:
-  number: 1
+  number: 2
   script: build.sh
 
 requirements:

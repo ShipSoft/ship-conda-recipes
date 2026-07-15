@@ -1,0 +1,8 @@
+# Pin the linked ROOT to the selected C++ standard build. root_cxx_standard is a variant
+# key: listing it constrains the root_base build selected in host and
+# folds the value into the package hash. photospp's autotools build sets
+# no explicit C++ standard, so there is no compile flag to drive here --
+# this only makes the ROOT build it links against deterministic.
+root_cxx_standard:
+  - "20"
+  - "23"

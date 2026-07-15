@@ -1,0 +1,7 @@
+# Build against the selected ROOT C++ standard. root_cxx_standard is a variant key:
+# listing it pins the root_base build selected in host to the matching
+# C++ standard and folds the value into the package hash; build.sh reads
+# it as $root_cxx_standard.
+root_cxx_standard:
+  - "20"
+  - "23"
