@@ -7,10 +7,10 @@ package:
 
 source:
   url: https://github.com/ShipSoft/data-model/archive/refs/tags/v${{ version }}.tar.gz
-  sha256: 7389604a7945abdf4edda51aee7b06bb56a6d6b2366e137a9288b0367cbe8a1c
+  sha256: a1d562620632cf272d1d91dae0a94332db489b93cc512ca8cdc42c507616766c
 
 build:
-  number: 2
+  number: 3
   skip:
     - win
   script: build.sh
