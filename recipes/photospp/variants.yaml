@@ -1,8 +1,16 @@
-# Pin the linked ROOT to the selected C++ standard build. root_cxx_standard is a variant
-# key: listing it constrains the root_base build selected in host and
-# folds the value into the package hash. photospp's autotools build sets
-# no explicit C++ standard, so there is no compile flag to drive here --
+# Pin the linked ROOT to the selected C++ standard build. root_cxx_standard is a
+# variant key: it is folded into the package hash. photospp's autotools build
+# sets no explicit C++ standard, so there is no compile flag to drive here --
 # this only makes the ROOT build it links against deterministic.
+#
+# root_base must be pinned explicitly as well. A bare `root_base` host spec
+# resolves, under root_cxx_standard 23, to the legacy pre-cxx-split root_base
+# 6.36.06 -- that build declares no root_cxx_standard dependency, so it
+# spuriously satisfies the C++23 marker and the solver prefers it. Pinning keeps
+# every recipe on the same ROOT series. Bump in lockstep when conda-forge moves
+# ROOT past 6.40.2.
 root_cxx_standard:
   - "20"
   - "23"
+root_base:
+  - "6.40.2"
