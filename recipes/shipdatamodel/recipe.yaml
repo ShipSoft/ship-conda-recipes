@@ -1,5 +1,5 @@
 context:
-  version: "0.1.0"
+  version: "0.2.0"
 
 package:
   name: shipdatamodel
@@ -7,10 +7,10 @@ package:
 
 source:
   url: https://github.com/ShipSoft/data-model/archive/refs/tags/v${{ version }}.tar.gz
-  sha256: a1d562620632cf272d1d91dae0a94332db489b93cc512ca8cdc42c507616766c
+  sha256: f36a382cb3f7d87e4be430166255338e6c18ae37ddc949ecf18c138b5e4af112
 
 build:
-  number: 3
+  number: 0
   skip:
     - win
   script: build.sh
