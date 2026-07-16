@@ -24,6 +24,11 @@ requirements:
   host:
     - root_base
     - root_cxx_standard
+    # 0.2.0 adds SHiPUnits: CMakeLists.txt does find_package(mp-units 2.5
+    # CONFIG REQUIRED) and SHiPDataModelConfig.cmake.in does
+    # find_dependency(mp-units 2.5 CONFIG). mp-units' run_exports pins it
+    # into run for consumers of the installed headers.
+    - mp-units
   run_exports:
     - ${{ pin_subpackage('shipdatamodel', upper_bound='x.x') }}
 
