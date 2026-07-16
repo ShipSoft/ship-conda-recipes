@@ -1,5 +1,5 @@
 context:
-  version: "0.1.0"
+  version: "0.2.0"
 
 package:
   name: shipgeometryservice
@@ -7,10 +7,10 @@ package:
 
 source:
   url: https://github.com/ShipSoft/geometry_service/archive/refs/tags/v${{ version }}.tar.gz
-  sha256: b93837a8e9d5515e20078f7eee25d49f03f96091462c85fa2a29cb44126634a0
+  sha256: ce227f1109e572f2d0f615e7f1890e2fd41eb0ae2e3c3f9d10dd7e611ed64ddf
 
 build:
-  number: 1
+  number: 0
   skip:
     - win
   script: build.sh
@@ -50,6 +50,7 @@ tests:
       - test -f $PREFIX/lib/libSHiPGeometryService.so
       - test -f $PREFIX/lib/cmake/SHiPGeometryService/SHiPGeometryServiceConfig.cmake
       - test -f $PREFIX/include/GeometryService/SHiPGeometryService.h
+      - test -f $PREFIX/include/GeometryService/G4RayScanner.h
 
 about:
   homepage: https://github.com/ShipSoft/geometry_service
