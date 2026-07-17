@@ -11,6 +11,7 @@ on a [prefix.dev](https://prefix.dev) channel.
 |---------|---------|---------------------|
 | acts-ship | 0.0.0.dev20260608+fcf8bbe | No (SHiP fork of conda-forge `acts-core`) |
 | aegir | 0.1.0 | No (SHiP-specific) |
+| aegir-genie | 0.1.0 | No (SHiP-specific, links GPL GENIE) |
 | fairroot | 19.0.1 | No (carries patch) |
 | fairship | 26.06 | No (SHiP-specific) |
 | ganga | 8.7.12 | No (HEP-specific, not in conda-forge today) |
