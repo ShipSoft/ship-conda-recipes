@@ -1,0 +1,93 @@
+context:
+  version: "0.1.0"
+
+package:
+  name: aegir-genie
+  version: ${{ version }}
+
+source:
+  url: https://github.com/ShipSoft/aegir-genie/archive/refs/tags/v${{ version }}.tar.gz
+  sha256: a4c1908e741d92f822fdc804af78c713478c6697af30e836c6b1de8b0e2db1d9
+
+build:
+  number: 0
+  skip:
+    - win
+  script: build.sh
+
+requirements:
+  build:
+    - ${{ compiler('cxx') }}
+    - sysroot_linux-64 2.17.*
+    - cmake
+    - make
+  host:
+    - shipdatamodel <1
+    # >=0.3.0: genie_source.cpp needs phlex/core/product_selector.hpp, added
+    # in 0.3.0. Also steers the solve to conda-forge phlex (0.3.1) over the
+    # stale 0.2.0 still on the ship channel, which strict channel priority
+    # would otherwise prefer.
+    - phlex >=0.3.0
+    - shipgeometryservice <1
+    - root_base >=6.40
+    # phlex/shipdatamodel are C++23; pin the matching ROOT variant so genie
+    # and phlex stay co-installable (an unconstrained solve drifts down to
+    # the C++20 ROOT build).
+    - root_cxx_standard ==23
+    # Production hadronization backend; the G18 tunes hardwire Pythia6. The
+    # build-string glob selects genie's pythia6 variant. Installing genie in
+    # host drags its dependency closure (lhapdf, pythia6, rootegpythia6,
+    # libxml2, gsl, log4cpp) into $PREFIX, which the CMakeLists resolves
+    # under ${GENIE_PREFIX}/lib.
+    - genie >=3.6.2 pythia6_*
+    - geant4
+    - random123
+    - libboost-devel
+    - tbb-devel
+    - spdlog
+    # GENIE's public headers include log4cpp; declared explicitly (it also
+    # arrives via genie's closure). conda-forge log4cpp 1.1.4 underdeclares
+    # its libnsl runtime dependency.
+    - log4cpp
+    - libnsl
+    # GeoModelCoreConfig.cmake does find_dependency(Eigen3); per conda-forge
+    # eigen-feedstock README case B, consumers of a library that exposes
+    # Eigen in public headers must list eigen-abi-devel in host. Remove once
+    # conda-forge geomodel-feedstock ships -devel outputs (case C).
+    - eigen-abi-devel
+    # GeoModelToolsConfig.cmake does find_dependency(nlohmann_json 3.12.0).
+    # conda-forge geomodel-tools keeps nlohmann_json in host only (no run /
+    # no run_exports) and nlohmann_json has no run_exports of its own, so any
+    # package whose Config triggers find_dependency(GeoModelTools) at
+    # configure time forces consumers to list nlohmann_json in host. Remove
+    # once conda-forge geomodel-feedstock adds nlohmann_json to
+    # geomodel-tools' run:.
+    - nlohmann_json
+
+tests:
+  - script:
+      - test -f $PREFIX/lib/libgenie_source.so
+      - test -f $PREFIX/bin/gevgen_ship
+      - test -d $PREFIX/share/aegir-genie/workflows
+
+about:
+  homepage: https://github.com/ShipSoft/aegir-genie
+  repository: https://github.com/ShipSoft/aegir-genie
+  summary: GENIE neutrino event generation plugin for the aegir simulation framework
+  description: |
+    aegir-genie embeds the GENIE neutrino event generator as a phlex
+    source plugin for the SHiP aegir simulation framework. A
+    genie::GMCJDriver convolves the SHiP neutrino flux with
+    cross-section splines and the GeoModel-built Geant4 geometry
+    (analyzed directly via SHiPGeometryService's ray scanner), placing
+    interaction vertices consistently with the tracked material, with
+    built-in protons-on-target accounting. Ships the genie_source
+    plugin and the standalone gevgen_ship generator.
+  # The distributed binary links the GPL GENIE library (combined work) over
+  # LGPL-licensed SHiP source; the bundled license text is the LGPL one.
+  license: GPL-3.0-or-later AND LGPL-3.0-or-later
+  license_file: LICENSES/LGPL-3.0-or-later.txt
+
+extra:
+  recipe-maintainers:
+    - olantwin
