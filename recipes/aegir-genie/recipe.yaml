@@ -24,9 +24,8 @@ requirements:
   host:
     - shipdatamodel <1
     # >=0.3.0: genie_source.cpp needs phlex/core/product_selector.hpp, added
-    # in 0.3.0. Also steers the solve to conda-forge phlex (0.3.1) over the
-    # stale 0.2.0 still on the ship channel, which strict channel priority
-    # would otherwise prefer.
+    # in 0.3.0. phlex is supplied by conda-forge (>=0.3.2); its run_export
+    # further tightens the built package's run-dep to >=0.3.2,<0.4.0a0.
     - phlex >=0.3.0
     - shipgeometryservice <1
     - root_base >=6.40
