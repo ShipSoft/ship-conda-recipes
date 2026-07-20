@@ -79,7 +79,22 @@ cp "${GENIE}"/src/make/Make.config* "${PREFIX}/share/genie/src/make/"
 mkdir -p "${PREFIX}/etc/conda/activate.d" "${PREFIX}/etc/conda/deactivate.d"
 cat > "${PREFIX}/etc/conda/activate.d/genie-activate.sh" <<'EOF'
 export GENIE="${CONDA_PREFIX}/share/genie"
+# GENIE's rootmaps reference headers relative to the include root
+# (e.g. Framework/Algorithm/Algorithm.h), so ROOT's cling autoloader needs
+# include/GENIE on ROOT_INCLUDE_PATH; without it, loading any genie:: type
+# floods stderr with "Missing FileEntry" errors. Back up/restore around our
+# prepend, mirroring the root package's activate-root.sh pattern.
+if [ -n "${ROOT_INCLUDE_PATH:-}" ]; then
+	export CONDA_BACKUP_ROOT_INCLUDE_PATH="${ROOT_INCLUDE_PATH}"
+fi
+export ROOT_INCLUDE_PATH="${CONDA_PREFIX}/include/GENIE${ROOT_INCLUDE_PATH:+:${ROOT_INCLUDE_PATH}}"
 EOF
 cat > "${PREFIX}/etc/conda/deactivate.d/genie-deactivate.sh" <<'EOF'
 unset GENIE
+if [ -n "${CONDA_BACKUP_ROOT_INCLUDE_PATH:-}" ]; then
+	export ROOT_INCLUDE_PATH="${CONDA_BACKUP_ROOT_INCLUDE_PATH}"
+	unset CONDA_BACKUP_ROOT_INCLUDE_PATH
+else
+	unset ROOT_INCLUDE_PATH
+fi
 EOF
