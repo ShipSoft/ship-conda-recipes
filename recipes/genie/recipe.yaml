@@ -10,7 +10,7 @@ source:
   sha256: 5770346d888bbac7a80872e7aa01953437ab867e335e39cc7412c9b83a0b4e2a
 
 build:
-  number: 1
+  number: 2
   # Make the hadronization backend visible in the build string
   # (e.g. genie-3.06.02-pythia6_h1234567_0).
   string: ${{ genie_hadronization }}_${{ hash }}_${{ build_number }}
