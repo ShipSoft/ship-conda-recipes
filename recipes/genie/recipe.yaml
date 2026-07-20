@@ -10,7 +10,7 @@ source:
   sha256: 5770346d888bbac7a80872e7aa01953437ab867e335e39cc7412c9b83a0b4e2a
 
 build:
-  number: 0
+  number: 1
   # Make the hadronization backend visible in the build string
   # (e.g. genie-3.06.02-pythia6_h1234567_0).
   string: ${{ genie_hadronization }}_${{ hash }}_${{ build_number }}
@@ -27,15 +27,12 @@ requirements:
     # GENIE's configure is a hand-rolled perl script, not autoconf.
     - perl
   host:
-    # Match the phlex/aegir ROOT: >=6.40 (an unconstrained cxx23 solve
-    # drifts down to 6.36, whose run_export then conflicts with the
-    # aegir stack).
-    - root_base >=6.40
-    # Pin the C++23 ROOT build variant: phlex pins ==23, and an
-    # unconstrained solve picks the C++20 variant here, which makes
-    # genie + phlex unresolvable in one environment (GENIE 3.06.02
-    # compiles fine as C++23).
-    - root_cxx_standard ==23
+    # ROOT series and C++ standard are driven by the root_base /
+    # root_cxx_standard variant keys (see variants.yaml). genie builds a
+    # cxx20 variant (for FairShip and the default ROOT stack) and a cxx23
+    # variant (for phlex/aegir).
+    - root_base
+    - root_cxx_standard
     - if: genie_hadronization == "pythia6"
       then:
         # TPythia6 interface: conda-forge ROOT is built without pythia6,
