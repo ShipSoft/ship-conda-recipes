@@ -1,6 +1,6 @@
 # prefix.dev/ship channel snapshot
 
-_Updated: 2026-07-13_
+_Updated: 2026-07-20_
 
 ## linux-64
 
@@ -20,16 +20,22 @@ _Updated: 2026-07-13_
 | acts-ship | 0.0.0.dev20260630+bedcaae | `hc97bc57_0` | 0 | 2026-06-30 |
 | acts-ship | 0.0.0.dev20260701+a7e5566 | `h0566472_0` | 0 | 2026-07-01 |
 | acts-ship | 0.0.0.dev20260701+a7e5566 | `hc97bc57_0` | 0 | 2026-07-01 |
+| acts-ship | 0.0.0.dev20260713+7608d7c | `h0566472_0` | 0 | 2026-07-15 |
+| acts-ship | 0.0.0.dev20260713+7608d7c | `hc97bc57_0` | 0 | 2026-07-15 |
 | aegir | 0.2.0 | `hb0f4dca_1` | 1 | 2026-06-19 |
 | aegir | 0.2.0 | `hb0f4dca_2` | 2 | 2026-06-26 |
 | aegir | 0.2.0 | `hb0f4dca_3` | 3 | 2026-07-04 |
 | fairroot | 19.0.1 | `hb0f4dca_9` | 9 | 2026-06-13 |
 | fairroot | 19.0.1 | `hb0f4dca_10` | 10 | 2026-06-14 |
 | fairroot | 19.0.1 | `hb0f4dca_11` | 11 | 2026-06-26 |
+| fairroot | 19.0.1 | `h6afcf60_12` | 12 | 2026-07-16 |
+| fairroot | 19.0.1 | `ha28ff26_12` | 12 | 2026-07-16 |
 | fairship | 26.05.7 | `hb0f4dca_4` | 4 | 2026-06-13 |
 | fairship | 26.05.7 | `hb0f4dca_5` | 5 | 2026-06-14 |
 | fairship | 26.06 | `hb0f4dca_0` | 0 | 2026-06-18 |
 | fairship | 26.06 | `hb0f4dca_1` | 1 | 2026-06-26 |
+| fairship | 26.06 | `h6afcf60_2` | 2 | 2026-07-16 |
+| fairship | 26.06 | `ha28ff26_2` | 2 | 2026-07-16 |
 | field-service | 0.1.0 | `h83dfeff_0` | 0 | 2026-06-19 |
 | field-service | 0.1.0 | `hb9574b7_0` | 0 | 2026-06-19 |
 | field-service | 0.1.0 | `h73f9d4e_1` | 1 | 2026-06-26 |
@@ -77,9 +83,8 @@ _Updated: 2026-07-13_
 | geant3 | 4.5 | `hb0f4dca_4` | 4 | 2026-06-13 |
 | geant3 | 4.5 | `hb0f4dca_5` | 5 | 2026-06-14 |
 | geant3 | 4.5 | `hb0f4dca_6` | 6 | 2026-06-26 |
-| geant4-vmc | 6.8 | `hb0f4dca_4` | 4 | 2026-06-13 |
-| geant4-vmc | 6.8 | `hb0f4dca_5` | 5 | 2026-06-14 |
-| geant4-vmc | 6.8 | `hb0f4dca_6` | 6 | 2026-06-26 |
+| geant3 | 4.5 | `h6afcf60_7` | 7 | 2026-07-16 |
+| geant3 | 4.5 | `ha28ff26_7` | 7 | 2026-07-16 |
 | genfit | 2.3.0 | `hb0f4dca_3` | 3 | 2026-05-27 |
 | genfit | 2.3.0 | `hb0f4dca_4` | 4 | 2026-06-08 |
 | genfit | 2.3.0 | `hb0f4dca_5` | 5 | 2026-06-10 |
@@ -87,6 +92,8 @@ _Updated: 2026-07-13_
 | genfit | 2.3.0 | `hb0f4dca_7` | 7 | 2026-06-13 |
 | genfit | 2.3.0 | `hb0f4dca_8` | 8 | 2026-06-14 |
 | genfit | 2.3.0 | `hb0f4dca_9` | 9 | 2026-06-26 |
+| genfit | 2.3.0 | `h6afcf60_10` | 10 | 2026-07-16 |
+| genfit | 2.3.0 | `ha28ff26_10` | 10 | 2026-07-16 |
 | genie | 3.06.02 | `pythia6_253f86f_0` | 0 | 2026-07-06 |
 | genie | 3.06.02 | `pythia8_211fdef_0` | 0 | 2026-07-06 |
 | libjsonnet | 0.22.0 | `hb0f4dca_0` | 0 | 2026-06-09 |
@@ -109,6 +116,8 @@ _Updated: 2026-07-13_
 | photospp | 3.64 | `hb0f4dca_2` | 2 | 2026-06-13 |
 | photospp | 3.64 | `hb0f4dca_3` | 3 | 2026-06-14 |
 | photospp | 3.64 | `hb0f4dca_4` | 4 | 2026-06-26 |
+| photospp | 3.64 | `h6afcf60_5` | 5 | 2026-07-16 |
+| photospp | 3.64 | `ha28ff26_5` | 5 | 2026-07-16 |
 | pythia6 | 6.4.28 | `hb0f4dca_3` | 3 | 2026-05-27 |
 | pythia6 | 6.4.28 | `hb0f4dca_4` | 4 | 2026-06-10 |
 | pythia6 | 6.4.28 | `hb0f4dca_5` | 5 | 2026-06-13 |
@@ -131,6 +140,10 @@ _Updated: 2026-07-13_
 | shipdatamodel | 0.1.0 | `hc97bc57_1` | 1 | 2026-06-19 |
 | shipdatamodel | 0.1.0 | `h0566472_2` | 2 | 2026-06-26 |
 | shipdatamodel | 0.1.0 | `hc97bc57_2` | 2 | 2026-06-26 |
+| shipdatamodel | 0.1.0 | `h0566472_3` | 3 | 2026-07-16 |
+| shipdatamodel | 0.1.0 | `hc97bc57_3` | 3 | 2026-07-16 |
+| shipdatamodel | 0.2.0 | `h0566472_0` | 0 | 2026-07-16 |
+| shipdatamodel | 0.2.0 | `hc97bc57_0` | 0 | 2026-07-16 |
 | shipgeometry | 0.1.0 | `hb0f4dca_0` | 0 | 2026-06-05 |
 | shipgeometry | 0.1.0 | `hb0f4dca_1` | 1 | 2026-06-05 |
 | shipgeometry | 0.1.0 | `hb0f4dca_2` | 2 | 2026-06-10 |
@@ -142,6 +155,7 @@ _Updated: 2026-07-13_
 | shipgeometry | 0.2.1 | `hb0f4dca_1` | 1 | 2026-06-26 |
 | shipgeometryservice | 0.1.0 | `hb0f4dca_0` | 0 | 2026-06-18 |
 | shipgeometryservice | 0.1.0 | `hb0f4dca_1` | 1 | 2026-06-26 |
+| shipgeometryservice | 0.2.0 | `hb0f4dca_0` | 0 | 2026-07-16 |
 
 ## noarch
 
