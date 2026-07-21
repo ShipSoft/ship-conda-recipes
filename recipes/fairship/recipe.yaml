@@ -7,7 +7,7 @@ package:
 
 source:
   url: https://github.com/ShipSoft/FairShip/archive/refs/tags/${{ version }}.tar.gz
-  sha256: 2f4469ae667b8ddce63e1fee4080ea9f35765789e1c006b07a4653ff5a1a443a
+  sha256: 2647f4b77b269f28a7a14a0cb5dd055b01a8255bb26c82336a54bceb91764e88
 
 build:
   number: 2
