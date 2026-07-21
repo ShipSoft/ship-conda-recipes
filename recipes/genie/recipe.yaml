@@ -10,10 +10,20 @@ source:
   sha256: 5770346d888bbac7a80872e7aa01953437ab867e335e39cc7412c9b83a0b4e2a
 
 build:
-  number: 2
+  number: 3
   # Make the hadronization backend visible in the build string
-  # (e.g. genie-3.06.02-pythia6_h1234567_0).
+  # (e.g. genie-3.06.02-pythia8_h1234567_0).
   string: ${{ genie_hadronization }}_${{ hash }}_${{ build_number }}
+  # pythia8 is the default variant the solver picks for a bare `genie`
+  # dependency: down-prioritize pythia6. FairShip's shipgen/genie_config
+  # mandates genie::Pythia8Decayer2023, which needs GENIE built with
+  # --enable-pythia8 (as the cvmfs/alienv build is: GOPT_ENABLE_PYTHIA8=YES);
+  # the pure-pythia6 variant FATALs there ("calling GENIE/PYTHIA8 decay
+  # without enabling PYTHIA8"). Down-prioritizing is implemented via
+  # track_features, so only the magnitude matters -- 1 is enough to break the
+  # tie in favour of pythia8.
+  variant:
+    down_prioritize_variant: ${{ 1 if genie_hadronization == "pythia6" else 0 }}
   script:
     file: build.sh
     env:
@@ -94,8 +104,11 @@ about:
     atmospheric neutrino experiments. This build enables LHAPDF6, the
     built-in flux and geometry drivers, and the FNAL-experiment and
     atmospheric event generation apps. Two hadronization/decay variants
-    are built: pythia6 (production; TPythia6 via the standalone
-    rootegpythia6 package) and pythia8 (upstream-experimental).
+    are built: pythia8 (default; --enable-pythia8, genie::Pythia8Decayer2023,
+    matching the FairShip/cvmfs build) and pythia6 (TPythia6 via the
+    standalone rootegpythia6 package, kept for the G18 tunes that hardwire
+    Pythia6 algorithms). The solver prefers pythia8 for a bare `genie`
+    dependency; request pythia6 explicitly (build "pythia6_*") if needed.
   # Upstream ships no LICENSE file; the GENIE copyright page states the
   # code is (partially) GPLv3, so GPL-3.0-or-later is our best estimate.
   license: GPL-3.0-or-later

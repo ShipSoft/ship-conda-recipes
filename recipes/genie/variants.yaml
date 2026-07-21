@@ -1,6 +1,8 @@
-# Hadronization/decay backend variants. pythia6 is the production
-# backend (matches upstream defaults and all G18 tunes); pythia8 is the
-# experimental upstream path (gated by --enable-pythia8).
+# Hadronization/decay backend variants. pythia8 is the default (gated by
+# --enable-pythia8, genie::Pythia8Decayer2023 -- matches the FairShip/cvmfs
+# build and its shipgen/genie_config); pythia6 (matches upstream defaults and
+# the G18 tunes) is still built but down-prioritized in recipe.yaml so a bare
+# `genie` dependency resolves to pythia8.
 genie_hadronization:
   - pythia6
   - pythia8
