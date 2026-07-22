@@ -10,7 +10,10 @@ source:
   sha256: 54c12d59d19d6161fb9bc29129c1e7cded4200c39f0db5e374e14fd70398cd08
 
 build:
-  number: 1
+  # Rebuild against current conda-forge to refresh the geomodel-core pin
+  # (6.27 -> 6.29); the previous build is stale relative to conda-forge and
+  # skews against fresh source builds in dev-source environments.
+  number: 2
   skip:
     - win
   script: build.sh
