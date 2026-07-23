@@ -47,8 +47,8 @@ Previously packaged here, now consumed directly from conda-forge:
 
 conda-forge splits ROOT builds by C++ standard: consumers put `root_base` and
 the `root_cxx_standard` marker in `host:` and rely on `root_base`'s
-`run_exports`. Every ROOT-linking recipe here builds two variants, driven by
-two keys in its `variants.yaml`:
+`run_exports`. Most ROOT-linking recipes here build two variants, driven by
+two keys in their `variants.yaml`:
 
 - `root_cxx_standard` (`"20"` / `"23"`) is a variant key: it is folded into
   the package hash, constrains the `root_base` build selected in `host:`, and
@@ -68,6 +68,12 @@ For packages whose upstream build system sets no explicit C++ standard
 (photospp's autotools, GENIE's perl configure — both inherit ROOT's standard
 via `root-config`), there is no compile flag to drive; the variant only makes
 the ROOT build they link against deterministic.
+
+The C++23-only aegir stack (aegir, aegir-genie) builds a single variant and
+constrains ROOT in `host:` instead — `root_base >=6.40` plus
+`root_cxx_standard ==23` — which equally excludes the legacy 6.36.06 build.
+rootegpythia6 builds both variants but likewise uses a `root_base >=6.40`
+floor in `host:` rather than a variant pin.
 
 ### Known upstream workarounds
 

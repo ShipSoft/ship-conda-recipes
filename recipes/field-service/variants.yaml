@@ -1,3 +1,7 @@
+# ROOT C++-standard variant; root_base is pinned deliberately — see
+# "ROOT C++ standard variants" in the README.
 root_cxx_standard:
   - "20"
   - "23"
+root_base:
+  - "6.40.2"

@@ -10,7 +10,7 @@ source:
   sha256: d19f2731a0d0c45167397a30068b3291cff388be47ac9c55afdd6713bfb2bf1d
 
 build:
-  number: 3
+  number: 4
   skip:
     - win
   script: build.sh
@@ -31,8 +31,11 @@ requirements:
     - shipgeometryservice <1
     - field-service-core
     - field-service-g4
-    - root_base
-    - root_cxx_standard
+    - root_base >=6.40
+    # phlex/shipdatamodel are C++23; pin the matching ROOT variant so aegir
+    # and phlex stay co-installable (an unconstrained solve drifts down to
+    # the C++20 ROOT build).
+    - root_cxx_standard ==23
     - geant4
     - pythia8
     - random123
