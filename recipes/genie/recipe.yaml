@@ -11,8 +11,6 @@ source:
 
 build:
   number: 3
-  # Make the hadronization backend visible in the build string
-  # (e.g. genie-3.06.02-pythia8_h1234567_0).
   string: ${{ genie_hadronization }}_${{ hash }}_${{ build_number }}
   # pythia8 is the default variant the solver picks for a bare `genie`
   # dependency: down-prioritize pythia6. FairShip's shipgen/genie_config
@@ -37,10 +35,6 @@ requirements:
     # GENIE's configure is a hand-rolled perl script, not autoconf.
     - perl
   host:
-    # ROOT series and C++ standard are driven by the root_base /
-    # root_cxx_standard variant keys (see variants.yaml). genie builds a
-    # cxx20 variant (for FairShip and the default ROOT stack) and a cxx23
-    # variant (for phlex/aegir).
     - root_base
     - root_cxx_standard
     - if: genie_hadronization == "pythia6"
@@ -60,10 +54,8 @@ requirements:
     # Runtime data tables ($GENIE/data), split out because they dominate
     # the package size and are identical for all build variants.
     - genie-data ==${{ version }}
-    # conda-forge's log4cpp package is missing its libnsl run dependency
-    # (liblog4cpp.so.5 has DT_NEEDED libnsl.so.3 but the package only
-    # depends on libgcc/libstdcxx); pull it in ourselves until that is
-    # fixed upstream.
+    # log4cpp's missing libnsl run dependency — see "Known upstream
+    # workarounds" in the README.
     - libnsl
   run_exports:
     - ${{ pin_subpackage('genie', upper_bound='x.x') }}

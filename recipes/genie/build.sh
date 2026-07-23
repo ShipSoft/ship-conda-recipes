@@ -15,7 +15,6 @@ case "${GENIE_HADRONIZATION}" in
         )
         ;;
     pythia8)
-        # Upstream-experimental path.
         hadronization_flags=(
             --disable-pythia6
             --enable-pythia8

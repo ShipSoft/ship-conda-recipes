@@ -16,25 +16,15 @@ name: Production GENIE splines
 #           (see recipes/genie-splines-ship/build.sh), and uploads the
 #           package to prefix.dev/ship.
 #
-# Calibration (genie 3.06.02 pythia6, tune G18_02a_02_11b, 250 knots,
-# Emax 400 GeV, single-threaded): free nucleons 98 min/flavour local,
-# ~113-127 min on CI runners. One derived nuclide has a large fixed
-# component on top of a mass-proportional one (measured):
-#   cost_local(nuclide) ≈ 10 + 0.1*A minutes   (W-184: 28 min;
-#   A≈16: ~11-12 min), CI ≈ 1.25x local.
-#
-# Prediction quality: in the 2026-07 production runs, stage-2 batches
-# uniformly took ~1.6x the model's prediction on CI runners (4h40m-
-# 5h50m against a ~3.3 h prediction) — the local-fit cost model
-# underestimates CI gmkspl across the board, it is not runner
-# variance. Don't trust the predictions to better than ~2x; the
-# per-batch cap below therefore includes a ~2x safety margin.
+# Stage-2 batching uses a measured per-nuclide cost model (see the
+# plan job); its predictions are only good to ~2x on CI runners, and
+# the per-batch cap carries a matching safety margin.
 #
 # Default 66-nuclide list: ~1420 predicted CI-min of stage-2 work per
-# flavour → ~15 batches of ≤100 predicted CI-min each (≈2.7 h actual
-# at the observed 1.6x; see the plan job log for the per-batch
-# predictions). The list is the union of the geometry's isotope
-# expansion and the averaged-A nuclide per element (Ni-59, Cu-64):
+# flavour → ~15 batches of ≤100 predicted CI-min each (≈2.7 h actual;
+# see the plan job log for the per-batch predictions). The list is the
+# union of the geometry's isotope expansion and the averaged-A nuclide
+# per element (Ni-59, Cu-64):
 # GENIE's ROOTGeomAnalyzer requests the latter — gevgen_fnal aborts
 # on an fUseSplines assertion if they are missing (see aegir's
 # scripts/gdml_target_nuclei.py, which generates the list).
@@ -146,12 +136,11 @@ jobs:
           # splines: a large fixed per-nuclide component plus a
           # mass-proportional one, cost_local ≈ 10 + 0.1*A minutes
           # (W-184: 28 min; A≈16: ~11-12 min). CI runners are ~1.25x
-          # slower. In production, actual CI durations came out a
-          # uniform ~1.6x above these predictions (see the header
-          # note), so the cap carries a ~2x safety margin: 100
-          # predicted CI-minutes ≈ 2.7 h actual, safe within the
-          # 355-min stage-2 timeout even at 2x plus the ~10 min
-          # environment setup.
+          # slower, and actual CI durations run a further uniform
+          # ~1.6x above these predictions, so the cap carries a ~2x
+          # safety margin: 100 predicted CI-minutes ≈ 2.7 h actual,
+          # safe within the 355-min stage-2 timeout even at 2x plus
+          # the ~10 min environment setup.
           ci_factor = 1.25
           cost = {t: ci_factor * (10.0 + 0.1 * a) for t, a in mass.items()}
           cap = 100.0
@@ -284,9 +273,8 @@ jobs:
     needs: [plan, stage2]
     # An explicit condition is required: a skipped ancestor (stage1
     # under artifact reuse) propagates "skipped" through the default
-    # success() check even when all direct needs succeeded — this is
-    # exactly how run 28924118285 completed 84/84 stage-2 batches and
-    # then skipped the merge. Accept a skipped stage2 only when its
+    # success() check even when all direct needs succeeded, silently
+    # skipping the merge. Accept a skipped stage2 only when its
     # artifacts are reused from an earlier run.
     if: >-
       ${{ !cancelled() && needs.plan.result == 'success' &&
