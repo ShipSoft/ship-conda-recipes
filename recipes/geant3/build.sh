@@ -1,7 +1,8 @@
 #!/bin/bash
 set -euxo pipefail
 
-# Detect gfortran version for compatibility flags
+# gfortran >= 10 rejects the legacy Fortran sources (non-conforming
+# argument types and BOZ constants) by default.
 FVERSION=$(gfortran --version | grep -i fortran | sed -e 's/.* //' | cut -d. -f1)
 FFLAGS=""
 if [ "${FVERSION}" -ge 10 ]; then

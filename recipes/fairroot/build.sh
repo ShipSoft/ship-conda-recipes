@@ -17,7 +17,9 @@ cmake ${CMAKE_ARGS} ${SRC_DIR} \
 cmake --build . -j${CPU_COUNT}
 cmake --install .
 
-# Work around hardcoded paths in PCM
+# The dictionary PCMs record headers under their source-module directories
+# (e.g. field/FairField.h) while the headers install flat into include/;
+# symlink the module names back onto include/ so cling resolves them.
 for DIR in source sink field event sim steer; do
   ln -nfs ../include "${PREFIX}/include/${DIR}"
 done

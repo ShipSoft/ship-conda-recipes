@@ -7,20 +7,11 @@ genie_hadronization:
   - pythia6
   - pythia8
 
-# Pin the linked ROOT to the selected C++ standard build. root_cxx_standard is a
-# variant key: it constrains the root_base build selected in host and is folded
-# into the package hash. GENIE's perl configure sets no explicit C++ standard
-# (it inherits ROOT's via root-config), so there is no compile flag to drive
-# here -- this only makes the ROOT build it links against deterministic. cxx20
-# is for consumers on the default ROOT builds (e.g. FairShip); cxx23 for the
-# phlex/aegir stack (phlex pins root_cxx_standard ==23).
-#
-# root_base must be pinned explicitly as well: a bare `root_base` host spec
-# resolves, under root_cxx_standard 23, to the legacy pre-cxx-split root_base
-# 6.36.06, which declares no root_cxx_standard dependency and so spuriously
-# satisfies the C++23 marker. Pinning keeps the whole stack on one ROOT series,
-# mirroring conda-forge's global root_base pin. Bump in lockstep on the next
-# ROOT migration.
+# ROOT C++-standard variant; root_base is pinned deliberately — see
+# "ROOT C++ standard variants" in the README. GENIE's perl configure sets no
+# explicit C++ standard (it inherits ROOT's via root-config), so there is no
+# compile flag to drive here — this only makes the ROOT build it links
+# against deterministic.
 root_cxx_standard:
   - "20"
   - "23"
