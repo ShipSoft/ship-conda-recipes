@@ -1,0 +1,67 @@
+context:
+  version: "0.2.0"
+
+package:
+  name: shannon
+  version: ${{ version }}
+
+source:
+  url: https://github.com/ShipSoft/Shannon/archive/refs/tags/v${{ version }}.tar.gz
+  sha256: 044f80fcbb0b1a427331246a42cdb192d726fda54c44d49b29f190c0ff68b87e
+
+build:
+  number: 0
+  skip:
+    - win
+  script: build.sh
+
+requirements:
+  build:
+    - ${{ compiler('cxx') }}
+    - sysroot_linux-64 2.17.*
+    - cmake
+    - make
+  host:
+    # Shannon consumes the digitised-hit data classes (RecHit and the
+    # per-detector hits under SHiP/detectors/) added in data-model 0.3.0;
+    # pin >=0.3 so the resolver cannot fall back to an earlier build that
+    # lacks those headers. The <1 upper bound excludes any legacy
+    # calendar-versioned builds on the ship channel.
+    - shipdatamodel >=0.3,<1
+    - phlex
+    - root_base
+    - root_cxx_standard
+    - random123
+    - libboost-devel
+    - tbb-devel
+    - spdlog
+    - fmt
+    - mp-units
+    - ms-gsl
+  run_exports:
+    - ${{ pin_subpackage('shannon', upper_bound='x.x') }}
+
+tests:
+  - script:
+      - test -f $PREFIX/lib/libread_sim_file.so
+      - test -f $PREFIX/lib/libdigitise_hits.so
+      - test -f $PREFIX/lib/libdigitised_output_module.so
+      - test -d $PREFIX/share/shannon/workflows
+
+about:
+  homepage: https://github.com/ShipSoft/Shannon
+  repository: https://github.com/ShipSoft/Shannon
+  summary: Phlex-based digitisation framework for the SHiP experiment
+  description: |
+    Shannon is the digitisation framework for the SHiP experiment, built
+    on top of the Phlex parallel data-processing toolkit and the SHiP
+    event data model. It provides pluggable modules that read simulated
+    events, digitise detector hits (with a counter-based Philox RNG and
+    shared Gaussian smearing), and write digitised hits and validation
+    histograms to an RNTuple-based output.
+  license: LGPL-3.0-or-later
+  license_file: LICENSES/LGPL-3.0-or-later.txt
+
+extra:
+  recipe-maintainers:
+    - olantwin
