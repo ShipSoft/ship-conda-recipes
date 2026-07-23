@@ -131,7 +131,6 @@ outputs:
   - package:
       name: field-service
     build:
-      # Metapackage: no files, just pulls in the three sub-packages.
       files: []
     requirements:
       run:

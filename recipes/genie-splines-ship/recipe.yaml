@@ -40,7 +40,6 @@ build:
   # >= 100 (its build-number input) so production packages always win
   # solver tie-breaks over smoke builds of the same version.
   number: ${{ env.get("GENIE_SPLINES_BUILD_NUMBER", default="1") | int }}
-  # Make the spline source visible in the build string.
   string: ${{ spline_source }}_${{ hash }}_${{ build_number }}
   noarch: generic
   script:
