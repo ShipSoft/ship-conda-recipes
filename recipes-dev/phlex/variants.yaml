@@ -2,6 +2,14 @@
 root_cxx_standard:
   - "23"
 
+# phlex requires GCC 15 (see the build.skip comment in recipe.yaml). The
+# feedstock pins this in its conda_build_config.yaml because the conda-forge
+# global default is still 14; mirror it so the dev build resolves GCC 15.
+cxx_compiler_version:
+  - "15"
+c_compiler_version:
+  - "15"
+
 # ${{ stdlib('c') }} in the recipe needs these; on feedstock CI they come
 # from the conda-forge global pinning. Values match conda-forge linux-64.
 c_stdlib:
