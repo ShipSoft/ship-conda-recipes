@@ -29,20 +29,9 @@ requirements:
     - geomodel-tools
     - sqlite
     - tomlplusplus
-    # GeoModelCoreConfig.cmake does find_dependency(Eigen3); per
-    # conda-forge eigen-feedstock README case B, consumers of a
-    # library that exposes Eigen in public headers must list
-    # eigen-abi-devel in host. Remove once conda-forge
-    # geomodel-feedstock ships -devel outputs (case C).
+    # GeoModel consumers need both in host — see "Known upstream
+    # workarounds" in the README for the remove-when conditions.
     - eigen-abi-devel
-    # GeoModelToolsConfig.cmake does find_dependency(nlohmann_json
-    # 3.12.0). conda-forge geomodel-tools keeps nlohmann_json in
-    # host only (no run / no run_exports) and nlohmann_json has no
-    # run_exports of its own, so any package whose Config triggers
-    # find_dependency(GeoModelTools) at configure time forces
-    # consumers to list nlohmann_json in host. Remove once
-    # conda-forge geomodel-feedstock adds nlohmann_json to
-    # geomodel-tools' run:.
     - nlohmann_json
   run_exports:
     - ${{ pin_subpackage('shipgeometry', upper_bound='x.x') }}

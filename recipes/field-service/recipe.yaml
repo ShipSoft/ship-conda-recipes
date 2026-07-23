@@ -15,7 +15,7 @@ source:
     target_directory: covfie_src
 
 build:
-  number: 1
+  number: 2
 
 outputs:
   - staging:
@@ -131,7 +131,6 @@ outputs:
   - package:
       name: field-service
     build:
-      # Metapackage: no files, just pulls in the three sub-packages.
       files: []
     requirements:
       run:

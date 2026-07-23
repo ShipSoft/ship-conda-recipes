@@ -10,7 +10,7 @@ source:
   sha256: d19f2731a0d0c45167397a30068b3291cff388be47ac9c55afdd6713bfb2bf1d
 
 build:
-  number: 3
+  number: 4
   skip:
     - win
   script: build.sh
@@ -31,8 +31,11 @@ requirements:
     - shipgeometryservice <1
     - field-service-core
     - field-service-g4
-    - root_base
-    - root_cxx_standard
+    - root_base >=6.40
+    # phlex/shipdatamodel are C++23; pin the matching ROOT variant so aegir
+    # and phlex stay co-installable (an unconstrained solve drifts down to
+    # the C++20 ROOT build).
+    - root_cxx_standard ==23
     - geant4
     - pythia8
     - random123
@@ -42,20 +45,9 @@ requirements:
     - fmt
     - mp-units
     - ms-gsl
-    # GeoModelCoreConfig.cmake does find_dependency(Eigen3); per
-    # conda-forge eigen-feedstock README case B, consumers of a
-    # library that exposes Eigen in public headers must list
-    # eigen-abi-devel in host. Remove once conda-forge
-    # geomodel-feedstock ships -devel outputs (case C).
+    # GeoModel consumers need both in host — see "Known upstream
+    # workarounds" in the README for the remove-when conditions.
     - eigen-abi-devel
-    # GeoModelToolsConfig.cmake does find_dependency(nlohmann_json
-    # 3.12.0). conda-forge geomodel-tools keeps nlohmann_json in
-    # host only (no run / no run_exports) and nlohmann_json has no
-    # run_exports of its own, so any package whose Config triggers
-    # find_dependency(GeoModelTools) at configure time forces
-    # consumers to list nlohmann_json in host. Remove once
-    # conda-forge geomodel-feedstock adds nlohmann_json to
-    # geomodel-tools' run:.
     - nlohmann_json
 tests:
   - script:
