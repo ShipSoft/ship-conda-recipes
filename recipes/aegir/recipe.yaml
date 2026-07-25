@@ -1,5 +1,5 @@
 context:
-  version: "0.2.0"
+  version: "0.3.0"
 
 package:
   name: aegir
@@ -7,10 +7,10 @@ package:
 
 source:
   url: https://github.com/ShipSoft/aegir/archive/refs/tags/v${{ version }}.tar.gz
-  sha256: d19f2731a0d0c45167397a30068b3291cff388be47ac9c55afdd6713bfb2bf1d
+  sha256: 583172fd11e519d4ad4770f4166c76d40a7bd84ea27cdc02347b74338d5aae3d
 
 build:
-  number: 3
+  number: 0
   skip:
     - win
   script: build.sh
