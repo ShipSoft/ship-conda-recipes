@@ -1,5 +1,5 @@
 context:
-  version: "0.1.0"
+  version: "0.2.0"
 
 package:
   name: aegir-genie
@@ -7,7 +7,7 @@ package:
 
 source:
   url: https://github.com/ShipSoft/aegir-genie/archive/refs/tags/v${{ version }}.tar.gz
-  sha256: a4c1908e741d92f822fdc804af78c713478c6697af30e836c6b1de8b0e2db1d9
+  sha256: 85c5e7c9a24e67d2c03da3758f530c27a26c2d63f4fc28db877ea09d30f49dc0
 
 build:
   number: 0
