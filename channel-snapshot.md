@@ -1,6 +1,6 @@
 # prefix.dev/ship channel snapshot
 
-_Updated: 2026-07-27_
+_Updated: 2026-08-03_
 
 ## linux-64
 
@@ -24,6 +24,8 @@ _Updated: 2026-07-27_
 | acts-ship | 0.0.0.dev20260713+7608d7c | `hc97bc57_0` | 0 | 2026-07-15 |
 | acts-ship | 0.0.0.dev20260713+7608d7c | `h6afcf60_1` | 1 | 2026-07-25 |
 | acts-ship | 0.0.0.dev20260713+7608d7c | `ha28ff26_1` | 1 | 2026-07-25 |
+| acts-ship | 0.0.0.dev20260729+c457825 | `h6afcf60_1` | 1 | 2026-07-30 |
+| acts-ship | 0.0.0.dev20260729+c457825 | `ha28ff26_1` | 1 | 2026-07-30 |
 | aegir | 0.2.0 | `hb0f4dca_1` | 1 | 2026-06-19 |
 | aegir | 0.2.0 | `hb0f4dca_2` | 2 | 2026-06-26 |
 | aegir | 0.2.0 | `hb0f4dca_3` | 3 | 2026-07-04 |
