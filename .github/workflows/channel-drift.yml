@@ -1,0 +1,49 @@
+name: Channel drift
+
+# Detect ship-channel packages whose conda-forge pins have fallen behind the
+# current conda-forge release (a stale run_exports bound). Unlike the binary
+# dev-build signal — which stays green because a free `*` solve co-selects the
+# older, mutually-compatible builds — this compares each published build's pins
+# against conda-forge and flags what needs rebuilding. On drift it bumps the
+# affected recipes' build.number and opens/updates a rebuild PR; merging it
+# rebuilds and re-uploads via build.yml.
+
+on:
+  schedule:
+    - cron: '0 4 * * 1'  # Mondays, 04:00 UTC (ahead of the channel snapshot)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  drift:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Detect drift and bump affected recipes
+        id: drift
+        run: |
+          set -euo pipefail
+          python3 ci/check-channel-drift.py --bump-recipes --pr-body pr-body.md
+          {
+            echo 'body<<PRBODY'
+            cat pr-body.md
+            echo 'PRBODY'
+          } >> "$GITHUB_OUTPUT"
+          rm -f pr-body.md
+
+      - name: Open / update rebuild PR
+        uses: peter-evans/create-pull-request@v8
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: 'chore: rebuild packages behind conda-forge'
+          title: 'chore: rebuild packages behind conda-forge'
+          body: ${{ steps.drift.outputs.body }}
+          branch: channel-drift
+          base: main
+          labels: drift
+          delete-branch: true
+          add-paths: recipes/**/recipe.yaml
