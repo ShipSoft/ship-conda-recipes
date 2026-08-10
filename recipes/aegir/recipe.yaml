@@ -10,7 +10,9 @@ source:
   sha256: 583172fd11e519d4ad4770f4166c76d40a7bd84ea27cdc02347b74338d5aae3d
 
 build:
-  number: 0
+  # Rebuild against shipgeometryservice 0.4.0 (new run_export) and refresh the
+  # geomodel-core / boost / fmt pins to current conda-forge.
+  number: 1
   skip:
     - win
   script: build.sh

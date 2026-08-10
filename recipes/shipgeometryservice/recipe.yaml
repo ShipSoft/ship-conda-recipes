@@ -1,5 +1,5 @@
 context:
-  version: "0.3.0"
+  version: "0.4.0"
 
 package:
   name: shipgeometryservice
@@ -7,13 +7,10 @@ package:
 
 source:
   url: https://github.com/ShipSoft/geometry_service/archive/refs/tags/v${{ version }}.tar.gz
-  sha256: d74955f0d551a3928ca72667e883b83102d40fcca4685156d2b7127ca5bee575
+  sha256: 824cd7e12ba086dd572d69f82d35bef0b6b30efeb26353a487175ba0f1a2a095
 
 build:
-  # Rebuild against current conda-forge to refresh the geomodel-core pin
-  # (6.27 -> 6.29); the previous build is stale relative to conda-forge and
-  # skews against fresh source builds in dev-source environments.
-  number: 1
+  number: 0
   skip:
     - win
   script: build.sh

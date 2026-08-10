@@ -10,7 +10,9 @@ source:
   sha256: 85c5e7c9a24e67d2c03da3758f530c27a26c2d63f4fc28db877ea09d30f49dc0
 
 build:
-  number: 0
+  # Rebuild against shipgeometryservice 0.4.0 (via aegir) and refresh pins to
+  # current conda-forge.
+  number: 1
   skip:
     - win
   script: build.sh
