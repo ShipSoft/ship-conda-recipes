@@ -11,9 +11,9 @@ source:
 
 build:
   # Rebuild against current conda-forge to refresh the geomodel-core pin
-  # (6.27 -> 6.29); the previous build is stale relative to conda-forge and
-  # skews against fresh source builds in dev-source environments.
-  number: 2
+  # (6.29 -> 6.31) so this binary co-installs with shipgeometryservice 0.4.0 and
+  # with fresh source builds in the dev-source environments.
+  number: 3
   skip:
     - win
   script: build.sh
