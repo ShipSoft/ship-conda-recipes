@@ -1,6 +1,6 @@
 # prefix.dev/ship channel snapshot
 
-_Updated: 2026-08-03_
+_Updated: 2026-08-10_
 
 ## linux-64
 
