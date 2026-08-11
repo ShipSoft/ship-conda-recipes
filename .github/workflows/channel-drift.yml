@@ -17,11 +17,19 @@ permissions:
   contents: write
   pull-requests: write
 
+# Serialize scheduled and manual runs so overlapping invocations queue rather
+# than race on the shared channel-drift branch / PR.
+concurrency:
+  group: channel-drift
+  cancel-in-progress: false
+
 jobs:
   drift:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
 
       - name: Set up pixi (drift env — provides py-rattler)
         uses: prefix-dev/setup-pixi@v0.10.1
