@@ -44,6 +44,15 @@ RECIPES_DIR = Path("recipes")
 # conda-forge on purpose. Keep this small and documented.
 IGNORE: set[tuple[str, str]] = set()
 
+# Dependency names to skip for ALL packages: ABI-marker packages that are
+# exact-pinned transitively (not "kept current"), so conda-forge publishing a
+# newer marker does NOT mean a rebuild helps. eigen-abi is pinned by
+# geomodel-core's baked eigen run_export (conda-forge geomodel-core is still on
+# eigen-abi 5.0.1.80 while conda-forge ships 5.0.1.100); it only advances when
+# conda-forge rebuilds geomodel-core against the newer eigen-abi — never on a
+# SHiP rebuild — so flagging it here is pure noise.
+IGNORE_DEPS: set[str] = {"eigen-abi"}
+
 
 # --- conda version ordering (delegated to rattler) --------------------------
 
@@ -182,7 +191,7 @@ def detect(ship: dict[str, list[dict]], cf: dict[str, str]) -> list[tuple]:
             for dep in rec.get("depends", []):
                 tokens = dep.split()
                 dep_name = tokens[0]
-                if (name, dep_name) in IGNORE:
+                if dep_name in IGNORE_DEPS or (name, dep_name) in IGNORE:
                     continue
                 constraint = tokens[1] if len(tokens) > 1 else ""
                 ub = upper_bound(constraint)

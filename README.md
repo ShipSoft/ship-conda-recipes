@@ -90,6 +90,14 @@ it can be dropped.
   list `eigen-abi-devel` in host.
   *Remove when* conda-forge geomodel-feedstock ships `-devel` outputs
   (case C).
+- **`eigen-abi` excluded from the channel-drift check**
+  (`ci/check-channel-drift.py` `IGNORE_DEPS`): every geomodel-core consumer
+  inherits an exact `eigen-abi` pin from geomodel-core's baked `eigen`
+  run_export. conda-forge geomodel-core is still on `eigen-abi 5.0.1.80` while
+  conda-forge ships `5.0.1.100`, so the marker reads as "behind" — but it's an
+  ABI lock a SHiP rebuild can't advance, so the drift check skips it.
+  *Remove when* conda-forge geomodel-core is rebuilt against the newer
+  eigen-abi.
 - **`nlohmann_json` in `host:`** (same four recipes):
   `GeoModelToolsConfig.cmake` does `find_dependency(nlohmann_json 3.12.0)`,
   but conda-forge geomodel-tools keeps nlohmann_json in host only (no run, no
