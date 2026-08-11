@@ -65,7 +65,7 @@ jobs:
           rm -f pixi.lock
           grep -A4 '\[feature.dev' pixi.toml
       - name: Set up pixi (pinned — preview-feature tripwire)
-        uses: prefix-dev/setup-pixi@v0.10.0
+        uses: prefix-dev/setup-pixi@v0.10.1
         with:
           pixi-version: v0.68.1
           cache: false
