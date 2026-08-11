@@ -129,6 +129,23 @@ class SelectionTest(unittest.TestCase):
         _picked, failed = drift.latest_builds()
         self.assertEqual(failed, ["linux-64"])
 
+    def test_ignored_dep_names_are_skipped(self):
+        # eigen-abi is an ABI marker pinned transitively (IGNORE_DEPS): a newer
+        # conda-forge marker must not be flagged, but genuine drift still is.
+        rec = {
+            "name": "shipgeometry", "version": "0.2.1", "build_number": 3,
+            "build": "hb0f4dca_3",
+            "depends": ["eigen-abi >=5.0.1.80,<5.0.1.81.0a0",
+                        "libboost >=1.90.0,<1.91.0a0"],
+        }
+        rows = drift.detect(
+            {"shipgeometry": [rec]},
+            {"eigen-abi": "5.0.1.100", "libboost": "1.91.0"},
+        )
+        flagged = {r[2] for r in rows}
+        self.assertNotIn("eigen-abi", flagged)
+        self.assertIn("libboost", flagged)
+
 
 if __name__ == "__main__":
     unittest.main()
