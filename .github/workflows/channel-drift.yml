@@ -23,11 +23,17 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
+      - name: Set up pixi (drift env — provides py-rattler)
+        uses: prefix-dev/setup-pixi@v0.10.1
+        with:
+          environments: drift
+          locked: true
+
       - name: Detect drift and bump affected recipes
         id: drift
         run: |
           set -euo pipefail
-          python3 ci/check-channel-drift.py --bump-recipes --pr-body pr-body.md
+          pixi run -e drift check-drift --bump-recipes --pr-body pr-body.md
           {
             echo 'body<<PRBODY'
             cat pr-body.md
