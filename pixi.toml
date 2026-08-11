@@ -61,6 +61,17 @@ platforms = ["linux-64"]
 genie = { version = "==3.06.02", build = "pythia6_*" }
 genie-data = "*"
 
+# Channel-drift check (.github/workflows/channel-drift.yml). py-rattler gives the
+# script conda's own VersionOrder for comparing pins against conda-forge, matching
+# what the solver / rattler-build use. Own environment so default builds stay lean.
+[feature.drift.dependencies]
+python = ">=3.11"
+py-rattler = "*"
+
+[feature.drift.tasks]
+check-drift = "python ci/check-channel-drift.py"
+
 [environments]
 lint = { features = ["lint"] }
 genie = { features = ["genie"] }
+drift = { features = ["drift"] }
