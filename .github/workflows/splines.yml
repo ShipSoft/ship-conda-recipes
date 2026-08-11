@@ -188,7 +188,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Install GENIE from the ship channel
-        uses: prefix-dev/setup-pixi@v0.10.0
+        uses: prefix-dev/setup-pixi@v0.10.1
         with:
           locked: true
           environments: genie
@@ -236,7 +236,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Install GENIE from the ship channel
-        uses: prefix-dev/setup-pixi@v0.10.0
+        uses: prefix-dev/setup-pixi@v0.10.1
         with:
           locked: true
           environments: genie
@@ -292,7 +292,7 @@ jobs:
           # workspace alongside PREFIX_DEV_API_KEY handling and uploads.
           persist-credentials: false
       # default env: rattler-build (build/upload). genie env: gspladd merge.
-      - uses: prefix-dev/setup-pixi@v0.10.0
+      - uses: prefix-dev/setup-pixi@v0.10.1
         with:
           locked: true
           environments: >-
