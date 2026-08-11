@@ -26,13 +26,14 @@ Modes:
 from __future__ import annotations
 
 import argparse
-import itertools
 import json
 import os
 import re
 import sys
 import urllib.request
 from pathlib import Path
+
+from rattler import Version
 
 SHIP_REPODATA = "https://prefix.dev/ship/{subdir}/repodata.json"
 CONDA_FORGE_CHANNELDATA = "https://conda.anaconda.org/conda-forge/channeldata.json"
@@ -44,61 +45,19 @@ RECIPES_DIR = Path("recipes")
 IGNORE: set[tuple[str, str]] = set()
 
 
-# --- conda version ordering (compact port of conda's VersionOrder) ----------
-
-def _parse(segment: str) -> list[list]:
-    components = []
-    for comp in re.split(r"[._-]", segment):
-        atoms: list = []
-        for run in re.findall(r"\d+|[^\d]+", comp):
-            atoms.append(int(run) if run.isdigit() else run)
-        # every component compares as [int, str, int, ...] — lead with an int
-        if not atoms or isinstance(atoms[0], str):
-            atoms.insert(0, 0)
-        components.append(atoms)
-    return components or [[0]]
-
-
-def _split(vstr: str) -> tuple[int, list[list], list[list]]:
-    vstr = vstr.strip().lower()
-    epoch, sep, rest = vstr.partition("!")
-    if not sep:
-        epoch, rest = "0", vstr
-    version, _, local = rest.partition("+")
-    return int(epoch or 0), _parse(version), _parse(local)
-
-
-def _cmp_atom(a, b) -> int:
-    if isinstance(a, int) and isinstance(b, int):
-        return (a > b) - (a < b)
-    if isinstance(a, str) and isinstance(b, str):
-        return (a > b) - (a < b)
-    # a string component (pre-release marker) sorts below a numeric one
-    return -1 if isinstance(a, str) else 1
-
-
-def _cmp_atoms(l1, l2) -> int:
-    for a, b in itertools.zip_longest(l1, l2, fillvalue=0):
-        r = _cmp_atom(a, b)
-        if r:
-            return r
-    return 0
-
-
-def _cmp_components(v1, v2) -> int:
-    for c1, c2 in itertools.zip_longest(v1, v2, fillvalue=[0]):
-        r = _cmp_atoms(c1, c2)
-        if r:
-            return r
-    return 0
-
+# --- conda version ordering (delegated to rattler) --------------------------
 
 def vcmp(a: str, b: str) -> int:
-    ea, va, la = _split(a)
-    eb, vb, lb = _split(b)
-    if ea != eb:
-        return (ea > eb) - (ea < eb)
-    return _cmp_components(va, vb) or _cmp_components(la, lb)
+    """Compare two conda version strings, returning -1/0/1.
+
+    Delegates to ``rattler.Version`` — the same conda ``VersionOrder``
+    implementation pixi and rattler-build use — so epoch/local/dev/post
+    ordering matches the solver exactly (a dev release sorts below its final
+    release, a post release above it), including odd repodata versions like
+    ``0.0.0.dev20260729+c457825``.
+    """
+    va, vb = Version(a), Version(b)
+    return (va > vb) - (va < vb)
 
 
 # --- matchspec upper bound --------------------------------------------------
@@ -128,28 +87,46 @@ def fetch_json(url: str):
         return json.load(resp)
 
 
-def latest_builds() -> dict[str, dict]:
-    """name -> the repodata record the solver would pick (max version/build)."""
-    picked: dict[str, dict] = {}
+def _rank_cmp(a: dict, b: dict) -> int:
+    """Order two records by version, then build_number (solver preference)."""
+    order = vcmp(a["version"], b["version"])
+    if order:
+        return order
+    an, bn = a.get("build_number", 0), b.get("build_number", 0)
+    return (an > bn) - (an < bn)
+
+
+def latest_builds() -> tuple[dict[str, list[dict]], list[str]]:
+    """name -> the records the solver could pick (all tied at max version/build).
+
+    Returns ``(picked, failed)`` where ``failed`` lists any subdir whose
+    repodata could not be fetched; callers must not report a clean no-drift
+    result while sources are missing.
+    """
+    picked: dict[str, list[dict]] = {}
+    failed: list[str] = []
     for subdir in SUBDIRS:
         try:
             repodata = fetch_json(SHIP_REPODATA.format(subdir=subdir))
-        except Exception as exc:  # noqa: BLE001 - empty subdir / transient
-            print(f"note: could not fetch {subdir} repodata: {exc}", file=sys.stderr)
+        except Exception as exc:  # noqa: BLE001 - transient / network / 403
+            print(f"error: could not fetch {subdir} repodata: {exc}", file=sys.stderr)
+            failed.append(subdir)
             continue
         records = {**repodata.get("packages", {}), **repodata.get("packages.conda", {})}
         for rec in records.values():
             name = rec["name"]
-            cur = picked.get(name)
-            if cur is None:
-                picked[name] = rec
+            variants = picked.setdefault(name, [])
+            if not variants:
+                variants.append(rec)
                 continue
-            order = vcmp(rec["version"], cur["version"])
-            if order > 0 or (
-                order == 0 and rec.get("build_number", 0) > cur.get("build_number", 0)
-            ):
-                picked[name] = rec
-    return picked
+            order = _rank_cmp(rec, variants[0])
+            if order > 0:  # strictly higher — supersede all retained ties
+                variants[:] = [rec]
+            elif order == 0 and all(
+                v.get("build") != rec.get("build") for v in variants
+            ):  # tie on version+build_number — retain distinct build strings
+                variants.append(rec)
+    return picked, failed
 
 
 def conda_forge_versions() -> dict[str, str]:
@@ -198,24 +175,25 @@ def bump_build_number(recipe: Path) -> int | None:
 
 # --- main -------------------------------------------------------------------
 
-def detect(ship: dict[str, dict], cf: dict[str, str]) -> list[tuple]:
+def detect(ship: dict[str, list[dict]], cf: dict[str, str]) -> list[tuple]:
     rows = []
-    for name, rec in sorted(ship.items()):
-        for dep in rec.get("depends", []):
-            tokens = dep.split()
-            dep_name = tokens[0]
-            if (name, dep_name) in IGNORE:
-                continue
-            constraint = tokens[1] if len(tokens) > 1 else ""
-            ub = upper_bound(constraint)
-            if not ub:
-                continue
-            latest = cf.get(dep_name)
-            if not latest:  # not a conda-forge package (e.g. another ship pkg)
-                continue
-            op, bound = ub
-            if exceeds(latest, op, bound):
-                rows.append((name, rec, dep_name, constraint, latest))
+    for name, variants in sorted(ship.items()):
+        for rec in variants:
+            for dep in rec.get("depends", []):
+                tokens = dep.split()
+                dep_name = tokens[0]
+                if (name, dep_name) in IGNORE:
+                    continue
+                constraint = tokens[1] if len(tokens) > 1 else ""
+                ub = upper_bound(constraint)
+                if not ub:
+                    continue
+                latest = cf.get(dep_name)
+                if not latest:  # not a conda-forge package (e.g. another ship pkg)
+                    continue
+                op, bound = ub
+                if exceeds(latest, op, bound):
+                    rows.append((name, rec, dep_name, constraint, latest))
     return rows
 
 
@@ -234,7 +212,7 @@ def render(rows: list[tuple]) -> str:
         "|------------|------------|--------------|--------------------|",
     ]
     for name, rec, dep, constraint, latest in rows:
-        build = f"{name} {rec['version']} (build {rec.get('build_number', 0)})"
+        build = f"{name} {rec['version']} `{rec.get('build', rec.get('build_number', 0))}`"
         lines.append(f"| {build} | {dep} | `{constraint}` | {latest} |")
     return "\n".join(lines) + "\n"
 
@@ -280,7 +258,15 @@ def main() -> int:
     ap.add_argument("--pr-body", type=Path, help="write the markdown report to this path")
     args = ap.parse_args()
 
-    ship = latest_builds()
+    ship, failed = latest_builds()
+    if failed:
+        print(
+            f"error: could not fetch ship repodata for: {', '.join(failed)}; "
+            "refusing to certify no-drift on partial data",
+            file=sys.stderr,
+        )
+        return 2
+
     cf = conda_forge_versions()
     rows = detect(ship, cf)
 
