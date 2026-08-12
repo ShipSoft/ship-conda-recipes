@@ -7,7 +7,7 @@ package:
 
 source:
   url: https://github.com/ShipSoft/data-model/archive/refs/tags/v${{ version }}.tar.gz
-  sha256: 028c82b85d2cc9070659bafb20ae8341fc4a617c95fa4c4c24383a8b228d2803
+  sha256: 624a0bbe12c3783d66770aa485b812413d4d0e6d2cc3768358ecabf1d231270f
 
 build:
   number: 0
