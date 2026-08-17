@@ -10,7 +10,7 @@ source:
   sha256: 5770346d888bbac7a80872e7aa01953437ab867e335e39cc7412c9b83a0b4e2a
 
 build:
-  number: 3
+  number: 4
   string: ${{ genie_hadronization }}_${{ hash }}_${{ build_number }}
   # pythia8 is the default variant the solver picks for a bare `genie`
   # dependency: down-prioritize pythia6. FairShip's shipgen/genie_config

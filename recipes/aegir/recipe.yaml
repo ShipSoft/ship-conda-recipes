@@ -12,7 +12,7 @@ source:
 build:
   # Rebuild against shipgeometryservice 0.4.0 (new run_export) and refresh the
   # geomodel-core / boost / fmt pins to current conda-forge.
-  number: 1
+  number: 2
   skip:
     - win
   script: build.sh
