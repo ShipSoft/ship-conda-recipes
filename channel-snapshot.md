@@ -1,6 +1,6 @@
 # prefix.dev/ship channel snapshot
 
-_Updated: 2026-08-10_
+_Updated: 2026-08-17_
 
 ## linux-64
 
@@ -26,12 +26,16 @@ _Updated: 2026-08-10_
 | acts-ship | 0.0.0.dev20260713+7608d7c | `ha28ff26_1` | 1 | 2026-07-25 |
 | acts-ship | 0.0.0.dev20260729+c457825 | `h6afcf60_1` | 1 | 2026-07-30 |
 | acts-ship | 0.0.0.dev20260729+c457825 | `ha28ff26_1` | 1 | 2026-07-30 |
+| acts-ship | 0.0.0.dev20260813+99440c4 | `h6afcf60_1` | 1 | 2026-08-13 |
+| acts-ship | 0.0.0.dev20260813+99440c4 | `ha28ff26_1` | 1 | 2026-08-13 |
 | aegir | 0.2.0 | `hb0f4dca_1` | 1 | 2026-06-19 |
 | aegir | 0.2.0 | `hb0f4dca_2` | 2 | 2026-06-26 |
 | aegir | 0.2.0 | `hb0f4dca_3` | 3 | 2026-07-04 |
 | aegir | 0.3.0 | `hb0f4dca_0` | 0 | 2026-07-25 |
+| aegir | 0.3.0 | `hb0f4dca_1` | 1 | 2026-08-11 |
 | aegir-genie | 0.1.0 | `hb0f4dca_0` | 0 | 2026-07-20 |
 | aegir-genie | 0.2.0 | `hb0f4dca_0` | 0 | 2026-07-25 |
+| aegir-genie | 0.2.0 | `hb0f4dca_1` | 1 | 2026-08-11 |
 | fairroot | 19.0.1 | `hb0f4dca_9` | 9 | 2026-06-13 |
 | fairroot | 19.0.1 | `hb0f4dca_10` | 10 | 2026-06-14 |
 | fairroot | 19.0.1 | `hb0f4dca_11` | 11 | 2026-06-26 |
@@ -171,6 +175,8 @@ _Updated: 2026-08-10_
 | shipdatamodel | 0.2.0 | `ha28ff26_1` | 1 | 2026-07-22 |
 | shipdatamodel | 0.3.0 | `h6afcf60_0` | 0 | 2026-07-23 |
 | shipdatamodel | 0.3.0 | `ha28ff26_0` | 0 | 2026-07-23 |
+| shipdatamodel | 0.4.0 | `h6afcf60_0` | 0 | 2026-08-12 |
+| shipdatamodel | 0.4.0 | `ha28ff26_0` | 0 | 2026-08-12 |
 | shipgeometry | 0.1.0 | `hb0f4dca_0` | 0 | 2026-06-05 |
 | shipgeometry | 0.1.0 | `hb0f4dca_1` | 1 | 2026-06-05 |
 | shipgeometry | 0.1.0 | `hb0f4dca_2` | 2 | 2026-06-10 |
@@ -181,11 +187,13 @@ _Updated: 2026-08-10_
 | shipgeometry | 0.2.1 | `hb0f4dca_0` | 0 | 2026-06-18 |
 | shipgeometry | 0.2.1 | `hb0f4dca_1` | 1 | 2026-06-26 |
 | shipgeometry | 0.2.1 | `hb0f4dca_2` | 2 | 2026-07-22 |
+| shipgeometry | 0.2.1 | `hb0f4dca_3` | 3 | 2026-08-11 |
 | shipgeometryservice | 0.1.0 | `hb0f4dca_0` | 0 | 2026-06-18 |
 | shipgeometryservice | 0.1.0 | `hb0f4dca_1` | 1 | 2026-06-26 |
 | shipgeometryservice | 0.2.0 | `hb0f4dca_0` | 0 | 2026-07-16 |
 | shipgeometryservice | 0.3.0 | `hb0f4dca_0` | 0 | 2026-07-20 |
 | shipgeometryservice | 0.3.0 | `hb0f4dca_1` | 1 | 2026-07-22 |
+| shipgeometryservice | 0.4.0 | `hb0f4dca_0` | 0 | 2026-08-11 |
 
 ## noarch
 
