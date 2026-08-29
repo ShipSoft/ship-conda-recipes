@@ -32,7 +32,7 @@ jobs:
           persist-credentials: false
 
       - name: Set up pixi (drift env — provides py-rattler)
-        uses: prefix-dev/setup-pixi@v0.10.1
+        uses: prefix-dev/setup-pixi@v0.10.2
         with:
           environments: drift
           locked: true
