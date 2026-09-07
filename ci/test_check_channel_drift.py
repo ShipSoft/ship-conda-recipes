@@ -327,6 +327,26 @@ class VariantPinTest(_TempRecipes):
             self.assertIn('root_base:\n  - "6.40.04"\n', text)
             self.assertIn('  - "20"\n  - "23"\n', text)  # matrix untouched
 
+    def test_report_states_which_half_the_run_acts_on(self):
+        # Both PR bodies carry the full picture; the note keeps a reader from
+        # taking the other half's table for this PR's scope.
+        self.simple("alpha", ROOT_PIN)
+        rows = [self.row("alpha", "gsl")]
+        pins, _ = drift.variant_pins()
+        variant_rows = drift.detect_variant_drift(pins, {"root_base": "6.40.04"})
+
+        recipes = drift.render(rows, variant_rows, {}, scope="recipes")
+        self.assertIn("bumps `build.number` only", recipes)
+        self.assertIn("variant-drift", recipes)
+
+        variants = drift.render(rows, variant_rows, {}, scope="variants")
+        self.assertIn("advances variant pins only", variants)
+        self.assertIn("channel-drift", variants)
+
+        # A plain report acts on nothing, so it claims nothing.
+        plain = drift.render(rows, variant_rows, {})
+        self.assertNotIn("This PR", plain)
+
     def test_partial_lockstep_is_refused(self):
         self.simple("alpha", ROOT_PIN)
         stray = self.simple("beta", ROOT_PIN)
