@@ -10,9 +10,9 @@ source:
   sha256: 583172fd11e519d4ad4770f4166c76d40a7bd84ea27cdc02347b74338d5aae3d
 
 build:
-  # Rebuild against shipgeometryservice 0.4.0 (new run_export) and refresh the
-  # geomodel-core / boost / fmt pins to current conda-forge.
-  number: 4
+  # Rebuild to pick up expat in host, needed by Geant4Config.cmake since
+  # conda-forge geant4 stopped pulling it in.
+  number: 5
   skip:
     - win
   script: build.sh
@@ -39,6 +39,11 @@ requirements:
     # the C++20 ROOT build).
     - root_cxx_standard ==23
     - geant4
+    # geant4 Config.cmake calls find_dependency() on all three; see
+    # "Known upstream workarounds" in the README.
+    - expat
+    - zlib
+    - freetype
     - pythia8
     - random123
     - libboost-devel

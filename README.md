@@ -111,6 +111,21 @@ it can be dropped.
   (`liblog4cpp.so.5` has `DT_NEEDED libnsl.so.3` but the package only depends
   on libgcc/libstdcxx).
   *Remove when* the conda-forge log4cpp feedstock declares it.
+- **`expat`, `zlib` and `freetype` in `host:`** (fairship, fairroot, aegir,
+  aegir-genie, shipgeometryservice, field-service): conda-forge geant4 is
+  built with `GEANT4_USE_SYSTEM_EXPAT=ON`, `GEANT4_USE_SYSTEM_ZLIB=ON` and
+  `GEANT4_USE_FREETYPE=ON`, so its `Geant4Config.cmake` calls
+  `find_dependency()` on EXPAT, ZLIB and Freetype — each of which needs
+  headers and a CMake config, not just the shared library. Since the
+  v1-recipe modernisation (conda-forge/geant4-feedstock#104) the geant4
+  output's `run:` lists only `libexpat` / `libzlib` / `libfreetype`, so
+  `find_package(Geant4)` fails in any consumer that does not bring the three
+  itself. Consumers that also depend on ROOT get `zlib` and `freetype` via
+  its closure and only trip over `expat`; shipgeometryservice, which has no
+  ROOT, trips over all three. The feedstock's own CMake test does not catch
+  this because its test environment lists all three explicitly.
+  *Remove when* conda-forge geant4-feedstock puts `expat`, `zlib` and
+  `freetype` back in the geant4 output's `run:`.
 
 ## Building
 
