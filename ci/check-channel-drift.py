@@ -353,15 +353,36 @@ def _dep_table(rows: list[tuple]) -> list[str]:
     return lines
 
 
+# The report always describes the whole picture — each half explains the other,
+# and the variant-pinned table is at once why some recipes are not bumped and
+# why the variant PR exists. But a given run only acts on one half, so say up
+# front which, or a reader takes the tables for this PR's scope.
+SCOPE_NOTES = {
+    "recipes": (
+        "**This PR bumps `build.number` only.** Pins held by our own "
+        "`variants.yaml` are listed below for context but advanced separately, "
+        "on the `variant-drift` branch."
+    ),
+    "variants": (
+        "**This PR advances variant pins only.** Stale conda-forge pins are "
+        "listed below for context but rebuilt separately, on the "
+        "`channel-drift` branch."
+    ),
+}
+
+
 def render(
     rows: list[tuple],
     variant_rows: list[tuple],
     inconsistent: dict[str, dict[str, list[Path]]],
+    scope: str | None = None,
 ) -> str:
     lines = ["# Channel drift check", ""]
     if not rows and not variant_rows and not inconsistent:
         lines.append("No stale conda-forge pins found in the ship channel. ✅")
         return "\n".join(lines) + "\n"
+    if scope:
+        lines += [SCOPE_NOTES[scope], ""]
 
     stale, pinned = split_rows(rows)
 
@@ -548,7 +569,8 @@ def main() -> int:
     pins, inconsistent = variant_pins()
     variant_rows = detect_variant_drift(pins, cf)
 
-    report = render(rows, variant_rows, inconsistent)
+    scope = "recipes" if args.bump_recipes else "variants" if args.bump_variants else None
+    report = render(rows, variant_rows, inconsistent, scope)
     if rows and args.bump_recipes:
         report += bump_affected(rows)
     if args.bump_variants:
