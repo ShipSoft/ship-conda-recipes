@@ -65,6 +65,17 @@ two keys in their `variants.yaml`:
   series, as conda-forge's global `root_base` pin does. Bump all
   `variants.yaml` in lockstep when conda-forge moves ROOT past 6.40.2.
 
+Because `root_base` is pinned by us rather than tracked to conda-forge, a
+rebuild reproduces the same pin — so the channel-drift check reports it apart
+from genuine stale pins and never bumps `build.number` for it. When conda-forge
+moves past the pin, the check opens a separate `variant-drift` PR advancing it
+across every `variants.yaml` at once. That PR is a real ROOT upgrade rather than
+a routine refresh, so review it on its own merits. No `build.number` bump
+accompanies it: changing a variant changes the build hash, so the build string
+is new and `--skip-existing` will not skip the rebuild. A recipe that pins only
+`root_cxx_standard` (rootegpythia6) is unaffected — its `root_base` pin does
+refresh on a rebuild, so it is bumped as usual.
+
 For packages whose upstream build system sets no explicit C++ standard
 (photospp's autotools, GENIE's perl configure — both inherit ROOT's standard
 via `root-config`), there is no compile flag to drive; the variant only makes

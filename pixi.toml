@@ -70,6 +70,7 @@ py-rattler = "*"
 
 [feature.drift.tasks]
 check-drift = "python ci/check-channel-drift.py"
+test-drift = "python ci/test_check_channel_drift.py"
 
 [environments]
 lint = { features = ["lint"] }

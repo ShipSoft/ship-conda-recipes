@@ -7,6 +7,10 @@ name: Channel drift
 # against conda-forge and flags what needs rebuilding. On drift it bumps the
 # affected recipes' build.number and opens/updates a rebuild PR; merging it
 # rebuilds and re-uploads via build.yml.
+#
+# Pins we hold ourselves in a recipe's variants.yaml (root_base) are exempt: a
+# rebuild reproduces them unchanged, so they get a separate PR that advances
+# the pin across every recipe in lockstep instead.
 
 on:
   schedule:
@@ -26,6 +30,26 @@ concurrency:
 jobs:
   drift:
     runs-on: ubuntu-latest
+    # Two independent legs rather than two create-pull-request calls in one
+    # job: each gets its own clean checkout, so neither can commit the other's
+    # edits. They target disjoint branches and paths.
+    #   recipes  — build.number bumps; a routine refresh, usually safe to merge.
+    #   variants — advances a pin we hold (root_base), i.e. a real ROOT upgrade
+    #              that rebuilds the stack and deserves review on its own.
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - leg: recipes
+            flag: '--bump-recipes'
+            branch: channel-drift
+            paths: recipes/**/recipe.yaml
+            commit: 'chore: rebuild packages behind conda-forge'
+          - leg: variants
+            flag: '--bump-variants'
+            branch: variant-drift
+            paths: recipes/**/variants.yaml
+            commit: 'chore: bump variant pins behind conda-forge'
     steps:
       - uses: actions/checkout@v7
         with:
@@ -37,11 +61,14 @@ jobs:
           environments: drift
           locked: true
 
-      - name: Detect drift and bump affected recipes
+      - name: Test the drift script
+        run: pixi run -e drift test-drift
+
+      - name: Detect drift and apply ${{ matrix.leg }} bumps
         id: drift
         run: |
           set -euo pipefail
-          pixi run -e drift check-drift --bump-recipes --pr-body pr-body.md
+          pixi run -e drift check-drift ${{ matrix.flag }} --pr-body pr-body.md
           {
             echo 'body<<PRBODY'
             cat pr-body.md
@@ -49,15 +76,16 @@ jobs:
           } >> "$GITHUB_OUTPUT"
           rm -f pr-body.md
 
-      - name: Open / update rebuild PR
+      # No-ops when the leg changed nothing, so a quiet week opens no PR.
+      - name: Open / update ${{ matrix.leg }} PR
         uses: peter-evans/create-pull-request@v8
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: 'chore: rebuild packages behind conda-forge'
-          title: 'chore: rebuild packages behind conda-forge'
+          commit-message: ${{ matrix.commit }}
+          title: ${{ matrix.commit }}
           body: ${{ steps.drift.outputs.body }}
-          branch: channel-drift
+          branch: ${{ matrix.branch }}
           base: main
           labels: drift
           delete-branch: true
-          add-paths: recipes/**/recipe.yaml
+          add-paths: ${{ matrix.paths }}
