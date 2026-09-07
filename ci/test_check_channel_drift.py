@@ -7,6 +7,8 @@ No pytest; run in the drift pixi env (the module imports ``rattler``):
 """
 
 import importlib.util
+import tempfile
+import textwrap
 import unittest
 from pathlib import Path
 
@@ -145,6 +147,197 @@ class SelectionTest(unittest.TestCase):
         flagged = {r[2] for r in rows}
         self.assertNotIn("eigen-abi", flagged)
         self.assertIn("libboost", flagged)
+
+
+class _TempRecipes(unittest.TestCase):
+    """Base: point RECIPES_DIR at a throwaway tree of recipes."""
+
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory()
+        self.recipes = Path(self._tmp.name)
+        self._orig_dir = drift.RECIPES_DIR
+        drift.RECIPES_DIR = self.recipes
+        drift.variant_pinned_deps.cache_clear()
+        self.addCleanup(self._restore)
+
+    def _restore(self):
+        drift.RECIPES_DIR = self._orig_dir
+        drift.variant_pinned_deps.cache_clear()
+        self._tmp.cleanup()
+
+    def write(self, dirname, recipe: str, variants: str | None = None) -> Path:
+        d = self.recipes / dirname
+        d.mkdir()
+        (d / "recipe.yaml").write_text(textwrap.dedent(recipe).lstrip())
+        if variants is not None:
+            (d / "variants.yaml").write_text(textwrap.dedent(variants).lstrip())
+        return d / "recipe.yaml"
+
+    @staticmethod
+    def row(pkg, dep):
+        rec = {"name": pkg, "version": "0.1.0", "build_number": 2, "build": "h0_2"}
+        return (pkg, rec, dep, ">=1,<2", "3.0")
+
+
+MULTI_OUTPUT = """
+    build:
+      number: 2
+
+    outputs:
+      - package:
+          name: thing-core
+        build:
+          files:
+            - lib/libthing.so
+      - package:
+          name: thing-tools
+        build:
+          files:
+            - bin/thing
+"""
+
+ROOT_PIN = """
+    root_cxx_standard:
+      - "20"
+      - "23"
+    root_base:
+      - "6.40.2"
+"""
+
+
+class RecipeBumpTest(_TempRecipes):
+    """build.number bumping, incl. multi-output and repeated-output recipes."""
+
+    def test_multi_output_top_level_number_is_bumped(self):
+        # Nested output build: blocks are indented, so only the column-0 one —
+        # which governs every output — is touched.
+        recipe = self.write("thing", MULTI_OUTPUT)
+        self.assertEqual(drift.bump_build_number(recipe), 3)
+        text = recipe.read_text()
+        self.assertIn("build:\n  number: 3\n", text)
+        self.assertEqual(text.count("number:"), 1)
+
+    def test_templated_number_is_left_for_manual_handling(self):
+        self.write("tmpl", """
+            context:
+              build_number: 0
+
+            build:
+              number: ${{ build_number }}
+
+            outputs:
+              - package:
+                  name: tmpl-core
+        """)
+        self.assertIsNone(drift.bump_build_number(self.recipes / "tmpl" / "recipe.yaml"))
+        report = drift.bump_affected([self.row("tmpl-core", "libboost")])
+        self.assertIn("no bumpable top-level", report)
+        self.assertIn("`tmpl`", report)
+
+    def test_recipe_bumped_once_when_several_outputs_flagged(self):
+        # Regression: both outputs map to one recipe.yaml, so iterating package
+        # names rather than recipes bumped it twice.
+        recipe = self.write("thing", MULTI_OUTPUT)
+        drift.bump_affected([
+            self.row("thing-core", "libboost"),
+            self.row("thing-tools", "gsl"),
+        ])
+        self.assertIn("build:\n  number: 3\n", recipe.read_text())
+
+    def test_unknown_package_is_listed_not_bumped(self):
+        report = drift.bump_affected([self.row("built-elsewhere", "libboost")])
+        self.assertIn("No recipe in this repo", report)
+
+
+class VariantPinTest(_TempRecipes):
+    """Deps pinned by our own variants.yaml, and pins that fall behind."""
+
+    def simple(self, dirname, variants=None, number=2):
+        return self.write(
+            dirname,
+            f"package:\n  name: {dirname}\n\nbuild:\n  number: {number}\n",
+            variants,
+        )
+
+    def test_matrix_keys_are_not_pins(self):
+        self.simple("alpha", ROOT_PIN)
+        pins, inconsistent = drift.variant_pins()
+        # root_cxx_standard carries two values: a build matrix, not a pin.
+        self.assertEqual(sorted(pins), ["root_base"])
+        self.assertEqual(pins["root_base"][0], "6.40.2")
+        self.assertEqual(inconsistent, {})
+
+    def test_divergent_values_reported_as_inconsistent(self):
+        self.simple("alpha", ROOT_PIN)
+        self.simple("beta", 'root_base:\n  - "6.40.04"\n')
+        pins, inconsistent = drift.variant_pins()
+        self.assertNotIn("root_base", pins)
+        self.assertEqual(sorted(inconsistent["root_base"]), ["6.40.04", "6.40.2"])
+
+    def test_variant_pinned_dep_does_not_trigger_a_bump(self):
+        recipe = self.simple("alpha", ROOT_PIN)
+        report = drift.bump_affected([self.row("alpha", "root_base")])
+        self.assertIn("  number: 2\n", recipe.read_text())
+        self.assertIn("variants.yaml", report)
+        self.assertIn("root_base", report)
+
+    def test_unpinned_dep_still_triggers_a_bump(self):
+        # Same recipe, also flagged for something its variants.yaml does not pin.
+        recipe = self.simple("alpha", ROOT_PIN)
+        drift.bump_affected([
+            self.row("alpha", "root_base"),
+            self.row("alpha", "gsl"),
+        ])
+        self.assertIn("  number: 3\n", recipe.read_text())
+
+    def test_recipe_pinning_only_a_matrix_key_is_bumpable(self):
+        # rootegpythia6 pins only root_cxx_standard, so its root_base pin does
+        # refresh on a rebuild and the bump is worth making.
+        recipe = self.simple("gamma", 'root_cxx_standard:\n  - "20"\n  - "23"\n')
+        drift.bump_affected([self.row("gamma", "root_base")])
+        self.assertIn("  number: 3\n", recipe.read_text())
+
+    def test_split_rows_partitions_on_the_owning_recipe(self):
+        self.simple("alpha", ROOT_PIN)
+        stale, pinned = drift.split_rows([
+            self.row("alpha", "root_base"),
+            self.row("alpha", "gsl"),
+        ])
+        self.assertEqual([r[2] for r in stale], ["gsl"])
+        self.assertEqual([r[2] for r in pinned], ["root_base"])
+
+    def test_detect_variant_drift(self):
+        self.simple("alpha", ROOT_PIN)
+        pins, _ = drift.variant_pins()
+        rows = drift.detect_variant_drift(pins, {"root_base": "6.40.04"})
+        self.assertEqual([(r[0], r[1], r[2]) for r in rows],
+                         [("root_base", "6.40.2", "6.40.04")])
+        # Level pegging, and keys conda-forge does not know, yield nothing.
+        self.assertEqual(drift.detect_variant_drift(pins, {"root_base": "6.40.2"}), [])
+        self.assertEqual(drift.detect_variant_drift(pins, {}), [])
+
+    def test_bump_variants_rewrites_every_recipe_and_keeps_quoting(self):
+        a = self.simple("alpha", ROOT_PIN)
+        b = self.simple("beta", ROOT_PIN)
+        pins, _ = drift.variant_pins()
+        rows = drift.detect_variant_drift(pins, {"root_base": "6.40.04"})
+        drift.bump_affected_variants(rows)
+        for recipe in (a, b):
+            text = (recipe.parent / "variants.yaml").read_text()
+            self.assertIn('root_base:\n  - "6.40.04"\n', text)
+            self.assertIn('  - "20"\n  - "23"\n', text)  # matrix untouched
+
+    def test_partial_lockstep_is_refused(self):
+        self.simple("alpha", ROOT_PIN)
+        stray = self.simple("beta", ROOT_PIN)
+        pins, _ = drift.variant_pins()
+        rows = drift.detect_variant_drift(pins, {"root_base": "6.40.04"})
+        # Someone moved one recipe out from under us between detect and bump.
+        (stray.parent / "variants.yaml").write_text('root_base:\n  - "7.0.0"\n')
+        report = drift.bump_affected_variants(rows)
+        self.assertIn("not rewritten", report)
+        alpha = (self.recipes / "alpha" / "variants.yaml").read_text()
+        self.assertIn('  - "6.40.2"\n', alpha)
 
 
 if __name__ == "__main__":
