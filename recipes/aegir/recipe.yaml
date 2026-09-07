@@ -12,7 +12,7 @@ source:
 build:
   # Rebuild to pick up expat in host, needed by Geant4Config.cmake since
   # conda-forge geant4 stopped pulling it in.
-  number: 5
+  number: 6
   skip:
     - win
   script: build.sh
