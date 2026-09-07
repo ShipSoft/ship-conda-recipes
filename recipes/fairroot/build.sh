@@ -3,6 +3,10 @@ set -euxo pipefail
 unset SIMPATH
 
 mkdir -p build && cd build
+# CMAKE_REQUIRE_FIND_PACKAGE_Geant4: geant4 is a deliberate host dep, but
+# FairRoot only warns when it is missing and silently drops simulation
+# support, so a Geant4Config that fails to load (e.g. an unsatisfiable
+# find_dependency) would otherwise ship a degraded package. Make it fatal.
 # shellcheck disable=SC2154  # root_cxx_standard is injected by the build environment
 cmake ${CMAKE_ARGS} ${SRC_DIR} \
     -DCMAKE_BUILD_TYPE=Release \
@@ -11,6 +15,7 @@ cmake ${CMAKE_ARGS} ${SRC_DIR} \
     -DCMAKE_CATCH_DISCOVER_TESTS_DISCOVERY_MODE=PRE_TEST \
     -DCMAKE_INSTALL_LIBDIR=lib \
     -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+    -DCMAKE_REQUIRE_FIND_PACKAGE_Geant4=ON \
     -DBUILD_BASEMQ=OFF \
     -DBUILD_EXAMPLES=ON \
     -DPythia6_LIBRARY_DIR="${PREFIX}/lib"

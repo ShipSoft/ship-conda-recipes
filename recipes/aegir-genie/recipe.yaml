@@ -10,9 +10,9 @@ source:
   sha256: 85c5e7c9a24e67d2c03da3758f530c27a26c2d63f4fc28db877ea09d30f49dc0
 
 build:
-  # Rebuild against shipgeometryservice 0.4.0 (via aegir) and refresh pins to
-  # current conda-forge.
-  number: 4
+  # Rebuild to pick up expat in host, needed by Geant4Config.cmake since
+  # conda-forge geant4 stopped pulling it in.
+  number: 5
   skip:
     - win
   script: build.sh
@@ -42,6 +42,11 @@ requirements:
     # under ${GENIE_PREFIX}/lib.
     - genie >=3.6.2 pythia6_*
     - geant4
+    # geant4 Config.cmake calls find_dependency() on all three; see
+    # "Known upstream workarounds" in the README.
+    - expat
+    - zlib
+    - freetype
     - random123
     - libboost-devel
     - tbb-devel

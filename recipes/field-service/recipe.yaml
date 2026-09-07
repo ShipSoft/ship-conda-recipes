@@ -15,7 +15,7 @@ source:
     target_directory: covfie_src
 
 build:
-  number: 2
+  number: 3
 
 outputs:
   - staging:
@@ -40,6 +40,11 @@ outputs:
       host:
       - mp-units
       - geant4
+      # geant4 Config.cmake calls find_dependency() on all three; see
+      # "Known upstream workarounds" in the README.
+      - expat
+      - zlib
+      - freetype
       - root_base
       - root_cxx_standard
 
@@ -63,12 +68,16 @@ outputs:
         - mp-units
       run_exports:
         - ${{ pin_subpackage('field-service-core', upper_bound='x.x') }}
-      # The shared staging host pulls geant4 + root_base for the g4-adapter and
-      # tools outputs; the core library doesn't link either, so suppress their
-      # run_exports here. mp-units run_export is kept (PUBLIC link).
+      # The shared staging host pulls geant4 (+ its expat / zlib / freetype
+      # Config deps) and root_base for the g4-adapter and tools outputs; the
+      # core library links none of them, so suppress their run_exports here.
+      # mp-units run_export is kept (PUBLIC link).
       ignore_run_exports:
         from_package:
           - geant4
+          - expat
+          - zlib
+          - freetype
           - root_base
           - root_cxx_standard
     tests:
@@ -93,6 +102,11 @@ outputs:
         # find_dependency(Geant4) is invoked from Config.cmake whenever the
         # G4AdapterTargets file is present in the prefix.
         - geant4
+        # ... which in turn calls find_dependency() on all three; see
+        # "Known upstream workarounds" in the README.
+        - expat
+        - zlib
+        - freetype
       run_exports:
         - ${{ pin_subpackage('field-service-g4', upper_bound='x.x') }}
       # ROOT is staged for the tools output, not the g4 adapter.
@@ -116,11 +130,14 @@ outputs:
     requirements:
       run:
         - ${{ pin_subpackage('field-service-core', exact=True) }}
-      # Tools don't link Geant4; mp-units is pulled in transitively via the
-      # core sub-package, not directly by these binaries.
+      # Tools don't link Geant4 or its Config deps; mp-units is pulled in
+      # transitively via the core sub-package, not directly by these binaries.
       ignore_run_exports:
         from_package:
           - geant4
+          - expat
+          - zlib
+          - freetype
           - mp-units
     tests:
       - script:

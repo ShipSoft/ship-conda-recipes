@@ -10,7 +10,7 @@ source:
   sha256: 824cd7e12ba086dd572d69f82d35bef0b6b30efeb26353a487175ba0f1a2a095
 
 build:
-  number: 0
+  number: 1
   skip:
     - win
   script: build.sh
@@ -26,6 +26,11 @@ requirements:
     - geomodel-core
     - geomodel-g4
     - geant4
+    # geant4 Config.cmake calls find_dependency() on all three; see
+    # "Known upstream workarounds" in the README.
+    - expat
+    - zlib
+    - freetype
     - mp-units
     # GeoModel consumers need both in host — see "Known upstream
     # workarounds" in the README for the remove-when conditions.
