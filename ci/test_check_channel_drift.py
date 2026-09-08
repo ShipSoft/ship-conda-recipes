@@ -6,7 +6,9 @@ No pytest; run in the drift pixi env (the module imports ``rattler``):
     pixi run -e drift python ci/test_check_channel_drift.py
 """
 
+import contextlib
 import importlib.util
+import io
 import tempfile
 import textwrap
 import unittest
@@ -358,6 +360,29 @@ class VariantPinTest(_TempRecipes):
         self.assertIn("not rewritten", report)
         alpha = (self.recipes / "alpha" / "variants.yaml").read_text()
         self.assertIn('  - "6.40.2"\n', alpha)
+
+
+class ArgumentTest(unittest.TestCase):
+    """The two bump modes are exclusive; the report cannot describe both."""
+
+    def parse(self, argv):
+        # argparse writes usage to stderr before raising SystemExit.
+        with contextlib.redirect_stderr(io.StringIO()):
+            return drift.build_parser().parse_args(argv)
+
+    def test_both_bump_flags_are_rejected(self):
+        with self.assertRaises(SystemExit):
+            self.parse(["--bump-recipes", "--bump-variants"])
+
+    def test_either_flag_alone_still_parses(self):
+        # Guards against a parser that rejects everything.
+        recipes = self.parse(["--bump-recipes"])
+        self.assertTrue(recipes.bump_recipes)
+        self.assertFalse(recipes.bump_variants)
+
+        variants = self.parse(["--bump-variants"])
+        self.assertTrue(variants.bump_variants)
+        self.assertFalse(variants.bump_recipes)
 
 
 if __name__ == "__main__":
