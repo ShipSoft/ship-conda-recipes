@@ -546,14 +546,22 @@ def bump_affected_variants(variant_rows: list[tuple]) -> str:
     return "\n".join(out)
 
 
-def main() -> int:
+def build_parser() -> argparse.ArgumentParser:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--bump-recipes", action="store_true",
-                    help="bump build.number once per affected recipe")
-    ap.add_argument("--bump-variants", action="store_true",
-                    help="rewrite variant pins conda-forge has moved past, in lockstep")
+    # One or the other, never both: the two edit disjoint paths and land on
+    # different branches (channel-drift vs variant-drift), and the report says
+    # up front which half the run acts on — it cannot describe both at once.
+    bump = ap.add_mutually_exclusive_group()
+    bump.add_argument("--bump-recipes", action="store_true",
+                      help="bump build.number once per affected recipe")
+    bump.add_argument("--bump-variants", action="store_true",
+                      help="rewrite variant pins conda-forge has moved past, in lockstep")
     ap.add_argument("--pr-body", type=Path, help="write the markdown report to this path")
-    args = ap.parse_args()
+    return ap
+
+
+def main() -> int:
+    args = build_parser().parse_args()
 
     ship, failed = latest_builds()
     if failed:
