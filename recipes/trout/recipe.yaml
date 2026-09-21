@@ -1,0 +1,93 @@
+context:
+  version: "0.1.0"
+
+package:
+  name: trout
+  version: ${{ version }}
+
+source:
+  url: https://github.com/ShipSoft/Trout/archive/refs/tags/v${{ version }}.tar.gz
+  sha256: 4e9bd0f567ef5fc1f18b9a929f143e00dbeccddc26be7411df0f93e9fc0c2a20
+
+build:
+  number: 0
+  skip:
+    - win
+  script: build.sh
+
+requirements:
+  build:
+    - ${{ compiler('cxx') }}
+    - sysroot_linux-64 2.17.*
+    - cmake
+    - make
+  host:
+    # Pin <1 to exclude the legacy calendar-versioned builds still on the
+    # ship channel (see the aegir recipe for the full rationale).
+    - shipdatamodel <1
+    - shipgeometry
+    - shipgeometryservice >=0.3,<1
+    - field-service-core
+    - field-service-g4
+    - phlex
+    # Upstream ACTS from conda-forge, not the acts-ship fork snapshot.
+    - acts-core
+    - root_base >=6.40
+    # phlex/shipdatamodel are C++23; pin the matching ROOT variant so trout
+    # and phlex stay co-installable (an unconstrained solve drifts down to
+    # the C++20 ROOT build).
+    - root_cxx_standard ==23
+    # acts_geometry_provider compiles against Geant4 headers directly.
+    - geant4
+    # geant4 Config.cmake calls find_dependency() on all three; see
+    # "Known upstream workarounds" in the README.
+    - expat
+    - zlib
+    - freetype
+    - random123
+    - libboost-devel
+    - tbb-devel
+    - spdlog
+    - fmt
+    - mp-units
+    - ms-gsl
+    # GeoModel consumers need both in host — see "Known upstream
+    # workarounds" in the README for the remove-when conditions.
+    - eigen-abi-devel
+    - nlohmann_json
+  run_exports:
+    - ${{ pin_subpackage('trout', upper_bound='x.x') }}
+
+tests:
+  - script:
+      - test -f $PREFIX/lib/libread_digitised_hits.so
+      - test -f $PREFIX/lib/libacts_geometry_provider.so
+      - test -f $PREFIX/lib/libacts_field_provider.so
+      - test -f $PREFIX/lib/libpassthrough.so
+      - test -f $PREFIX/lib/libip_selector.so
+      - test -f $PREFIX/lib/libspectrometer_tracking.so
+      - test -f $PREFIX/lib/libupstream_tagger_reco.so
+      - test -f $PREFIX/lib/libsurround_tagger_reco.so
+      - test -f $PREFIX/lib/libcalorimeter_reco.so
+      - test -f $PREFIX/lib/libtiming_detector_reco.so
+      - test -f $PREFIX/lib/librec_output_module.so
+      - test -d $PREFIX/share/trout/workflows
+
+about:
+  homepage: https://github.com/ShipSoft/Trout
+  repository: https://github.com/ShipSoft/Trout
+  summary: Phlex-based reconstruction framework for the SHiP experiment
+  description: |
+    Trout is the reconstruction package for the SHiP experiment, built on
+    top of the Phlex parallel data-processing toolkit. It reads the
+    digitised-hit output of the Shannon digitisation framework and provides
+    ACTS-based spectrometer track finding and fitting, per-subdetector
+    reconstruction modules, and RNTuple/histogram output.
+  license: LGPL-3.0-or-later
+  license_file:
+    - LICENSES/LGPL-3.0-or-later.txt
+    - LICENSES/MPL-2.0.txt
+
+extra:
+  recipe-maintainers:
+    - olantwin
