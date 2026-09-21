@@ -24,9 +24,9 @@ requirements:
     - cmake
     - make
   host:
-    # >=6.40: an unconstrained cxx23 solve drifts down to root 6.36,
-    # whose run_export then conflicts with the phlex/aegir stack.
-    - root_base >=6.40
+    # root_base is pinned by variants.yaml, not constrained here: a variant
+    # value only substitutes into a dependency listed without a version.
+    - root_base
     - root_cxx_standard
     - pythia6
   run_exports:

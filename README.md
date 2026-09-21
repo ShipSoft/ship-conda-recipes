@@ -72,9 +72,12 @@ moves past the pin, the check opens a separate `variant-drift` PR advancing it
 across every `variants.yaml` at once. That PR is a real ROOT upgrade rather than
 a routine refresh, so review it on its own merits. No `build.number` bump
 accompanies it: changing a variant changes the build hash, so the build string
-is new and `--skip-existing` will not skip the rebuild. A recipe that pins only
-`root_cxx_standard` (rootegpythia6) is unaffected — its `root_base` pin does
-refresh on a rebuild, so it is bumped as usual.
+is new and `--skip-existing` will not skip the rebuild. Every ROOT-linking
+recipe carries the pin, rootegpythia6 included: fairship and genie list
+rootegpythia6 in `host:` and pin `root_base` themselves, so a rootegpythia6
+left to float to conda-forge's current ROOT either makes their host env
+unsolvable or sends the solver back to a pre-`root_base` build from the
+channel.
 
 For packages whose upstream build system sets no explicit C++ standard
 (photospp's autotools, GENIE's perl configure — both inherit ROOT's standard
@@ -84,8 +87,8 @@ the ROOT build they link against deterministic.
 The C++23-only aegir stack (aegir, aegir-genie) builds a single variant and
 constrains ROOT in `host:` instead — `root_base >=6.40` plus
 `root_cxx_standard ==23` — which equally excludes the legacy 6.36.06 build.
-rootegpythia6 builds both variants but likewise uses a `root_base >=6.40`
-floor in `host:` rather than a variant pin.
+rootegpythia6 builds both variants and pins `root_base` in `variants.yaml`, in
+lockstep with fairship and genie, which link against it.
 
 ### Known upstream workarounds
 
