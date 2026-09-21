@@ -135,6 +135,9 @@ it can be dropped.
   its closure and only trip over `expat`; shipgeometryservice, which has no
   ROOT, trips over all three. The feedstock's own CMake test does not catch
   this because its test environment lists all three explicitly.
+  The dev-build workflows resolve the upstream pixi manifests instead of these
+  recipes, so FairShip's and geometry_service's `pixi.toml` carry the same
+  three; drop those alongside the recipe entries.
   *Remove when* conda-forge geant4-feedstock puts `expat`, `zlib` and
   `freetype` back in the geant4 output's `run:`.
 

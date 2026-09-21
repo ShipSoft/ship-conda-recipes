@@ -17,6 +17,20 @@ on:
         description: 'aegir ref to build (default: main HEAD)'
         type: string
         default: ''
+      # The sibling checkouts default to their main branches; override one to
+      # try a fix out before it is merged.
+      data_model_ref:
+        description: 'data-model ref (default: main HEAD)'
+        type: string
+        default: ''
+      geometry_ref:
+        description: 'Geometry ref (default: main HEAD)'
+        type: string
+        default: ''
+      geometry_service_ref:
+        description: 'geometry_service ref (default: main HEAD)'
+        type: string
+        default: ''
   pull_request:
     paths:
       - '.github/workflows/dev-source-build-aegir.yml'
@@ -41,16 +55,19 @@ jobs:
         with:
           persist-credentials: false
           repository: ShipSoft/data-model
+          ref: ${{ inputs.data_model_ref || '' }}
           path: data-model
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
           repository: ShipSoft/Geometry
+          ref: ${{ inputs.geometry_ref || '' }}
           path: geometry
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
           repository: ShipSoft/geometry_service
+          ref: ${{ inputs.geometry_service_ref || '' }}
           path: geometry_service
       - name: Enable the dev environment
         # Uncomment the opt-in multi-package block shipped (commented) in
