@@ -77,7 +77,8 @@ recipe carries the pin, rootegpythia6 included: fairship and genie list
 rootegpythia6 in `host:` and pin `root_base` themselves, so a rootegpythia6
 left to float to conda-forge's current ROOT either makes their host env
 unsolvable or sends the solver back to a pre-`root_base` build from the
-channel.
+channel. `ci/check-variant-lockstep.py` enforces that at review time; it runs
+as a prek hook and needs no network access.
 
 For packages whose upstream build system sets no explicit C++ standard
 (photospp's autotools, GENIE's perl configure — both inherit ROOT's standard
