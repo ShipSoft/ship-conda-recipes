@@ -4,3 +4,8 @@
 root_cxx_standard:
   - "20"
   - "23"
+# root_base is pinned deliberately — see "ROOT C++ standard variants" in the
+# README. fairship and genie put rootegpythia6 in host: and pin root_base
+# themselves, so this has to move in lockstep with theirs.
+root_base:
+  - "6.40.2"
