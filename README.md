@@ -27,6 +27,7 @@ on a [prefix.dev](https://prefix.dev) channel.
 | shipdatamodel | 0.3.0 | No (SHiP-specific) |
 | shipgeometry | 0.2.0 | No (SHiP-specific) |
 | shipgeometryservice | 0.1.0 | No (SHiP-specific) |
+| trout | 0.1.0 | No (SHiP-specific) |
 
 ### Upstreamed to conda-forge
 
