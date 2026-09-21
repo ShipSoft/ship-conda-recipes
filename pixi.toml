@@ -36,6 +36,8 @@ commitizen = "*"
 
 [feature.lint.tasks]
 lint = "prek run --all-files"
+# Offline invariant behind the root_base lockstep; also wired as a prek hook.
+test-lockstep = "python ci/test_check_variant_lockstep.py"
 # Install the git hooks and route them through `pixi run` so the conda-provided
 # hook tools are on PATH at commit time (required on NixOS, where the tools are
 # not runnable without pixi activation).
