@@ -1,6 +1,6 @@
 # prefix.dev/ship channel snapshot
 
-_Updated: 2026-09-14_
+_Updated: 2026-09-21_
 
 ## linux-64
 
@@ -87,6 +87,8 @@ _Updated: 2026-09-14_
 | fairship | 26.07 | `ha28ff26_6` | 6 | 2026-09-07 |
 | fairship | 26.07 | `h6afcf60_7` | 7 | 2026-09-08 |
 | fairship | 26.07 | `ha28ff26_7` | 7 | 2026-09-08 |
+| fairship | 26.09 | `h6afcf60_7` | 7 | 2026-09-21 |
+| fairship | 26.09 | `ha28ff26_7` | 7 | 2026-09-21 |
 | field-service | 0.1.0 | `h83dfeff_0` | 0 | 2026-06-19 |
 | field-service | 0.1.0 | `hb9574b7_0` | 0 | 2026-06-19 |
 | field-service | 0.1.0 | `h73f9d4e_1` | 1 | 2026-06-26 |
