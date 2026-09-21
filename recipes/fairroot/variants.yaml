@@ -4,4 +4,4 @@ root_cxx_standard:
   - "20"
   - "23"
 root_base:
-  - "6.40.2"
+  - "6.40.04"

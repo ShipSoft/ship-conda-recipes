@@ -8,4 +8,4 @@ root_cxx_standard:
 # README. fairship and genie put rootegpythia6 in host: and pin root_base
 # themselves, so this has to move in lockstep with theirs.
 root_base:
-  - "6.40.2"
+  - "6.40.04"
