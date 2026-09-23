@@ -1,13 +1,9 @@
 #!/bin/bash
 set -euxo pipefail
 
-# gfortran >= 10 rejects the legacy Fortran sources (non-conforming
-# argument types and BOZ constants) by default.
-FVERSION=$(gfortran --version | grep -i fortran | sed -e 's/.* //' | cut -d. -f1)
-FFLAGS=""
-if [ "${FVERSION}" -ge 10 ]; then
-    FFLAGS="-fallow-argument-mismatch -fallow-invalid-boz -fno-tree-loop-distribute-patterns"
-fi
+# Permit the legacy Fortran sources (non-conforming argument types and BOZ
+# constants) under modern gfortran.
+FFLAGS="-fallow-argument-mismatch -fallow-invalid-boz -fno-tree-loop-distribute-patterns"
 
 mkdir -p build && cd build
 # shellcheck disable=SC2154  # root_cxx_standard is injected by the build environment

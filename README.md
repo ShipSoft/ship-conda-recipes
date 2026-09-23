@@ -7,27 +7,32 @@ on a [prefix.dev](https://prefix.dev) channel.
 
 ## Packages
 
-| Package | Version | Upstream candidate? |
-|---------|---------|---------------------|
-| acts-ship | 0.0.0.dev20260608+fcf8bbe | No (SHiP fork of conda-forge `acts-core`) |
-| aegir | 0.1.0 | No (SHiP-specific) |
-| aegir-genie | 0.1.0 | No (SHiP-specific, links GPL GENIE) |
-| fairroot | 19.0.1 | No (carries patch) |
-| fairship | 26.06 | No (SHiP-specific) |
-| ganga | 8.7.12 | No (HEP-specific, not in conda-forge today) |
-| geant3 | 4.5 | Yes |
-| genfit | 2.3.0 | Yes |
-| mp-units | 2.5.0 | Yes (conda-forge feedstock) |
-| npdb-client | 0.3.0 | No (SHiP-specific, split recipe with `python-npdb-client`) |
-| photospp | 3.64 | Yes |
-| pythia6 | 6.4.28 | No (SND-LHC fork) |
-| random123 | 1.14.0 | Yes (conda-forge feedstock) |
-| rootegpythia6 | 0.1 | No (niche) |
-| shannon | 0.2.0 | No (SHiP-specific) |
-| shipdatamodel | 0.3.0 | No (SHiP-specific) |
-| shipgeometry | 0.2.0 | No (SHiP-specific) |
-| shipgeometryservice | 0.1.0 | No (SHiP-specific) |
-| trout | 0.1.0 | No (SHiP-specific) |
+| Package | Upstream candidate? |
+|---------|---------------------|
+| acts-ship | No (SHiP fork of conda-forge `acts-core`) |
+| aegir | No (SHiP-specific) |
+| aegir-genie | No (SHiP-specific, links GPL GENIE) |
+| fairroot | No (carries patch) |
+| fairship | No (SHiP-specific) |
+| field-service | No (SHiP-specific) |
+| ganga | No (HEP-specific, not in conda-forge today) |
+| geant3 | Yes |
+| genfit | Yes |
+| genie | No (GPL, links SHiP-specific drivers) |
+| genie-data | No (ships with `genie`) |
+| genie-splines-ship | No (SHiP-specific splines) |
+| mp-units | Yes (conda-forge feedstock) |
+| npdb-client | No (SHiP-specific, split recipe with `python-npdb-client`) |
+| photospp | Yes |
+| pythia6 | No (SND-LHC fork) |
+| random123 | Yes (conda-forge feedstock) |
+| rootegpythia6 | No (niche) |
+| shannon | No (SHiP-specific) |
+| ship-ci-metrics | No (SHiP-specific) |
+| shipdatamodel | No (SHiP-specific) |
+| shipgeometry | No (SHiP-specific) |
+| shipgeometryservice | No (SHiP-specific) |
+| trout | No (SHiP-specific) |
 
 ### Upstreamed to conda-forge
 
@@ -142,7 +147,8 @@ it can be dropped.
   this because its test environment lists all three explicitly.
   The dev-build workflows resolve the upstream pixi manifests instead of these
   recipes, so FairShip's and geometry_service's `pixi.toml` carry the same
-  three; drop those alongside the recipe entries.
+  three (and field_service's carries `expat`); drop those alongside the recipe
+  entries.
   *Remove when* conda-forge geant4-feedstock puts `expat`, `zlib` and
   `freetype` back in the geant4 output's `run:`.
 
