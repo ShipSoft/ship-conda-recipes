@@ -51,6 +51,33 @@ tests:
       - test -f $PREFIX/lib/libShipData.so
       - test -d $PREFIX/include
       - test -d $PREFIX/share/FairShip/geometry
+      # rattler-build's linking check runs against the host env, so a host dep
+      # whose run_export never reaches the run env still packages green and
+      # only fails when someone loads the library. That is how a fairship
+      # without libEGPythia6.so shipped. The test env is the run env, so
+      # resolve every NEEDED entry of the libraries this package installs.
+      # Scoped to our own files through conda-meta: $PREFIX/lib also carries
+      # other packages' optional plugins (pythia8's LHAPDF6 interface), which
+      # are meant to dangle until their backend is installed.
+      - |
+        meta=$(ls "$PREFIX"/conda-meta/fairship-*.json)
+        libs=$(grep -oE '"lib/lib[^"]*\.so[^"]*"' "$meta" | tr -d '"' | sort -u)
+        # A silent pass here would be worse than a false alarm, so make an
+        # empty or unreadable list fail rather than resolve nothing.
+        test -n "$libs" || { echo "no libraries listed in $meta"; exit 1; }
+        for lib in $libs; do
+          test -f "$PREFIX/$lib" || { echo "listed but absent: $lib"; exit 1; }
+          # ldd mid-pipeline would hide its own failure behind an empty grep,
+          # so capture it first and check the status before the output.
+          deps=$(ldd "$PREFIX/$lib") \
+            || { echo "ldd could not inspect $lib"; exit 1; }
+          unresolved=$(echo "$deps" | grep 'not found' || true)
+          if [ -n "$unresolved" ]; then
+            echo "unresolved runtime libraries in $lib:"
+            echo "$unresolved"
+            exit 1
+          fi
+        done
 
 about:
   homepage: https://ship.web.cern.ch/
