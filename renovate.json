@@ -35,10 +35,10 @@
       "versioning": "loose"
     },
     {
-      "description": "Packages pinned to commits/branches, not release tags",
+      "description": "Packages pinned to commits, branches or fork tags, not release tags",
       "matchPackageNames": [
-        "luketpickering/ROOTEGPythia6",
-        "SND-LHC/pythia6",
+        "ShipSoft/ROOTEGPythia6",
+        "ShipSoft/pythia6",
         "acts-project/covfie",
         "webbjm/acts"
       ],
