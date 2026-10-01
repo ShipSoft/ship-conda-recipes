@@ -20,7 +20,7 @@ on a [prefix.dev](https://prefix.dev) channel.
 | mp-units | 2.5.0 | Yes (conda-forge feedstock) |
 | npdb-client | 0.3.0 | No (SHiP-specific, split recipe with `python-npdb-client`) |
 | photospp | 3.64 | Yes |
-| pythia6 | 6.4.28 | No (SND-LHC fork) |
+| pythia6 | 6.4.28 | No (ShipSoft fork) |
 | random123 | 1.14.0 | Yes (conda-forge feedstock) |
 | rootegpythia6 | 0.1 | No (niche) |
 | shannon | 0.2.0 | No (SHiP-specific) |
