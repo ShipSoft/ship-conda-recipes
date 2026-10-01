@@ -1,20 +1,18 @@
 context:
   version: "0.1"
+  # ShipSoft fork of luketpickering/ROOTEGPythia6, which has no releases.
+  tag: "v6.28.0-ship1"
 
 package:
   name: rootegpythia6
   version: ${{ version }}
 
 source:
-  # Upstream has no tagged release; pin to the commit.
-  url: https://github.com/luketpickering/ROOTEGPythia6/archive/feb7c7eb8d368aee20bf1cb01f1bbfb9cfaeb6b5.tar.gz
-  sha256: 891d637fe278c9f77eca14d66eaeb7d49af6d2bdef73af637fcc41783b096832
-  patches:
-    - fix-dictionary-paths.patch
-    - fix-pythia6-private-link.patch
+  url: https://github.com/ShipSoft/ROOTEGPythia6/archive/refs/tags/${{ tag }}.tar.gz
+  sha256: 14b02629c503539ec6f60bd8f48cacc2161264ac0e4520c51932ada6b1dc9f04
 
 build:
-  number: 10
+  number: 11
   script: build.sh
 
 requirements:
@@ -37,8 +35,8 @@ tests:
       - test -f $PREFIX/lib/libEGPythia6.so
 
 about:
-  homepage: https://github.com/luketpickering/ROOTEGPythia6
-  repository: https://github.com/luketpickering/ROOTEGPythia6
+  homepage: https://github.com/ShipSoft/ROOTEGPythia6
+  repository: https://github.com/ShipSoft/ROOTEGPythia6
   summary: Standalone ROOT EGPythia6 library (extracted from ROOT 6.28)
   description: |
     ROOTEGPythia6 packages the EGPythia6 library — ROOT's TGenerator
