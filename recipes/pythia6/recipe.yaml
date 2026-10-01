@@ -1,19 +1,18 @@
 context:
   version: "6.4.28"
+  # ShipSoft fork of SND-LHC/pythia6 with the PDFLIB dummy routines restored.
+  tag: "v6.4.28-ship1"
 
 package:
   name: pythia6
   version: ${{ version }}
 
 source:
-  # SND-LHC/pythia6 has no tagged release; pin to the commit.
-  url: https://github.com/SND-LHC/pythia6/archive/a918d08839df79965787e1fbf43ea16acc1e443d.tar.gz
-  sha256: 3806efdb4fd1e295082f193bd0d03800d3fa904525cb82b0a9540401701711fa
-  patches:
-    - restore-dummy-pdflib.patch
+  url: https://github.com/ShipSoft/pythia6/archive/refs/tags/${{ tag }}.tar.gz
+  sha256: caa94bef5dd904cc5dc1c46c10c5731b576936ddc3b639ce86f9dfab82d44079
 
 build:
-  number: 6
+  number: 7
   script: build.sh
 
 requirements:
@@ -34,15 +33,15 @@ tests:
 
 about:
   homepage: https://pythia.org/pythia6/
-  repository: https://github.com/SND-LHC/pythia6
-  summary: Pythia6 event generator sources (SND@LHC distribution)
+  repository: https://github.com/ShipSoft/pythia6
+  summary: Pythia6 event generator sources (SHiP distribution)
   description: |
     Pythia6 is the legacy Fortran version of the Pythia high-energy
     physics event generator, providing parton showers, multi-parton
     interactions and hadronisation for hadronic collisions. This
-    repository is the SND@LHC distribution of the sources (originally
-    repackaged for ALICE) used for building Pythia6 as a shared
-    library against ROOT.
+    repository is the SHiP fork of the SND@LHC distribution of the
+    sources (originally repackaged for ALICE) used for building Pythia6
+    as a shared library against ROOT.
   # Upstream tarball ships no LICENSE; GPL-2.0 is the historical
   # Pythia 6.4 license per the physics manual (arXiv:hep-ph/0603175).
   license: GPL-2.0-or-later
