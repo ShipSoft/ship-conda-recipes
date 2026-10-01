@@ -1,5 +1,5 @@
 context:
-  version: "0.1.0"
+  version: "0.2.0"
 
 recipe:
   name: field-service
@@ -7,7 +7,7 @@ recipe:
 
 source:
   - url: https://github.com/ShipSoft/field_service/archive/refs/tags/v${{ version }}.tar.gz
-    sha256: 926e3f2c39cee64cecf55945c5a8e9dd9ec5c2e6223b807fd7e9109f5d2016c3
+    sha256: af847bfc9bb2b2f2cf655ddf0924a960d896e4dc9ccc00aa84ca30400a401cf8
   # covfie is FetchContent'd by upstream CMake; vendor it so the build
   # stays offline. Pinned to the same tag the CMakeLists.txt uses.
   - url: https://github.com/acts-project/covfie/archive/refs/tags/v0.15.6.tar.gz
@@ -15,7 +15,7 @@ source:
     target_directory: covfie_src
 
 build:
-  number: 3
+  number: 0
 
 outputs:
   - staging:
@@ -39,6 +39,9 @@ outputs:
       - make
       host:
       - mp-units
+      # SHiP/Units.hpp (SHiP::SHiPUnits). Pin <1 to exclude the legacy
+      # 26.06.0 builds still on the ship channel.
+      - shipdatamodel <1
       - geant4
       # geant4 Config.cmake calls find_dependency() on all three; see
       # "Known upstream workarounds" in the README.
@@ -56,16 +59,19 @@ outputs:
         - lib/libSHiPFieldService.so*
         - include/FieldService/IFieldSource.h
         - include/FieldService/CovfieFieldSource.h
+        - include/FieldService/FieldMap.h
         - lib/cmake/SHiPFieldService/SHiPFieldServiceConfig.cmake
         - lib/cmake/SHiPFieldService/SHiPFieldServiceConfigVersion.cmake
         - lib/cmake/SHiPFieldService/SHiPFieldServiceTargets.cmake
         - lib/cmake/SHiPFieldService/SHiPFieldServiceTargets-*.cmake
     requirements:
       run:
-        # find_dependency(mp-units) in SHiPFieldServiceConfig.cmake — needs
-        # mp-units in consumers' host env at configure time, which requires
-        # listing it here rather than relying on mp-units' run_exports alone.
+        # find_dependency(mp-units) and find_dependency(SHiPDataModel) in
+        # SHiPFieldServiceConfig.cmake — needed in consumers' host env at
+        # configure time, which requires listing them here rather than
+        # relying on their run_exports alone.
         - mp-units
+        - shipdatamodel <1
       run_exports:
         - ${{ pin_subpackage('field-service-core', upper_bound='x.x') }}
       # The shared staging host pulls geant4 (+ its expat / zlib / freetype
@@ -85,8 +91,37 @@ outputs:
           - test -f $PREFIX/lib/libSHiPFieldService.so
           - test -f $PREFIX/include/FieldService/IFieldSource.h
           - test -f $PREFIX/include/FieldService/CovfieFieldSource.h
+          - test -f $PREFIX/include/FieldService/FieldMap.h
           - test -f $PREFIX/lib/cmake/SHiPFieldService/SHiPFieldServiceConfig.cmake
           - test -f $PREFIX/lib/cmake/SHiPFieldService/SHiPFieldServiceTargets.cmake
+
+  - package:
+      name: field-service-mapio
+    inherit: field-service-build
+    build:
+      files:
+        - lib/libSHiPFieldServiceMapIO.so*
+        - include/FieldService/FieldMapIO.h
+        - lib/cmake/SHiPFieldService/SHiPFieldServiceMapIOTargets.cmake
+        - lib/cmake/SHiPFieldService/SHiPFieldServiceMapIOTargets-*.cmake
+    requirements:
+      run:
+        - ${{ pin_subpackage('field-service-core', exact=True) }}
+      run_exports:
+        - ${{ pin_subpackage('field-service-mapio', upper_bound='x.x') }}
+      # Links ROOT (kept via root_base's run_exports), not Geant4 or its
+      # Config deps.
+      ignore_run_exports:
+        from_package:
+          - geant4
+          - expat
+          - zlib
+          - freetype
+    tests:
+      - script:
+          - test -f $PREFIX/lib/libSHiPFieldServiceMapIO.so
+          - test -f $PREFIX/include/FieldService/FieldMapIO.h
+          - test -f $PREFIX/lib/cmake/SHiPFieldService/SHiPFieldServiceMapIOTargets.cmake
 
   - package:
       name: field-service-g4
@@ -109,7 +144,7 @@ outputs:
         - freetype
       run_exports:
         - ${{ pin_subpackage('field-service-g4', upper_bound='x.x') }}
-      # ROOT is staged for the tools output, not the g4 adapter.
+      # ROOT is staged for the mapio and tools outputs, not the g4 adapter.
       ignore_run_exports:
         from_package:
           - root_base
@@ -124,12 +159,13 @@ outputs:
     inherit: field-service-build
     build:
       files:
-        - bin/cvf_to_text
-        - bin/generate_constant_cvf
-        - bin/fairship_to_cvf
+        - bin/fieldmap_dump
+        - bin/generate_constant_fieldmap
+        - bin/fairship_to_fieldmap
+        - bin/plot_field_map
     requirements:
       run:
-        - ${{ pin_subpackage('field-service-core', exact=True) }}
+        - ${{ pin_subpackage('field-service-mapio', exact=True) }}
       # Tools don't link Geant4 or its Config deps; mp-units is pulled in
       # transitively via the core sub-package, not directly by these binaries.
       ignore_run_exports:
@@ -141,9 +177,14 @@ outputs:
           - mp-units
     tests:
       - script:
-          - test -f $PREFIX/bin/cvf_to_text
-          - test -f $PREFIX/bin/generate_constant_cvf
-          - test -f $PREFIX/bin/fairship_to_cvf
+          - test -f $PREFIX/bin/fieldmap_dump
+          - test -f $PREFIX/bin/generate_constant_fieldmap
+          - test -f $PREFIX/bin/fairship_to_fieldmap
+          - test -f $PREFIX/bin/plot_field_map
+          # Round trip through the installed binaries: catches a tool that
+          # resolves the wrong libSHiPFieldService at run time.
+          - generate_constant_fieldmap smoke.root smoke 0 1 0 -1 1 -1 1 -1 1
+          - fieldmap_dump smoke.root
 
   - package:
       name: field-service
@@ -152,6 +193,7 @@ outputs:
     requirements:
       run:
         - ${{ pin_subpackage('field-service-core', exact=True) }}
+        - ${{ pin_subpackage('field-service-mapio', exact=True) }}
         - ${{ pin_subpackage('field-service-g4', exact=True) }}
         - ${{ pin_subpackage('field-service-tools', exact=True) }}
 
@@ -162,13 +204,13 @@ about:
   description: |
     SHiPFieldService is a framework-agnostic C++20 library exposing the
     SHiP magnetic field maps to simulation (aegir) and reconstruction.
-    It wraps the covfie library for storage and interpolation of
-    regular-grid field maps. The core library has no Geant4 dependency
-    so reconstruction can consume it without pulling Geant4 in; an
-    optional header-only Geant4 adapter (G4MagFieldAdapter) is shipped
-    as a separate sub-package. ROOT-based conversion utilities for the
-    legacy FairShip field-map format are provided in a tools
-    sub-package.
+    Maps are stored in the SHiP field-map format, a versioned ROOT
+    RNTuple layout, and evaluated with the covfie library. The core
+    library links neither Geant4 nor ROOT. Reading and writing map
+    files is in the mapio sub-package, and an optional header-only
+    Geant4 adapter (G4MagFieldAdapter) is shipped as a separate
+    sub-package. The tools sub-package converts the legacy FairShip
+    field-map format and inspects and plots maps.
   license: LGPL-3.0-or-later
   license_file: LICENSES/LGPL-3.0-or-later.txt
 
