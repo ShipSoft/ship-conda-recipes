@@ -1,0 +1,55 @@
+context:
+  version: "0.1.0"
+
+package:
+  name: ship-random
+  version: ${{ version }}
+
+source:
+  url: https://github.com/ShipSoft/ship-random/archive/refs/tags/v${{ version }}.tar.gz
+  sha256: 87ab5b219d206dd40a2a7a1fff50e94537794fd75774151d7e00b029b7ddd30f
+
+build:
+  number: 0
+  noarch: generic
+  skip:
+    - win
+  script: build.sh
+
+requirements:
+  build:
+    # Only for the sequence test run in build.sh; nothing compiled is
+    # installed.
+    - ${{ compiler('cxx') }}
+    - cmake
+    - make
+  host:
+    - random123
+  run:
+    - random123
+  run_exports:
+    # A minor release may change the drawn sequences, which changes
+    # simulated, digitised and reconstructed events.
+    - ${{ pin_subpackage('ship-random', upper_bound='x.x') }}
+
+tests:
+  - script:
+      - test -f $PREFIX/include/ship/random/philox_rng.hpp
+      - test -f $PREFIX/lib/cmake/SHiPRandom/SHiPRandomConfig.cmake
+
+about:
+  homepage: https://github.com/ShipSoft/ship-random
+  repository: https://github.com/ShipSoft/ship-random
+  summary: Random number helpers shared by the SHiP software
+  description: |
+    Header-only random number helpers shared by the SHiP simulation,
+    digitisation and reconstruction packages (aegir, aegir-genie,
+    Shannon, Trout). Provides ship::random::PhiloxRng, a counter-based
+    generator built on Random123's Philox 4x32, as a CMake package
+    (find_package(SHiPRandom), target SHiP::Random).
+  license: LGPL-3.0-or-later
+  license_file: LICENSES/LGPL-3.0-or-later.txt
+
+extra:
+  recipe-maintainers:
+    - olantwin
