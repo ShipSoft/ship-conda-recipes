@@ -1,6 +1,6 @@
 # prefix.dev/ship channel snapshot
 
-_Updated: 2026-09-28_
+_Updated: 2026-10-05_
 
 ## linux-64
 
@@ -40,6 +40,8 @@ _Updated: 2026-09-28_
 | acts-ship | 0.0.0.dev20260813+99440c4 | `h6adce4a_6` | 6 | 2026-09-24 |
 | acts-ship | 0.0.0.dev20260813+99440c4 | `h6afcf60_6` | 6 | 2026-09-23 |
 | acts-ship | 0.0.0.dev20260813+99440c4 | `ha28ff26_6` | 6 | 2026-09-23 |
+| acts-ship | 0.0.0.dev20260813+99440c4 | `h0518e97_7` | 7 | 2026-09-29 |
+| acts-ship | 0.0.0.dev20260813+99440c4 | `h6adce4a_7` | 7 | 2026-09-29 |
 | aegir | 0.2.0 | `hb0f4dca_1` | 1 | 2026-06-19 |
 | aegir | 0.2.0 | `hb0f4dca_2` | 2 | 2026-06-26 |
 | aegir | 0.2.0 | `hb0f4dca_3` | 3 | 2026-07-04 |
@@ -51,6 +53,7 @@ _Updated: 2026-09-28_
 | aegir | 0.3.0 | `hb0f4dca_5` | 5 | 2026-09-07 |
 | aegir | 0.3.0 | `hb0f4dca_6` | 6 | 2026-09-08 |
 | aegir | 0.3.0 | `hb0f4dca_7` | 7 | 2026-09-23 |
+| aegir | 0.3.0 | `hb0f4dca_8` | 8 | 2026-09-29 |
 | aegir-genie | 0.1.0 | `hb0f4dca_0` | 0 | 2026-07-20 |
 | aegir-genie | 0.2.0 | `hb0f4dca_0` | 0 | 2026-07-25 |
 | aegir-genie | 0.2.0 | `hb0f4dca_1` | 1 | 2026-08-11 |
@@ -60,6 +63,7 @@ _Updated: 2026-09-28_
 | aegir-genie | 0.2.0 | `hb0f4dca_5` | 5 | 2026-09-07 |
 | aegir-genie | 0.2.0 | `hb0f4dca_6` | 6 | 2026-09-08 |
 | aegir-genie | 0.2.0 | `hb0f4dca_7` | 7 | 2026-09-23 |
+| aegir-genie | 0.2.0 | `hb0f4dca_8` | 8 | 2026-09-29 |
 | fairroot | 19.0.1 | `hb0f4dca_9` | 9 | 2026-06-13 |
 | fairroot | 19.0.1 | `hb0f4dca_10` | 10 | 2026-06-14 |
 | fairroot | 19.0.1 | `hb0f4dca_11` | 11 | 2026-06-26 |
@@ -79,6 +83,8 @@ _Updated: 2026-09-28_
 | fairroot | 19.0.1 | `h6adce4a_18` | 18 | 2026-09-24 |
 | fairroot | 19.0.1 | `h6afcf60_18` | 18 | 2026-09-23 |
 | fairroot | 19.0.1 | `ha28ff26_18` | 18 | 2026-09-23 |
+| fairroot | 19.0.1 | `h0518e97_19` | 19 | 2026-09-29 |
+| fairroot | 19.0.1 | `h6adce4a_19` | 19 | 2026-09-29 |
 | fairship | 26.05.7 | `hb0f4dca_4` | 4 | 2026-06-13 |
 | fairship | 26.05.7 | `hb0f4dca_5` | 5 | 2026-06-14 |
 | fairship | 26.06 | `hb0f4dca_0` | 0 | 2026-06-18 |
@@ -103,6 +109,8 @@ _Updated: 2026-09-28_
 | fairship | 26.09 | `h6adce4a_8` | 8 | 2026-09-24 |
 | fairship | 26.09 | `h6afcf60_8` | 8 | 2026-09-23 |
 | fairship | 26.09 | `ha28ff26_8` | 8 | 2026-09-23 |
+| fairship | 26.09 | `h0518e97_9` | 9 | 2026-09-29 |
+| fairship | 26.09 | `h6adce4a_9` | 9 | 2026-09-29 |
 | field-service | 0.1.0 | `h83dfeff_0` | 0 | 2026-06-19 |
 | field-service | 0.1.0 | `hb9574b7_0` | 0 | 2026-06-19 |
 | field-service | 0.1.0 | `h73f9d4e_1` | 1 | 2026-06-26 |
@@ -120,6 +128,8 @@ _Updated: 2026-09-28_
 | field-service | 0.1.0.dev0 | `hf774abd_2` | 2 | 2026-06-18 |
 | field-service | 0.1.0.dev0 | `hb2dd60d_3` | 3 | 2026-06-18 |
 | field-service | 0.1.0.dev0 | `hd1b55c3_3` | 3 | 2026-06-18 |
+| field-service | 0.2.0 | `hbda4f27_0` | 0 | 2026-10-01 |
+| field-service | 0.2.0 | `hc75c75e_0` | 0 | 2026-10-01 |
 | field-service-core | 0.1.0 | `h0566472_0` | 0 | 2026-06-19 |
 | field-service-core | 0.1.0 | `hc97bc57_0` | 0 | 2026-06-19 |
 | field-service-core | 0.1.0 | `h0566472_1` | 1 | 2026-06-26 |
@@ -137,6 +147,8 @@ _Updated: 2026-09-28_
 | field-service-core | 0.1.0.dev0 | `hc97bc57_2` | 2 | 2026-06-18 |
 | field-service-core | 0.1.0.dev0 | `h0566472_3` | 3 | 2026-06-18 |
 | field-service-core | 0.1.0.dev0 | `hc97bc57_3` | 3 | 2026-06-18 |
+| field-service-core | 0.2.0 | `h0518e97_0` | 0 | 2026-10-01 |
+| field-service-core | 0.2.0 | `h6adce4a_0` | 0 | 2026-10-01 |
 | field-service-g4 | 0.1.0 | `hc496693_0` | 0 | 2026-06-19 |
 | field-service-g4 | 0.1.0 | `hf4ec559_0` | 0 | 2026-06-19 |
 | field-service-g4 | 0.1.0 | `h798224f_1` | 1 | 2026-06-26 |
@@ -154,6 +166,10 @@ _Updated: 2026-09-28_
 | field-service-g4 | 0.1.0.dev0 | `h4953c98_2` | 2 | 2026-06-18 |
 | field-service-g4 | 0.1.0.dev0 | `h8c1c234_3` | 3 | 2026-06-18 |
 | field-service-g4 | 0.1.0.dev0 | `he69e5d4_3` | 3 | 2026-06-18 |
+| field-service-g4 | 0.2.0 | `h4c13c63_0` | 0 | 2026-10-01 |
+| field-service-g4 | 0.2.0 | `h7ffe25b_0` | 0 | 2026-10-01 |
+| field-service-mapio | 0.2.0 | `h4c13c63_0` | 0 | 2026-10-01 |
+| field-service-mapio | 0.2.0 | `h7ffe25b_0` | 0 | 2026-10-01 |
 | field-service-tools | 0.1.0 | `hc496693_0` | 0 | 2026-06-19 |
 | field-service-tools | 0.1.0 | `hf4ec559_0` | 0 | 2026-06-19 |
 | field-service-tools | 0.1.0 | `h798224f_1` | 1 | 2026-06-26 |
@@ -171,6 +187,8 @@ _Updated: 2026-09-28_
 | field-service-tools | 0.1.0.dev0 | `h4953c98_2` | 2 | 2026-06-18 |
 | field-service-tools | 0.1.0.dev0 | `h8c1c234_3` | 3 | 2026-06-18 |
 | field-service-tools | 0.1.0.dev0 | `he69e5d4_3` | 3 | 2026-06-18 |
+| field-service-tools | 0.2.0 | `h10e6422_0` | 0 | 2026-10-01 |
+| field-service-tools | 0.2.0 | `h6c5dc73_0` | 0 | 2026-10-01 |
 | geant3 | 4.5 | `hb0f4dca_4` | 4 | 2026-06-13 |
 | geant3 | 4.5 | `hb0f4dca_5` | 5 | 2026-06-14 |
 | geant3 | 4.5 | `hb0f4dca_6` | 6 | 2026-06-26 |
@@ -201,6 +219,8 @@ _Updated: 2026-09-28_
 | genfit | 2.3.0 | `h6adce4a_15` | 15 | 2026-09-24 |
 | genfit | 2.3.0 | `h6afcf60_15` | 15 | 2026-09-23 |
 | genfit | 2.3.0 | `ha28ff26_15` | 15 | 2026-09-23 |
+| genfit | 2.3.0 | `h0518e97_16` | 16 | 2026-09-29 |
+| genfit | 2.3.0 | `h6adce4a_16` | 16 | 2026-09-29 |
 | genie | 3.06.02 | `pythia6_253f86f_0` | 0 | 2026-07-06 |
 | genie | 3.06.02 | `pythia8_211fdef_0` | 0 | 2026-07-06 |
 | genie | 3.06.02 | `pythia6_5d7d477_1` | 1 | 2026-07-20 |
@@ -239,6 +259,10 @@ _Updated: 2026-09-28_
 | genie | 3.06.02 | `pythia8_6d69a71_8` | 8 | 2026-09-24 |
 | genie | 3.06.02 | `pythia8_97fe125_8` | 8 | 2026-09-23 |
 | genie | 3.06.02 | `pythia8_d593e58_8` | 8 | 2026-09-23 |
+| genie | 3.06.02 | `pythia6_7f30c96_9` | 9 | 2026-09-29 |
+| genie | 3.06.02 | `pythia6_bfe31c9_9` | 9 | 2026-09-29 |
+| genie | 3.06.02 | `pythia8_07b49c4_9` | 9 | 2026-09-29 |
+| genie | 3.06.02 | `pythia8_6d69a71_9` | 9 | 2026-09-29 |
 | libjsonnet | 0.22.0 | `hb0f4dca_0` | 0 | 2026-06-09 |
 | libjsonnet | 0.22.0 | `hb0f4dca_1` | 1 | 2026-06-10 |
 | mp-units | 2.5.0 | `hb0f4dca_0` | 0 | 2026-06-05 |
@@ -262,6 +286,7 @@ _Updated: 2026-09-28_
 | pythia6 | 6.4.28 | `hb0f4dca_4` | 4 | 2026-06-10 |
 | pythia6 | 6.4.28 | `hb0f4dca_5` | 5 | 2026-06-13 |
 | pythia6 | 6.4.28 | `hb0f4dca_6` | 6 | 2026-06-14 |
+| pythia6 | 6.4.28 | `hb0f4dca_7` | 7 | 2026-10-01 |
 | python-npdb-client | 0.2.10 | `hb0f4dca_0` | 0 | 2026-06-17 |
 | python-npdb-client | 0.3.0 | `hb0f4dca_0` | 0 | 2026-06-26 |
 | rootegpythia6 | 0.1 | `hb0f4dca_5` | 5 | 2026-06-11 |
@@ -276,12 +301,15 @@ _Updated: 2026-09-28_
 | rootegpythia6 | 0.1 | `h6afcf60_10` | 10 | 2026-09-21 |
 | rootegpythia6 | 0.1 | `ha28ff26_10` | 10 | 2026-09-21 |
 | rootegpythia6 | 0.1 | `hc97bc57_10` | 10 | 2026-09-08 |
+| rootegpythia6 | 0.1 | `h0518e97_11` | 11 | 2026-10-01 |
+| rootegpythia6 | 0.1 | `h6adce4a_11` | 11 | 2026-10-01 |
 | shannon | 0.2.0 | `hb0f4dca_0` | 0 | 2026-07-23 |
 | shannon | 0.2.0 | `hb0f4dca_1` | 1 | 2026-08-17 |
 | shannon | 0.2.0 | `hb0f4dca_2` | 2 | 2026-08-25 |
 | shannon | 0.2.0 | `hb0f4dca_3` | 3 | 2026-08-31 |
 | shannon | 0.2.0 | `hb0f4dca_4` | 4 | 2026-09-08 |
 | shannon | 0.2.0 | `hb0f4dca_5` | 5 | 2026-09-23 |
+| shannon | 0.2.0 | `hb0f4dca_6` | 6 | 2026-09-29 |
 | shipdatamodel | 0.1.0 | `hb0f4dca_0` | 0 | 2026-06-19 |
 | shipdatamodel | 0.1.0 | `h0566472_1` | 1 | 2026-06-19 |
 | shipdatamodel | 0.1.0 | `hc97bc57_1` | 1 | 2026-06-19 |
@@ -301,6 +329,8 @@ _Updated: 2026-09-28_
 | shipdatamodel | 0.4.0 | `h6adce4a_1` | 1 | 2026-09-24 |
 | shipdatamodel | 0.4.0 | `h6afcf60_1` | 1 | 2026-09-08 |
 | shipdatamodel | 0.4.0 | `ha28ff26_1` | 1 | 2026-09-08 |
+| shipdatamodel | 0.5.0 | `h0518e97_0` | 0 | 2026-09-29 |
+| shipdatamodel | 0.5.0 | `h6adce4a_0` | 0 | 2026-09-29 |
 | shipgeometry | 0.1.0 | `hb0f4dca_0` | 0 | 2026-06-05 |
 | shipgeometry | 0.1.0 | `hb0f4dca_1` | 1 | 2026-06-05 |
 | shipgeometry | 0.1.0 | `hb0f4dca_2` | 2 | 2026-06-10 |
@@ -320,6 +350,7 @@ _Updated: 2026-09-28_
 | shipgeometryservice | 0.4.0 | `hb0f4dca_0` | 0 | 2026-08-11 |
 | shipgeometryservice | 0.4.0 | `hb0f4dca_1` | 1 | 2026-09-07 |
 | trout | 0.1.0 | `hb0f4dca_0` | 0 | 2026-09-22 |
+| trout | 0.1.0 | `hb0f4dca_1` | 1 | 2026-09-29 |
 
 ## noarch
 
@@ -335,3 +366,4 @@ _Updated: 2026-09-28_
 | random123 | 1.14.0 | `h4616a5c_0` | 0 | 2026-06-05 |
 | random123 | 1.14.0 | `h4616a5c_1` | 1 | 2026-06-14 |
 | ship-ci-metrics | 0.1.0 | `pyh4616a5c_0` | 0 | 2026-07-03 |
+| ship-random | 0.1.0 | `h4616a5c_0` | 0 | 2026-10-05 |
