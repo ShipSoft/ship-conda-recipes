@@ -40,7 +40,6 @@ requirements:
     - pythia8
     - evtgen
     - hepmc2
-    - hepmc3
     - fmt
     - gsl
     - xerces-c
