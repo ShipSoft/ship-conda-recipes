@@ -29,6 +29,6 @@ spdlog:
 fmt:
   - "12"
 python:
-  - "3.13"
+  - "3.14"
 libboost-devel:
   - "1.90"
