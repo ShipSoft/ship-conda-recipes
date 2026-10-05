@@ -5,3 +5,7 @@ root_cxx_standard:
   - "23"
 root_base:
   - "6.40.04"
+# evtgen 2.0.x underdeclares its hepmc3 dependency; see "Known upstream
+# workarounds" in the README.
+evtgen:
+  - "2.2.3"
