@@ -4,10 +4,10 @@
 # scripts/build-phlex-pr.sh) instead of the release tarball, the build number
 # is 9999 with a pr_<rev> build string so local channels win any comparison
 # against the released build, and the variant matrix is fixed to the C++23 /
-# Python 3.13 combination the SHiP stack uses. Lives under recipes-dev/ so
+# Python 3.14 combination the SHiP stack uses. Lives under recipes-dev/ so
 # the build-all task (recipes/ only) never publishes it.
 context:
-  version: "0.3.0"
+  version: "0.4.1"
   git_rev: main
 
 package:
@@ -40,6 +40,7 @@ requirements:
     - libboost-devel
     - fmt
     - tbb-devel
+    - ms-gsl
     - spdlog
     - libjsonnet
     # required by the python/numba plugin (plugins/python)
@@ -50,6 +51,12 @@ requirements:
     - root_cxx_standard
   run:
     - python
+    # headers and CMake configs of dependencies exported by phlexConfig.cmake
+    - libboost-devel
+    - fmt
+    - tbb-devel
+    - ms-gsl
+    - spdlog
   run_exports:
     - ${{ pin_subpackage('phlex', upper_bound='x.x') }}
 
