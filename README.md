@@ -132,6 +132,17 @@ it can be dropped.
   (`liblog4cpp.so.5` has `DT_NEEDED libnsl.so.3` but the package only depends
   on libgcc/libstdcxx).
   *Remove when* the conda-forge log4cpp feedstock declares it.
+- **`evtgen` pinned to 2.2.3 in `variants.yaml`** (fairroot, fairship):
+  every conda-forge evtgen 2.0.0 build links `libHepMC3.so.3` (hepmc3 3.2.x)
+  but depends on `hepmc3 >=3.2.3,<4.0a0`. hepmc3 3.3.x ships
+  `libHepMC3.so.4`, so the solver can pair evtgen 2.0.0 with it and
+  `libEvtGen.so` fails to load. That pairing is what the solver picks
+  whenever the env needs hepmc3 3.3.1 (current pythia8 builds do), because
+  every evtgen 2.2.x build depends on photos, and conda-forge photos only
+  exists for hepmc3 3.3.0 and older. With the pin the stack stays on
+  hepmc3 3.3.0, matching the `hepmc3 <3.3.1` cap in acts-ship.
+  *Remove when* conda-forge repodata caps evtgen 2.0.0 at `hepmc3 <3.3`;
+  advance it once photos and evtgen are rebuilt against hepmc3 3.3.1.
 - **`expat`, `zlib` and `freetype` in `host:`** (fairship, fairroot, aegir,
   aegir-genie, shipgeometryservice, field-service): conda-forge geant4 is
   built with `GEANT4_USE_SYSTEM_EXPAT=ON`, `GEANT4_USE_SYSTEM_ZLIB=ON` and
