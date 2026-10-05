@@ -1,5 +1,5 @@
 context:
-  version: "0.1.0"
+  version: "0.2.0"
 
 package:
   name: ship-random
@@ -7,7 +7,7 @@ package:
 
 source:
   url: https://github.com/ShipSoft/ship-random/archive/refs/tags/v${{ version }}.tar.gz
-  sha256: 87ab5b219d206dd40a2a7a1fff50e94537794fd75774151d7e00b029b7ddd30f
+  sha256: 07689995a67e4298acd844783914d80c9fd448d4054065f485a7de9d5e39235b
 
 build:
   number: 0
@@ -34,7 +34,7 @@ requirements:
 
 tests:
   - script:
-      - test -f $PREFIX/include/ship/random/philox_rng.hpp
+      - test -f $PREFIX/include/SHiP/random/philox_rng.hpp
       - test -f $PREFIX/lib/cmake/SHiPRandom/SHiPRandomConfig.cmake
 
 about:
@@ -44,7 +44,7 @@ about:
   description: |
     Header-only random number helpers shared by the SHiP simulation,
     digitisation and reconstruction packages (aegir, aegir-genie,
-    Shannon, Trout). Provides ship::random::PhiloxRng, a counter-based
+    Shannon, Trout). Provides SHiP::random::PhiloxRng, a counter-based
     generator built on Random123's Philox 4x32, as a CMake package
     (find_package(SHiPRandom), target SHiP::Random).
   license: LGPL-3.0-or-later
