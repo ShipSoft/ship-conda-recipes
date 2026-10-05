@@ -29,7 +29,9 @@ requirements:
     # build time and picks 26.06.0, baking the wrong run_export pin
     # into aegir.
     - shipdatamodel <1
-    - phlex
+    # <0.4: phlex 0.4 replaced phlex::detail::provider_bundles, which the
+    # 0.3.0 sources use. Drop with the bump to a release requiring phlex 0.4.
+    - phlex <0.4
     - shipgeometryservice <1
     - field-service-core
     - field-service-g4
