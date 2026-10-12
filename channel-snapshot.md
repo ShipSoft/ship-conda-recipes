@@ -1,6 +1,6 @@
 # prefix.dev/ship channel snapshot
 
-_Updated: 2026-10-05_
+_Updated: 2026-10-12_
 
 ## linux-64
 
@@ -367,3 +367,4 @@ _Updated: 2026-10-05_
 | random123 | 1.14.0 | `h4616a5c_1` | 1 | 2026-06-14 |
 | ship-ci-metrics | 0.1.0 | `pyh4616a5c_0` | 0 | 2026-07-03 |
 | ship-random | 0.1.0 | `h4616a5c_0` | 0 | 2026-10-05 |
+| ship-random | 0.2.0 | `h4616a5c_0` | 0 | 2026-10-05 |
