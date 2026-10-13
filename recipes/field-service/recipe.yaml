@@ -1,5 +1,5 @@
 context:
-  version: "0.2.0"
+  version: "0.3.0"
 
 recipe:
   name: field-service
@@ -7,11 +7,11 @@ recipe:
 
 source:
   - url: https://github.com/ShipSoft/field_service/archive/refs/tags/v${{ version }}.tar.gz
-    sha256: af847bfc9bb2b2f2cf655ddf0924a960d896e4dc9ccc00aa84ca30400a401cf8
+    sha256: 633f6adb8e36f85f4ee074408103e2e78e0cd5b64d3ca91db8bacc34acc568a9
   # covfie is FetchContent'd by upstream CMake; vendor it so the build
   # stays offline. Pinned to the same tag the CMakeLists.txt uses.
-  - url: https://github.com/acts-project/covfie/archive/refs/tags/v0.15.6.tar.gz
-    sha256: ed22408f981692398408ffe04ff8e6230c022288552a83dbc2ad34b96003a84e
+  - url: https://github.com/acts-project/covfie/archive/refs/tags/v0.16.0.tar.gz
+    sha256: f1491b85c5e8ed9535e4b99adb85661512964132baf6dc9b9a9af10e4b625cb3
     target_directory: covfie_src
 
 build:
@@ -26,6 +26,7 @@ outputs:
             -DCMAKE_CXX_STANDARD=${{ root_cxx_standard }} \
             -DCMAKE_INSTALL_LIBDIR=lib \
             -DBUILD_G4_ADAPTER=ON \
+            -DBUILD_ACTS_ADAPTER=ON \
             -DBUILD_TOOLS=ON \
             -DBUILD_TESTING=OFF \
             -DFETCHCONTENT_SOURCE_DIR_COVFIE=${SRC_DIR}/covfie_src
@@ -48,6 +49,11 @@ outputs:
       - expat
       - zlib
       - freetype
+      # ACTS adapter (header-only). ActsConfig.cmake calls find_dependency()
+      # on Boost and Eigen3, which acts-core does not depend on.
+      - acts-core
+      - libboost-devel
+      - eigen
       - root_base
       - root_cxx_standard
 
@@ -80,6 +86,8 @@ outputs:
       # mp-units run_export is kept (PUBLIC link).
       ignore_run_exports:
         from_package:
+          - acts-core
+          - libboost-devel
           - geant4
           - expat
           - zlib
@@ -107,12 +115,18 @@ outputs:
     requirements:
       run:
         - ${{ pin_subpackage('field-service-core', exact=True) }}
+        # libSHiPFieldServiceMapIO.so references GLIBCXX_3.4.36, which first
+        # ships in libstdcxx 16.2; the compiler's run_exports only ask for
+        # >=16 (#190).
+        - libstdcxx >=16.2
       run_exports:
         - ${{ pin_subpackage('field-service-mapio', upper_bound='x.x') }}
       # Links ROOT (kept via root_base's run_exports), not Geant4 or its
       # Config deps.
       ignore_run_exports:
         from_package:
+          - acts-core
+          - libboost-devel
           - geant4
           - expat
           - zlib
@@ -147,12 +161,49 @@ outputs:
       # ROOT is staged for the mapio and tools outputs, not the g4 adapter.
       ignore_run_exports:
         from_package:
+          - acts-core
+          - libboost-devel
           - root_base
           - root_cxx_standard
     tests:
       - script:
           - test -f $PREFIX/include/FieldService/G4MagFieldAdapter.h
           - test -f $PREFIX/lib/cmake/SHiPFieldService/SHiPFieldServiceG4AdapterTargets.cmake
+
+  - package:
+      name: field-service-acts
+    inherit: field-service-build
+    build:
+      files:
+        - include/FieldService/ActsFieldAdapter.h
+        - lib/cmake/SHiPFieldService/SHiPFieldServiceActsAdapterTargets.cmake
+    requirements:
+      run:
+        - ${{ pin_subpackage('field-service-core', exact=True) }}
+        # find_dependency(Acts) is invoked from Config.cmake whenever the
+        # ActsAdapterTargets file is present in the prefix, and ActsConfig
+        # in turn looks for Boost and Eigen3.
+        - acts-core
+        - libboost-devel
+        - eigen
+      run_exports:
+        - ${{ pin_subpackage('field-service-acts', upper_bound='x.x') }}
+      # Header-only: nothing staged is linked into this output.
+      ignore_run_exports:
+        from_package:
+          - acts-core
+          - libboost-devel
+          - geant4
+          - expat
+          - zlib
+          - freetype
+          - mp-units
+          - root_base
+          - root_cxx_standard
+    tests:
+      - script:
+          - test -f $PREFIX/include/FieldService/ActsFieldAdapter.h
+          - test -f $PREFIX/lib/cmake/SHiPFieldService/SHiPFieldServiceActsAdapterTargets.cmake
 
   - package:
       name: field-service-tools
@@ -170,6 +221,8 @@ outputs:
       # transitively via the core sub-package, not directly by these binaries.
       ignore_run_exports:
         from_package:
+          - acts-core
+          - libboost-devel
           - geant4
           - expat
           - zlib
@@ -195,6 +248,7 @@ outputs:
         - ${{ pin_subpackage('field-service-core', exact=True) }}
         - ${{ pin_subpackage('field-service-mapio', exact=True) }}
         - ${{ pin_subpackage('field-service-g4', exact=True) }}
+        - ${{ pin_subpackage('field-service-acts', exact=True) }}
         - ${{ pin_subpackage('field-service-tools', exact=True) }}
 
 about:
@@ -207,10 +261,10 @@ about:
     Maps are stored in the SHiP field-map format, a versioned ROOT
     RNTuple layout, and evaluated with the covfie library. The core
     library links neither Geant4 nor ROOT. Reading and writing map
-    files is in the mapio sub-package, and an optional header-only
-    Geant4 adapter (G4MagFieldAdapter) is shipped as a separate
-    sub-package. The tools sub-package converts the legacy FairShip
-    field-map format and inspects and plots maps.
+    files is in the mapio sub-package. Header-only adapters for Geant4
+    (G4MagFieldAdapter) and ACTS (ActsFieldAdapter) are shipped as
+    separate sub-packages. The tools sub-package converts the legacy
+    FairShip field-map format and inspects and plots maps.
   license: LGPL-3.0-or-later
   license_file: LICENSES/LGPL-3.0-or-later.txt
 
