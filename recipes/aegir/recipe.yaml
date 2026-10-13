@@ -1,5 +1,5 @@
 context:
-  version: "0.3.0"
+  version: "0.4.0"
 
 package:
   name: aegir
@@ -7,12 +7,10 @@ package:
 
 source:
   url: https://github.com/ShipSoft/aegir/archive/refs/tags/v${{ version }}.tar.gz
-  sha256: 583172fd11e519d4ad4770f4166c76d40a7bd84ea27cdc02347b74338d5aae3d
+  sha256: 7d9274e33fec96a10baa0bbfabfd9b92b332cf8660919d58c3c00678f3d044af
 
 build:
-  # Rebuild to pick up expat in host, needed by Geant4Config.cmake since
-  # conda-forge geant4 stopped pulling it in.
-  number: 8
+  number: 0
   skip:
     - win
   script: build.sh
@@ -24,11 +22,13 @@ requirements:
     - cmake
     - make
   host:
-    - shipdatamodel
-    - phlex
-    - shipgeometryservice
-    - field-service-core
-    - field-service-g4
+    - shipdatamodel >=0.5
+    - phlex >=0.4.1
+    - shipgeometryservice >=0.3
+    - field-service-core >=0.2
+    - field-service-g4 >=0.2
+    # SHiPFieldService::MapIO, used by field_map_provider.
+    - field-service-mapio >=0.2
     - root_base >=6.40
     # phlex/shipdatamodel are C++23; pin the matching ROOT variant so aegir
     # and phlex stay co-installable (an unconstrained solve drifts down to
@@ -40,8 +40,10 @@ requirements:
     - expat
     - zlib
     - freetype
-    - pythia8
+    - pythia8 >=8.312
     - random123
+    # SHiP::random::PhiloxRng, the generators' per-event RNG.
+    - ship-random >=0.2
     - libboost-devel
     - tbb-devel
     - spdlog
@@ -57,15 +59,19 @@ tests:
       - test -f $PREFIX/lib/libparticle_gun_source.so
       - test -f $PREFIX/lib/libpythia8_source.so
       - test -f $PREFIX/lib/libfixed_target_source.so
+      - test -f $PREFIX/lib/libfile_source.so
+      - test -f $PREFIX/lib/libgenie_reader_source.so
       - test -f $PREFIX/lib/libgeometry_builtin_provider.so
       - test -f $PREFIX/lib/libgeometry_gdml_provider.so
       - test -f $PREFIX/lib/libgeometry_geomodel_provider.so
-      - test -f $PREFIX/lib/libfield_covfie_provider.so
+      - test -f $PREFIX/lib/libfield_map_provider.so
       - test -f $PREFIX/lib/libfield_null_provider.so
       - test -f $PREFIX/lib/libgeant4_module.so
       - test -f $PREFIX/lib/libsim_output_module.so
       - test -f $PREFIX/bin/pythia8_benchmark
       - test -d $PREFIX/share/aegir/workflows
+      - test -f $PREFIX/include/aegir/mc_particle_source.hpp
+      - test -f $PREFIX/lib/cmake/aegir/aegirConfig.cmake
 
 about:
   homepage: https://github.com/ShipSoft/aegir
