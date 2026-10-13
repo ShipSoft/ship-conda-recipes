@@ -1,5 +1,5 @@
 context:
-  version: "0.3.0"
+  version: "0.4.0"
 
 recipe:
   name: field-service
@@ -7,7 +7,7 @@ recipe:
 
 source:
   - url: https://github.com/ShipSoft/field_service/archive/refs/tags/v${{ version }}.tar.gz
-    sha256: 633f6adb8e36f85f4ee074408103e2e78e0cd5b64d3ca91db8bacc34acc568a9
+    sha256: d610639467579a66fa9b87f59fc6f2d4fd6bdc9d9e4d8ca85c7e6da261f26a41
   # covfie is FetchContent'd by upstream CMake; vendor it so the build
   # stays offline. Pinned to the same tag the CMakeLists.txt uses.
   - url: https://github.com/acts-project/covfie/archive/refs/tags/v0.16.0.tar.gz
@@ -42,7 +42,7 @@ outputs:
       - mp-units
       # SHiP/Units.hpp (SHiP::SHiPUnits). Pin <1 to exclude the legacy
       # 26.06.0 builds still on the ship channel.
-      - shipdatamodel <1
+      - shipdatamodel >=0.6.0
       - geant4
       # geant4 Config.cmake calls find_dependency() on all three; see
       # "Known upstream workarounds" in the README.
@@ -64,8 +64,11 @@ outputs:
       files:
         - lib/libSHiPFieldService.so*
         - include/FieldService/IFieldSource.h
+        - include/SHiP/FieldService/IFieldSource.h
         - include/FieldService/CovfieFieldSource.h
+        - include/SHiP/FieldService/CovfieFieldSource.h
         - include/FieldService/FieldMap.h
+        - include/SHiP/FieldService/FieldMap.h
         - lib/cmake/SHiPFieldService/SHiPFieldServiceConfig.cmake
         - lib/cmake/SHiPFieldService/SHiPFieldServiceConfigVersion.cmake
         - lib/cmake/SHiPFieldService/SHiPFieldServiceTargets.cmake
@@ -77,7 +80,7 @@ outputs:
         # configure time, which requires listing them here rather than
         # relying on their run_exports alone.
         - mp-units
-        - shipdatamodel <1
+        - shipdatamodel >=0.6.0
       run_exports:
         - ${{ pin_subpackage('field-service-core', upper_bound='x.x') }}
       # The shared staging host pulls geant4 (+ its expat / zlib / freetype
@@ -98,8 +101,11 @@ outputs:
       - script:
           - test -f $PREFIX/lib/libSHiPFieldService.so
           - test -f $PREFIX/include/FieldService/IFieldSource.h
+          - test -f $PREFIX/include/SHiP/FieldService/IFieldSource.h
           - test -f $PREFIX/include/FieldService/CovfieFieldSource.h
+          - test -f $PREFIX/include/SHiP/FieldService/CovfieFieldSource.h
           - test -f $PREFIX/include/FieldService/FieldMap.h
+          - test -f $PREFIX/include/SHiP/FieldService/FieldMap.h
           - test -f $PREFIX/lib/cmake/SHiPFieldService/SHiPFieldServiceConfig.cmake
           - test -f $PREFIX/lib/cmake/SHiPFieldService/SHiPFieldServiceTargets.cmake
 
@@ -110,6 +116,7 @@ outputs:
       files:
         - lib/libSHiPFieldServiceMapIO.so*
         - include/FieldService/FieldMapIO.h
+        - include/SHiP/FieldService/FieldMapIO.h
         - lib/cmake/SHiPFieldService/SHiPFieldServiceMapIOTargets.cmake
         - lib/cmake/SHiPFieldService/SHiPFieldServiceMapIOTargets-*.cmake
     requirements:
@@ -135,6 +142,7 @@ outputs:
       - script:
           - test -f $PREFIX/lib/libSHiPFieldServiceMapIO.so
           - test -f $PREFIX/include/FieldService/FieldMapIO.h
+          - test -f $PREFIX/include/SHiP/FieldService/FieldMapIO.h
           - test -f $PREFIX/lib/cmake/SHiPFieldService/SHiPFieldServiceMapIOTargets.cmake
 
   - package:
@@ -143,6 +151,7 @@ outputs:
     build:
       files:
         - include/FieldService/G4MagFieldAdapter.h
+        - include/SHiP/FieldService/G4MagFieldAdapter.h
         - lib/cmake/SHiPFieldService/SHiPFieldServiceG4AdapterTargets.cmake
         - lib/cmake/SHiPFieldService/SHiPFieldServiceG4AdapterTargets-*.cmake
     requirements:
@@ -168,6 +177,7 @@ outputs:
     tests:
       - script:
           - test -f $PREFIX/include/FieldService/G4MagFieldAdapter.h
+          - test -f $PREFIX/include/SHiP/FieldService/G4MagFieldAdapter.h
           - test -f $PREFIX/lib/cmake/SHiPFieldService/SHiPFieldServiceG4AdapterTargets.cmake
 
   - package:
@@ -176,6 +186,7 @@ outputs:
     build:
       files:
         - include/FieldService/ActsFieldAdapter.h
+        - include/SHiP/FieldService/ActsFieldAdapter.h
         - lib/cmake/SHiPFieldService/SHiPFieldServiceActsAdapterTargets.cmake
     requirements:
       run:
@@ -203,6 +214,7 @@ outputs:
     tests:
       - script:
           - test -f $PREFIX/include/FieldService/ActsFieldAdapter.h
+          - test -f $PREFIX/include/SHiP/FieldService/ActsFieldAdapter.h
           - test -f $PREFIX/lib/cmake/SHiPFieldService/SHiPFieldServiceActsAdapterTargets.cmake
 
   - package:
