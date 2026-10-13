@@ -25,9 +25,8 @@ requirements:
     # Shannon consumes the digitised-hit data classes (RecHit and the
     # per-detector hits under SHiP/detectors/) added in data-model 0.3.0;
     # pin >=0.3 so the resolver cannot fall back to an earlier build that
-    # lacks those headers. The <1 upper bound excludes any legacy
-    # calendar-versioned builds on the ship channel.
-    - shipdatamodel >=0.3,<1
+    # lacks those headers.
+    - shipdatamodel >=0.3
     - phlex
     - root_base
     - root_cxx_standard
