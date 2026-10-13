@@ -40,8 +40,7 @@ outputs:
       - make
       host:
       - mp-units
-      # SHiP/Units.hpp (SHiP::SHiPUnits). Pin <1 to exclude the legacy
-      # 26.06.0 builds still on the ship channel.
+      # SHiP/Units.hpp (SHiP::SHiPUnits); >=0.6.0 for SHiP::Length.
       - shipdatamodel >=0.6.0
       - geant4
       # geant4 Config.cmake calls find_dependency() on all three; see

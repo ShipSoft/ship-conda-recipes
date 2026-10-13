@@ -24,13 +24,9 @@ requirements:
     - cmake
     - make
   host:
-    # Pin <1 to exclude the legacy 26.06.0 builds still on the ship
-    # channel; without this, conda's resolver maximises version at
-    # build time and picks 26.06.0, baking the wrong run_export pin
-    # into aegir.
-    - shipdatamodel <1
+    - shipdatamodel
     - phlex
-    - shipgeometryservice <1
+    - shipgeometryservice
     - field-service-core
     - field-service-g4
     - root_base >=6.40

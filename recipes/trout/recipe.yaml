@@ -22,11 +22,9 @@ requirements:
     - cmake
     - make
   host:
-    # Pin <1 to exclude the legacy calendar-versioned builds still on the
-    # ship channel (see the aegir recipe for the full rationale).
-    - shipdatamodel <1
+    - shipdatamodel
     - shipgeometry
-    - shipgeometryservice >=0.3,<1
+    - shipgeometryservice >=0.3
     - field-service-core
     - field-service-g4
     # >=0.3.0: several modules include phlex/core/product_selector.hpp,
