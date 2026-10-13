@@ -1,5 +1,5 @@
 context:
-  version: "0.5.0"
+  version: "0.6.0"
 
 package:
   name: shipdatamodel
@@ -7,7 +7,7 @@ package:
 
 source:
   url: https://github.com/ShipSoft/data-model/archive/refs/tags/v${{ version }}.tar.gz
-  sha256: 957ec35f38fd39a2aac82b1e12088f18578d48edc830d5ee197d7036909e7740
+  sha256: 2c5a6af1efc291ec48ace3f262bd20225a7c056941b7723911649b500354113d
 
 build:
   number: 0
@@ -39,6 +39,11 @@ tests:
       - test -f $PREFIX/lib/libSHiPDataModel_rdict.pcm
       - test -f $PREFIX/lib/cmake/SHiPDataModel/SHiPDataModelConfig.cmake
       - test -f $PREFIX/include/SHiP/MCParticle.hpp
+      # 0.6.0 de-stuttered the exported target names. The library file names are
+      # deliberately unchanged, so the tests above would not notice if the
+      # export names regressed.
+      - grep -q "SHiP::DataModel" $PREFIX/lib/cmake/SHiPDataModel/SHiPDataModelTargets.cmake
+      - grep -q "SHiP::Units" $PREFIX/lib/cmake/SHiPDataModel/SHiPDataModelTargets.cmake
 
 about:
   homepage: https://github.com/ShipSoft/data-model
