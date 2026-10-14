@@ -1,5 +1,5 @@
 context:
-  version: "0.2.0"
+  version: "0.3.0"
 
 package:
   name: aegir-genie
@@ -7,12 +7,10 @@ package:
 
 source:
   url: https://github.com/ShipSoft/aegir-genie/archive/refs/tags/v${{ version }}.tar.gz
-  sha256: 85c5e7c9a24e67d2c03da3758f530c27a26c2d63f4fc28db877ea09d30f49dc0
+  sha256: f222fee430970ff01cdbf6806708cea86636e063b6218970472bf1744caf52ee
 
 build:
-  # Rebuild to pick up expat in host, needed by Geant4Config.cmake since
-  # conda-forge geant4 stopped pulling it in.
-  number: 8
+  number: 0
   skip:
     - win
   script: build.sh
@@ -25,11 +23,13 @@ requirements:
     - make
   host:
     - shipdatamodel
-    # >=0.3.0: genie_source.cpp needs phlex/core/product_selector.hpp, added
-    # in 0.3.0. phlex is supplied by conda-forge (>=0.3.2); its run_export
-    # further tightens the built package's run-dep to >=0.3.2,<0.4.0a0.
-    - phlex >=0.3.0
-    - shipgeometryservice
+    - phlex >=0.4.1
+    - shipgeometryservice >=0.3
+    # genie_source builds on aegir's installed generator-source helper
+    # (aegir::source_helper, first installed in 0.4.0).
+    - aegir >=0.4
+    # SHiP::random::PhiloxRng, the per-event reseeding RNG.
+    - ship-random >=0.2
     - root_base >=6.40
     # phlex/shipdatamodel are C++23; pin the matching ROOT variant so genie
     # and phlex stay co-installable (an unconstrained solve drifts down to
@@ -60,6 +60,10 @@ requirements:
     # workarounds" in the README for the remove-when conditions.
     - eigen-abi-devel
     - nlohmann_json
+  run:
+    # aegir has no run_exports. The genie workflows load aegir's plugins,
+    # and aegir 0.x only promises a stable source helper within a minor.
+    - aegir >=0.4,<0.5
 
 tests:
   - script:
