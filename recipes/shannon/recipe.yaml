@@ -1,5 +1,5 @@
 context:
-  version: "0.2.0"
+  version: "0.3.0"
 
 package:
   name: shannon
@@ -7,10 +7,10 @@ package:
 
 source:
   url: https://github.com/ShipSoft/Shannon/archive/refs/tags/v${{ version }}.tar.gz
-  sha256: 044f80fcbb0b1a427331246a42cdb192d726fda54c44d49b29f190c0ff68b87e
+  sha256: b69570f330828f981146da61853a789436743720d3203e3a49eea195ef9854d2
 
 build:
-  number: 6
+  number: 0
   skip:
     - win
   script: build.sh
@@ -25,11 +25,15 @@ requirements:
     # Shannon consumes the digitised-hit data classes (RecHit and the
     # per-detector hits under SHiP/detectors/) added in data-model 0.3.0;
     # pin >=0.3 so the resolver cannot fall back to an earlier build that
-    # lacks those headers.
-    - shipdatamodel >=0.3
-    - phlex
-    - root_base
-    - root_cxx_standard
+    # lacks those headers. 0.3.x still uses the camelCase field names that
+    # data-model 0.6 renamed, so it cannot build against 0.6.
+    - shipdatamodel >=0.3,<0.6
+    - phlex >=0.4.1
+    # SHiP::random::PhiloxRng, the per-event reseeding RNG.
+    - ship-random >=0.2
+    - root_base >=6.40
+    # phlex/shipdatamodel are C++23; pin the matching ROOT variant.
+    - root_cxx_standard ==23
     - random123
     - libboost-devel
     - tbb-devel
