@@ -1,5 +1,5 @@
 context:
-  version: "0.1.0"
+  version: "0.2.0"
 
 package:
   name: trout
@@ -7,10 +7,10 @@ package:
 
 source:
   url: https://github.com/ShipSoft/Trout/archive/refs/tags/v${{ version }}.tar.gz
-  sha256: 4e9bd0f567ef5fc1f18b9a929f143e00dbeccddc26be7411df0f93e9fc0c2a20
+  sha256: 8697734e91c95de31de8e8d8ccbff66f15f8131745c63affab7551eee6326a47
 
 build:
-  number: 1
+  number: 0
   skip:
     - win
   script: build.sh
@@ -22,16 +22,19 @@ requirements:
     - cmake
     - make
   host:
-    - shipdatamodel
+    # 0.2.x still uses the camelCase field names that data-model 0.6
+    # renamed, so it cannot build against 0.6.
+    - shipdatamodel >=0.5,<0.6
     - shipgeometry
     - shipgeometryservice >=0.3
-    - field-service-core
-    - field-service-g4
-    # >=0.3.0: several modules include phlex/core/product_selector.hpp,
-    # added in 0.3.0; upstream's pixi.toml declares the same floor. phlex is
-    # supplied by conda-forge (>=0.3.2); its run_export further tightens the
-    # built package's run-dep to >=0.3.2,<0.4.0a0.
-    - phlex >=0.3.0
+    # The placement helpers and the ACTS adapter first ship in 0.3.0;
+    # 0.4 needs data-model 0.6.
+    - field-service-core >=0.3,<0.4
+    - field-service-mapio >=0.3,<0.4
+    - field-service-acts >=0.3,<0.4
+    - phlex >=0.4.1
+    # SHiP::random::PhiloxRng, for make_test_input.
+    - ship-random >=0.2
     # Upstream ACTS from conda-forge, not the acts-ship fork snapshot.
     - acts-core
     - root_base >=6.40
