@@ -22,7 +22,9 @@ requirements:
     - cmake
     - make
   host:
-    - shipdatamodel
+    # 0.3.x still uses the camelCase field names that data-model 0.6
+    # renamed, so it cannot build against 0.6.
+    - shipdatamodel <0.6
     - phlex >=0.4.1
     - shipgeometryservice >=0.3
     # genie_source builds on aegir's installed generator-source helper
