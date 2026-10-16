@@ -34,7 +34,8 @@ permissions:
 
 concurrency:
   group: nightly-main-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
+  # A manual dispatch on main must not cancel the scheduled run mid-upload.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 env:
   NIGHTLY_CHANNEL: ship-experiment/nightly
