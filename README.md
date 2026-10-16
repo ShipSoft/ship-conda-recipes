@@ -50,6 +50,17 @@ Previously packaged here, now consumed directly from conda-forge:
 
 ## Recipe conventions
 
+### Compiler versions (`global-variants.yaml`)
+
+Every build passes `global-variants.yaml` with `--variant-config`: `build.yml`,
+`nightly-main.yml` and the pixi build tasks. It pins `c_compiler_version` and
+`cxx_compiler_version` to the versions in conda-forge's global pinning. Without
+it rattler-build uses the newest compiler on conda-forge, and a package built
+with a newer GCC than its consumers can fail to link in their environments
+(seen with `std::format` code built by GCC 16 and linked by GCC 15). Move the
+pin when conda-forge does, and bump `build.number` in every recipe whose build
+string changes, so the rebuilds supersede the old builds.
+
 ### ROOT C++ standard variants (`root_cxx_standard` / `root_base`)
 
 conda-forge splits ROOT builds by C++ standard: consumers put `root_base` and
@@ -167,6 +178,7 @@ To build a single recipe:
 
 ```bash
 pixi run rattler-build build --recipe recipes/<package-name> \
+    --variant-config global-variants.yaml \
     --channel https://prefix.dev/ship --channel conda-forge
 ```
 
@@ -193,5 +205,6 @@ To build one library's main locally:
 pixi exec --spec python --spec ruamel.yaml python scripts/mainify-recipe.py \
     recipes/ship-random ship-random <sha> <commit-count> /tmp/ship-random-main
 pixi run rattler-build build --recipe /tmp/ship-random-main \
+    --variant-config global-variants.yaml \
     --channel https://prefix.dev/ship --channel conda-forge
 ```

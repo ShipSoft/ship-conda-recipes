@@ -11,12 +11,13 @@ rattler-build = ">=0.35"
 # Build every recipe under recipes/. rattler-build resolves cross-recipe
 # dependency order from the requirements: blocks; already-built packages
 # are skipped.
-build-all = "rattler-build build --recipe-dir recipes/ --skip-existing=all --channel https://prefix.dev/ship --channel conda-forge"
+build-all = "rattler-build build --recipe-dir recipes/ --variant-config global-variants.yaml --skip-existing=all --channel https://prefix.dev/ship --channel conda-forge"
 
 # Convenience shortcut for the recipe most actively iterated on. For any
 # other recipe, run: pixi run rattler-build build --recipe recipes/<name>
+# --variant-config global-variants.yaml
 # --channel https://prefix.dev/ship --channel conda-forge
-build-aegir = "rattler-build build --recipe recipes/aegir --channel https://prefix.dev/ship --channel conda-forge"
+build-aegir = "rattler-build build --recipe recipes/aegir --variant-config global-variants.yaml --channel https://prefix.dev/ship --channel conda-forge"
 
 # Build the phlex package from an upstream PR (or any git ref) into the local
 # dev channel ../ship-local-channel for consumption by downstream dev

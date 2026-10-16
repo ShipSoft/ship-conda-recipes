@@ -14,7 +14,7 @@ source:
     - fix-dictionary-paths.patch
 
 build:
-  number: 17
+  number: 18
   script: build.sh
 
 requirements:

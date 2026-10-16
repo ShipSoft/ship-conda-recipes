@@ -160,6 +160,7 @@ jobs:
           # file list, which main is free to change (e.g. Geometry dropping
           # its TOML configs), so skip them; the consumer jobs test the build.
           pixi run rattler-build build --recipe "$RUNNER_TEMP/recipe" \
+            --variant-config global-variants.yaml \
             --channel https://prefix.dev/ship --channel conda-forge \
             --test skip
 
