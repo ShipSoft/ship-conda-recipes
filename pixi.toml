@@ -2,7 +2,7 @@
 name = "ship-conda-recipes"
 description = "Conda recipes for SHiP experiment packages not available on conda-forge"
 channels = ["conda-forge"]
-platforms = ["linux-64"]
+platforms = ["linux-64", "linux-aarch64", "osx-arm64"]
 
 [dependencies]
 # Floor at the version CI is locked to; older releases lack features the
@@ -61,6 +61,7 @@ done
 # don't pull ROOT.
 [feature.genie]
 channels = ["https://prefix.dev/ship-experiment/stable", "conda-forge"]
+platforms = ["linux-64"]
 
 [feature.genie.dependencies]
 # Keep the version in sync with recipes/genie and recipes/genie-splines-ship.
