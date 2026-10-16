@@ -18,12 +18,13 @@ jobs:
       - name: Generate channel snapshot
         run: |
           set -euo pipefail
+          channel_url="https://prefix.dev/ship-experiment/stable"
           {
             echo "# prefix.dev/ship-experiment/stable channel snapshot"
             echo
             echo "_Updated: $(date -u +%Y-%m-%d)_"
             for subdir in linux-64 noarch; do
-              repodata=$(curl -fsSL "https://prefix.dev/ship-experiment/stable/${subdir}/repodata.json" 2>/dev/null) || continue
+              repodata=$(curl -fsSL "${channel_url}/${subdir}/repodata.json" 2>/dev/null) || continue
               count=$(echo "$repodata" | jq '."packages.conda" | length')
               [ "$count" = "0" ] && continue
               echo
@@ -51,7 +52,8 @@ jobs:
           commit-message: 'chore(snapshot): refresh prefix.dev/ship-experiment/stable channel snapshot'
           title: 'chore: refresh channel snapshot'
           body: |
-            Weekly snapshot of the [prefix.dev/ship-experiment/stable](https://prefix.dev/channels/@ship-experiment/stable) channel.
+            Weekly snapshot of the
+            [prefix.dev/ship-experiment/stable](https://prefix.dev/channels/@ship-experiment/stable) channel.
 
             Auto-generated; merge to keep `channel-snapshot.md` current. The diff
             shows new builds, version bumps, and any accidental publishes since
