@@ -1,9 +1,13 @@
 #!/usr/bin/env bash
-# Refresh sha256 in a rattler-build recipe after Renovate bumps
-# context.version. The recipes use a single context.version field that holds
-# the upstream tag form (e.g. "2-2", "6-8") and a source URL templated as
-# .../v${{ version }}.tar.gz; the dotted package.version is derived via Jinja
-# in the recipe itself, so this script does not touch the version line.
+# Refresh the sha256 values in a rattler-build recipe after Renovate bumps
+# context.version. The source URLs are taken from `rattler-build --render-only`
+# rather than by substituting the version textually, so templated tag forms
+# (`v${{ version | replace(".", "-") }}`, `${{ tag }}`, ...) resolve exactly as
+# they do in a real build. Multi-source recipes are handled as long as every
+# url source carries a sha256: the n-th `sha256:` line in the file is matched
+# to the n-th rendered url source.
+#
+# Needs rattler-build and jq on PATH.
 #
 # Usage: ci/finalize-recipe-bump.sh path/to/recipe.yaml [more.yaml ...]
 #
@@ -15,41 +19,45 @@ for recipe in "$@"; do
     echo "skip: $recipe (not a file)" >&2
     continue
   fi
+  dir=$(dirname "$recipe")
 
-  version=$(grep -E '^[[:space:]]+version:[[:space:]]*"' "$recipe" \
-            | head -1 \
-            | sed -E 's/^[[:space:]]+version:[[:space:]]*"([^"]+)".*/\1/')
-  if [ -z "$version" ]; then
-    echo "skip: $recipe (no context.version field)" >&2
+  variant_args=()
+  if [ -f "$dir/variants.yaml" ]; then
+    variant_args=(-m "$dir/variants.yaml")
+  fi
+
+  # Rendered url sources in recipe order, deduplicated across variants and
+  # outputs (staging caches repeat the top-level sources).
+  rendered=$(rattler-build build --render-only --recipe "$dir" "${variant_args[@]}")
+  mapfile -t urls < <(
+    jq -r '[.[] | .recipe | (.staging_caches[]?.source[]?, .source[]?)
+                | select(type == "object" and has("url") and has("sha256")) | .url]
+               | reduce .[] as $u ([]; if any(.[]; . == $u) then . else . + [$u] end)
+               | .[]' <<< "$rendered"
+  )
+  if [ ${#urls[@]} -eq 0 ]; then
+    echo "skip: $recipe (no url source with sha256)" >&2
     continue
   fi
 
-  # Multi-source recipes (YAML `source:` list with `- url:` entries) need
-  # one sha256 per URL; this script only refreshes the first sha256 line,
-  # so it would cross-contaminate the others. Bail out cleanly — those
-  # recipes are expected to be on Renovate's disabled list anyway.
-  url_count=$(grep -cE '^[[:space:]]+(- )?url:[[:space:]]*http' "$recipe" || true)
-  if [ "$url_count" -gt 1 ]; then
-    echo "skip: $recipe (multi-source recipe; refresh sha256s manually)" >&2
-    continue
+  sha_count=$(grep -cE '^[[:space:]]+(- )?sha256:[[:space:]]*[a-f0-9]{64}' "$recipe" || true)
+  if [ "$sha_count" -ne ${#urls[@]} ]; then
+    echo "error: $recipe has $sha_count sha256 lines but ${#urls[@]} url sources;" \
+         "refresh it manually" >&2
+    exit 1
   fi
 
-  url_template=$(grep -E '^[[:space:]]+(- )?url:[[:space:]]*http' "$recipe" \
-                 | head -1 \
-                 | sed -E 's/^[[:space:]]+(- )?url:[[:space:]]*//') || true
-  if [ -z "$url_template" ]; then
-    echo "skip: $recipe (no source URL matched)" >&2
-    continue
-  fi
-  url=$(echo "$url_template" \
-        | sed -E "s|\\\$\\{\\{[[:space:]]*version[[:space:]]*\\}\\}|$version|g")
-
-  echo "[$recipe] version=$version" >&2
-  echo "[$recipe] url=$url" >&2
-
-  new_sha=$(curl -fsSL "$url" | sha256sum | cut -d' ' -f1)
-
-  sed -i -E "s|^([[:space:]]+sha256:[[:space:]]*)[a-f0-9]+|\\1$new_sha|" "$recipe"
-
-  echo "[$recipe] sha256=$new_sha" >&2
+  for i in "${!urls[@]}"; do
+    url=${urls[$i]}
+    new_sha=$(curl -fsSL --retry 3 "$url" | sha256sum | cut -d' ' -f1)
+    # Replace the (i+1)-th sha256 value in the file.
+    awk -v n=$((i + 1)) -v sha="$new_sha" '
+      /^[[:space:]]+(- )?sha256:[[:space:]]*[a-f0-9]{64}/ && ++seen == n {
+        sub(/[a-f0-9]{64}/, sha)
+      }
+      { print }
+    ' "$recipe" > "$recipe.tmp"
+    mv "$recipe.tmp" "$recipe"
+    echo "[$recipe] $url sha256=$new_sha" >&2
+  done
 done
