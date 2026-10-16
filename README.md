@@ -203,7 +203,7 @@ rebuilt; dispatch the workflow with `force` to rebuild it.
 To build one library's main locally:
 
 ```bash
-pixi exec --spec python --spec ruamel.yaml python scripts/mainify-recipe.py \
+pixi run -e nightly mainify-recipe \
     recipes/ship-random ship-random <sha> <commit-count> /tmp/ship-random-main
 pixi run rattler-build build --recipe /tmp/ship-random-main \
     --variant-config global-variants.yaml \

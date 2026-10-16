@@ -78,7 +78,17 @@ py-rattler = "*"
 check-drift = "python ci/check-channel-drift.py"
 test-drift = "python ci/test_check_channel_drift.py"
 
+# Nightly main builds (.github/workflows/nightly-main.yml): ruamel.yaml for
+# scripts/mainify-recipe.py, locked here instead of resolved fresh each night.
+[feature.nightly.dependencies]
+python = "3.13.*"
+"ruamel.yaml" = "*"
+
+[feature.nightly.tasks]
+mainify-recipe = "python scripts/mainify-recipe.py"
+
 [environments]
 lint = { features = ["lint"] }
+nightly = { features = ["nightly"] }
 genie = { features = ["genie"] }
 drift = { features = ["drift"] }

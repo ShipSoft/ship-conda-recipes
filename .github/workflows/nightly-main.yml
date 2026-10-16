@@ -141,8 +141,7 @@ jobs:
           SHA: ${{ steps.main.outputs.sha }}
           COUNT: ${{ steps.main.outputs.count }}
         run: |
-          pixi exec --spec python=3.13 --spec ruamel.yaml \
-            python scripts/mainify-recipe.py "recipes/$RECIPE" "$REPO" "$SHA" "$COUNT" \
+          pixi run -e nightly mainify-recipe "recipes/$RECIPE" "$REPO" "$SHA" "$COUNT" \
             "$RUNNER_TEMP/recipe"
           {
             echo "## $RECIPE from ShipSoft/$REPO@${SHA:0:7}"
