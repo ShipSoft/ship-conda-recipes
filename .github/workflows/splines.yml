@@ -104,6 +104,7 @@ jobs:
   plan:
     name: Plan nuclide batches
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     outputs:
       batches: ${{ steps.plan.outputs.batches }}
     steps:
@@ -114,8 +115,8 @@ jobs:
           # Fail fast before the multi-hour stage1/stage2 compute if the
           # build number is below the production floor (>= 100 so
           # production packages win solver tie-breaks over smoke builds).
-          if [ "$BUILD_NUMBER" -lt 100 ]; then
-            echo "::error::build-number must be >= 100 (production floor); got $BUILD_NUMBER."
+          if ! [[ "$BUILD_NUMBER" =~ ^[0-9]+$ ]] || (( BUILD_NUMBER < 100 )); then
+            echo "::error::build-number must be an integer >= 100 (production floor); got $BUILD_NUMBER."
             exit 1
           fi
       - name: Balance nuclide batches by predicted cost
@@ -312,6 +313,18 @@ jobs:
           # partials come from that earlier run (needs actions: read).
           run-id: ${{ inputs.stage2-run-id || github.run_id }}
           github-token: ${{ github.token }}
+      - name: Check that every partial is present
+        env:
+          BATCHES: ${{ needs.plan.outputs.batches }}
+        run: |
+          # Reused stage-2 artifacts come from an earlier run that may have
+          # partially failed; never package an incomplete spline set.
+          expected=$(( 6 * $(jq length <<< "$BATCHES") ))
+          found=$(find partials -name '*.xml' | wc -l)
+          if [ "$found" -ne "$expected" ]; then
+            echo "::error::expected $expected partial spline files (6 flavours x batches), found $found."
+            exit 1
+          fi
       - name: Merge partial splines with gspladd
         run: |
           # gspladd de-duplicates the free-nucleon splines that every
