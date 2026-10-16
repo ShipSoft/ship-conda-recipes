@@ -17,6 +17,14 @@ on:
         type: boolean
         default: false
 
+permissions:
+  contents: read
+
+# Supersede in-flight PR runs on a new push; never cancel main or merge-queue runs.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   build:
     uses: ShipSoft/.github/.github/workflows/rattler-build-and-upload.yml@main
