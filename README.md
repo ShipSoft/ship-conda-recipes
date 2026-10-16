@@ -30,6 +30,7 @@ The old `prefix.dev/ship` channel no longer receives uploads.
 | rootegpythia6 | No (niche) |
 | shannon | No (SHiP-specific) |
 | ship-ci-metrics | No (SHiP-specific) |
+| ship-random | No (SHiP-specific) |
 | shipdatamodel | No (SHiP-specific) |
 | shipgeometry | No (SHiP-specific) |
 | shipgeometryservice | No (SHiP-specific) |
@@ -75,13 +76,13 @@ two keys in their `variants.yaml`:
   `build.sh` as `$root_cxx_standard`. cxx20 serves consumers of the default
   ROOT builds (e.g. FairShip); cxx23 serves the phlex/aegir stack (phlex pins
   `root_cxx_standard ==23`).
-- `root_base` must be pinned explicitly as well (currently `6.40.2`). A bare
+- `root_base` must be pinned explicitly as well (currently `6.40.04`). A bare
   `root_base` host spec resolves, under `root_cxx_standard` 23, to the legacy
   pre-cxx-split `root_base` 6.36.06 — that build declares no
   `root_cxx_standard` dependency, so it spuriously satisfies the C++23 marker
   and the solver prefers it. Pinning keeps every recipe on the same ROOT
   series, as conda-forge's global `root_base` pin does. Bump all
-  `variants.yaml` in lockstep when conda-forge moves ROOT past 6.40.2.
+  `variants.yaml` in lockstep when conda-forge moves ROOT past 6.40.04.
 
 Because `root_base` is pinned by us rather than tracked to conda-forge, a
 rebuild reproduces the same pin — so the channel-drift check reports it apart
@@ -103,9 +104,10 @@ For packages whose upstream build system sets no explicit C++ standard
 via `root-config`), there is no compile flag to drive; the variant only makes
 the ROOT build they link against deterministic.
 
-The C++23-only aegir stack (aegir, aegir-genie) builds a single variant and
-constrains ROOT in `host:` instead — `root_base >=6.40` plus
-`root_cxx_standard ==23` — which equally excludes the legacy 6.36.06 build.
+The C++23-only aegir stack (aegir, aegir-genie, shannon, trout) builds a
+single variant and constrains ROOT in `host:` instead — `root_base >=6.40`
+plus `root_cxx_standard ==23` — which equally excludes the legacy 6.36.06
+build.
 rootegpythia6 builds both variants and pins `root_base` in `variants.yaml`, in
 lockstep with fairship and genie, which link against it.
 
@@ -117,7 +119,7 @@ rationale inline next to the pin. Each entry states the condition under which
 it can be dropped.
 
 - **`eigen-abi-devel` in `host:`** (aegir, aegir-genie, shipgeometry,
-  shipgeometryservice): `GeoModelCoreConfig.cmake` does
+  shipgeometryservice, trout): `GeoModelCoreConfig.cmake` does
   `find_dependency(Eigen3)`; per the conda-forge eigen-feedstock README
   (case B), consumers of a library that exposes Eigen in public headers must
   list `eigen-abi-devel` in host.
@@ -131,7 +133,7 @@ it can be dropped.
   ABI lock a SHiP rebuild can't advance, so the drift check skips it.
   *Remove when* conda-forge geomodel-core is rebuilt against the newer
   eigen-abi.
-- **`nlohmann_json` in `host:`** (same four recipes):
+- **`nlohmann_json` in `host:`** (same five recipes):
   `GeoModelToolsConfig.cmake` does `find_dependency(nlohmann_json 3.12.0)`,
   but conda-forge geomodel-tools keeps nlohmann_json in host only (no run, no
   run_exports) and nlohmann_json has no run_exports of its own — so any
@@ -145,8 +147,8 @@ it can be dropped.
   on libgcc/libstdcxx).
   *Remove when* the conda-forge log4cpp feedstock declares it.
 - **`expat`, `zlib` and `freetype` in `host:`** (fairship, fairroot, aegir,
-  aegir-genie, shipgeometryservice, field-service): conda-forge geant4 is
-  built with `GEANT4_USE_SYSTEM_EXPAT=ON`, `GEANT4_USE_SYSTEM_ZLIB=ON` and
+  aegir-genie, shipgeometryservice, field-service, trout): conda-forge geant4
+  is built with `GEANT4_USE_SYSTEM_EXPAT=ON`, `GEANT4_USE_SYSTEM_ZLIB=ON` and
   `GEANT4_USE_FREETYPE=ON`, so its `Geant4Config.cmake` calls
   `find_dependency()` on EXPAT, ZLIB and Freetype — each of which needs
   headers and a CMake config, not just the shared library. Since the
@@ -208,4 +210,16 @@ pixi exec --spec python --spec ruamel.yaml python scripts/mainify-recipe.py \
 pixi run rattler-build build --recipe /tmp/ship-random-main \
     --variant-config global-variants.yaml \
     --channel https://prefix.dev/ship-experiment/stable --channel conda-forge
+```
+
+## Dev builds of upstream PRs
+
+`recipes-dev/` holds recipes that are never published. `build-all` only
+builds `recipes/`. `recipes-dev/phlex` mirrors the conda-forge phlex-feedstock
+recipe but builds from a git ref. It writes into a local channel at
+`../ship-local-channel`, which downstream dev environments resolve ahead of
+conda-forge:
+
+```bash
+pixi run build-phlex-pr <pr-number|branch|tag|sha>
 ```
