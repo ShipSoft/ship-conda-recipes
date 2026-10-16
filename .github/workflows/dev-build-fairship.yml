@@ -33,6 +33,8 @@ jobs:
         with:
           repository: ShipSoft/FairShip
           ref: ${{ inputs.ref || '' }}
+          # The upstream build runs arbitrary code; keep the token out of it.
+          persist-credentials: false
           fetch-depth: 0
           fetch-tags: true
       - name: Drop committed lock to force fresh resolve
