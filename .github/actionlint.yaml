@@ -1,0 +1,8 @@
+# actionlint's bundled action metadata predates the client-id input of
+# actions/create-github-app-token (app-id is deprecated in its favour). Drop
+# these once actionlint knows about it.
+paths:
+  .github/workflows/**/*.{yml,yaml}:
+    ignore:
+      - 'input "client-id" is not defined in action "actions/create-github-app-token@v\d+"'
+      - 'missing input "app-id" which is required by action "actions/create-github-app-token@v\d+"'
