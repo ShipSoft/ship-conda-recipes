@@ -23,8 +23,13 @@ if [[ "$ref" =~ ^[0-9]+$ ]]; then
     sha=$(gh api "repos/$REPO/pulls/$ref" --jq .head.sha 2>/dev/null) ||
         sha=$(git ls-remote "https://github.com/$REPO.git" "refs/pull/$ref/head" | cut -f1)
 else
-    # Branch or tag; fall back to treating the argument as a commit SHA.
-    sha=$(git ls-remote "https://github.com/$REPO.git" "$ref" | head -n1 | cut -f1)
+    # Branch or tag (matched exactly, so `main` cannot hit `foo/main`;
+    # annotated tags resolve to the peeled commit). Otherwise treat the
+    # argument as a commit SHA.
+    refs=$(git ls-remote "https://github.com/$REPO.git" \
+        "refs/heads/$ref" "refs/tags/$ref" "refs/tags/$ref^{}")
+    sha=$(awk '$2 ~ /\^\{\}$/ {print $1; exit}' <<< "$refs")
+    [[ -n "$sha" ]] || sha=$(head -n1 <<< "$refs" | cut -f1)
     [[ -n "$sha" ]] || sha=$ref
 fi
 if [[ -z "$sha" ]]; then
@@ -39,6 +44,10 @@ tmpdir=$(mktemp -d)
 trap 'rm -rf "$tmpdir"' EXIT
 cp recipes-dev/phlex/* "$tmpdir/"
 sed -i "s|^  git_rev: .*|  git_rev: $sha|" "$tmpdir/recipe.yaml"
+grep -qxF "  git_rev: $sha" "$tmpdir/recipe.yaml" || {
+    echo "error: could not set git_rev in the phlex dev recipe" >&2
+    exit 1
+}
 
 rattler-build build \
     --recipe "$tmpdir/recipe.yaml" \
