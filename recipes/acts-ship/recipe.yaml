@@ -16,7 +16,7 @@ source:
   sha256: 47a5ccd66302d0fb9c967f9df15e115d6529a8f1edeff362a22b4f6c0cb93198
 
 build:
-  number: 9
+  number: 10
   skip: win
   script: build.sh
 
@@ -91,7 +91,9 @@ tests:
       - test -f $PREFIX/lib/libActsPluginRoot.so
       - test -f $PREFIX/lib/libActsExamplesSHiP.so
       - test -f $PREFIX/lib/cmake/Acts/ActsConfig.cmake
-      - python -c "import acts"
+      - python -c "import acts, acts.examples, acts.fatras"
+      # Shared libraries live in lib/ only, not duplicated into site-packages.
+      - python -c "import acts, pathlib; assert not list(pathlib.Path(acts.__file__).parent.rglob('libActs*.so'))"
 
 about:
   homepage: https://github.com/webbjm/acts/tree/shipdist-build

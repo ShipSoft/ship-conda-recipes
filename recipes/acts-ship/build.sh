@@ -24,8 +24,13 @@ if [ -d "${PREFIX}/python/acts" ]; then
     rm -rf "${PREFIX}/python"
 fi
 
-find build/ -type f -name "*.so" -print0 | while IFS= read -r -d '' so; do
-    cp "${so}" "${PY_SITE}/acts/" || exit 1
+# Add the Python extension modules that the install step did not place
+# itself. Only *.cpython-*.so: the libActs*.so shared libraries are already
+# installed into lib/ and must not be duplicated into site-packages.
+find build/ -type f -name "*.cpython-*.so" -print0 | while IFS= read -r -d '' so; do
+    if [ -z "$(find "${PY_SITE}/acts" -name "$(basename "${so}")" -print -quit)" ]; then
+        cp "${so}" "${PY_SITE}/acts/"
+    fi
 done
 
 if [ ! -d "${PY_SITE}/acts" ] || [ -z "$(ls -A "${PY_SITE}/acts")" ]; then
