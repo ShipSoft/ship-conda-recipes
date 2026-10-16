@@ -42,10 +42,13 @@ import json
 import os
 import re
 import sys
+import time
+import urllib.error
 import urllib.request
 from pathlib import Path
 
 from rattler import Version
+from recipe_parsing import read_variants, recipe_names
 
 SHIP_REPODATA = "https://prefix.dev/ship-experiment/stable/{subdir}/repodata.json"
 CONDA_FORGE_CHANNELDATA = "https://conda.anaconda.org/conda-forge/channeldata.json"
@@ -101,11 +104,21 @@ def exceeds(latest: str, op: str, bound: str) -> bool:
 
 # --- data fetching ----------------------------------------------------------
 
-def fetch_json(url: str):
+def fetch_json(url: str, attempts: int = 3):
     # prefix.dev rejects the default urllib User-Agent with 403.
     req = urllib.request.Request(url, headers={"User-Agent": "ship-channel-drift/1"})
-    with urllib.request.urlopen(req, timeout=120) as resp:
-        return json.load(resp)
+    for attempt in range(1, attempts + 1):
+        try:
+            with urllib.request.urlopen(req, timeout=120) as resp:
+                return json.load(resp)
+        except urllib.error.HTTPError as exc:
+            # A 4xx is a definite answer; only server errors are retried.
+            if exc.code < 500 or attempt == attempts:
+                raise
+        except (urllib.error.URLError, TimeoutError):
+            if attempt == attempts:
+                raise
+        time.sleep(5 * attempt)
 
 
 def _rank_cmp(a: dict, b: dict) -> int:
@@ -161,27 +174,9 @@ def recipe_name_map() -> dict[str, Path]:
     """package/output name -> recipe.yaml path (for rebuild bumps)."""
     mapping: dict[str, Path] = {}
     for recipe in sorted(RECIPES_DIR.glob("*/recipe.yaml")):
-        for line in recipe.read_text().splitlines():
-            m = re.match(r"^\s*name:\s*([A-Za-z0-9._-]+)\s*$", line)
-            if m:
-                mapping.setdefault(m.group(1), recipe)
+        for name in recipe_names(recipe):
+            mapping.setdefault(name, recipe)
     return mapping
-
-
-def _read_variants(path: Path) -> dict[str, list[str]]:
-    """Parse a variants.yaml into ``key -> [value, ...]``."""
-    out: dict[str, list[str]] = {}
-    key = None
-    for line in path.read_text().splitlines():
-        m = re.match(r"^([A-Za-z0-9._-]+):\s*$", line)
-        if m:
-            key = m.group(1)
-            out.setdefault(key, [])
-            continue
-        m = re.match(r"^\s+-\s*(.+?)\s*$", line)
-        if m and key:
-            out[key].append(m.group(1).strip("\"'"))
-    return out
 
 
 @functools.lru_cache(maxsize=None)
@@ -189,12 +184,16 @@ def variant_pinned_deps(recipe: Path) -> frozenset[str]:
     """Dependency names this recipe pins in its own variants.yaml.
 
     conda-forge moving past such a pin does not make the published build
-    stale in a way a rebuild fixes: the rebuild reproduces the same pin.
+    stale in a way a rebuild fixes: the rebuild reproduces the same pin. A
+    key with several values is a build matrix, not a pin, so it is left out:
+    a matrix over a real dependency (e.g. ``python``) must still flag drift.
     """
     variants = recipe.parent / "variants.yaml"
     if not variants.is_file():
         return frozenset()
-    return frozenset(_read_variants(variants))
+    return frozenset(
+        key for key, vals in read_variants(variants).items() if len(vals) == 1
+    )
 
 
 def variant_pins() -> tuple[dict[str, tuple[str, list[Path]]], dict[str, dict[str, list[Path]]]]:
@@ -215,7 +214,7 @@ def variant_pins() -> tuple[dict[str, tuple[str, list[Path]]], dict[str, dict[st
         variants = recipe.parent / "variants.yaml"
         if not variants.is_file():
             continue
-        for key, vals in _read_variants(variants).items():
+        for key, vals in read_variants(variants).items():
             if len(vals) != 1:
                 matrix.add(key)
                 continue

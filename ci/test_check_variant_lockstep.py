@@ -189,5 +189,30 @@ class LockstepTest(unittest.TestCase):
         self.assertEqual(len(problems), 1, problems)
 
 
+class ReadVariantsTest(unittest.TestCase):
+    def test_comments_and_quotes(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "variants.yaml"
+            path.write_text(textwrap.dedent("""
+                # header comment
+                root_base:  # the ROOT series
+                  - "6.40.04"  # keep in lockstep
+                root_cxx_standard:
+                  # matrix
+                  - '20'
+                  - 23
+                tag:
+                  - a#b
+            """).lstrip())
+            self.assertEqual(
+                lockstep.read_variants(path),
+                {
+                    "root_base": ["6.40.04"],
+                    "root_cxx_standard": ["20", "23"],
+                    "tag": ["a#b"],
+                },
+            )
+
+
 if __name__ == "__main__":
     unittest.main()
