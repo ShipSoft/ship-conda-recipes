@@ -10,10 +10,17 @@ permissions:
   contents: write
   pull-requests: write
 
+# A Renovate force-push while this job runs would make the push below fail
+# non-fast-forward; the newer run supersedes it.
+concurrency:
+  group: finalize-renovate-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
 jobs:
   finalize:
-    if: github.actor == 'renovate[bot]'
+    if: github.event.pull_request.user.login == 'renovate[bot]'
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
         with:
@@ -21,11 +28,17 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
 
-      - name: Refresh sha256 and derive version for changed HEP-tag recipes
+      - uses: prefix-dev/setup-pixi@v0.11.2
+        with:
+          locked: true
+
+      - name: Refresh sha256 for changed recipes
+        env:
+          BASE_REF: ${{ github.base_ref }}
         run: |
           set -euo pipefail
           mapfile -t changed < <(
-            git diff --name-only "origin/${{ github.base_ref }}...HEAD" \
+            git diff --name-only "origin/${BASE_REF}...HEAD" \
               -- 'recipes/*/recipe.yaml'
           )
           if [ ${#changed[@]} -eq 0 ]; then
@@ -33,7 +46,7 @@ jobs:
             exit 0
           fi
           printf 'Changed recipes:\n%s\n' "${changed[@]}"
-          ci/finalize-recipe-bump.sh "${changed[@]}"
+          pixi run ci/finalize-recipe-bump.sh "${changed[@]}"
 
       - name: Commit and push if anything changed
         run: |
@@ -45,5 +58,5 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add recipes
-          git commit -m 'chore(recipe): refresh sha256 and version after tag bump'
+          git commit -m 'chore(recipe): refresh sha256 after version bump'
           git push
