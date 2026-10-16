@@ -12,7 +12,7 @@ source:
   sha256: caa94bef5dd904cc5dc1c46c10c5731b576936ddc3b639ce86f9dfab82d44079
 
 build:
-  number: 8
+  number: 9
   script: build.sh
 
 requirements:
@@ -29,6 +29,7 @@ requirements:
 tests:
   - script:
       - test -f $PREFIX/lib/libpythia6.so
+      - test -L $PREFIX/lib/libPythia6.so
       - test -f $PREFIX/lib/libPythia6.so
 
 about:
