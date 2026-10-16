@@ -10,7 +10,7 @@ source:
   sha256: 0fbfe4a9e50b3bc8af7efc11d2b167c341ba0ec3103ddbdf6d88736fd1f26e23
 
 build:
-  number: 9
+  number: 10
   script: build.sh
 
 requirements:
@@ -30,7 +30,8 @@ requirements:
 
 tests:
   - script:
-      - test -f $PREFIX/lib/libgeant321.so || test -f $PREFIX/lib64/libgeant321.so
+      - test -f $PREFIX/lib/libgeant321.so
+      - test ! -e $PREFIX/lib64
 
 about:
   homepage: https://vmc-project.github.io
