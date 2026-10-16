@@ -101,6 +101,7 @@ class SelectionTest(unittest.TestCase):
                 "foo-a.tar.bz2": pkg("cxx20_h0_0", ["bar <2"]),
                 "foo-b.tar.bz2": pkg("cxx23_h1_0", ["bar <3"]),
             }},
+            "linux-aarch64": {"packages": {}},
             "noarch": {"packages": {}},
         })
         picked, failed = drift.latest_builds()
@@ -123,14 +124,33 @@ class SelectionTest(unittest.TestCase):
                 "b": pkg("1.0", 0, "h1_0"),
                 "c": pkg("1.1", 0, "h0_0"),  # strictly higher wipes the ties
             }},
+            "linux-aarch64": {"packages": {}},
             "noarch": {"packages": {}},
         })
         picked, _ = drift.latest_builds()
         self.assertEqual([r["version"] for r in picked["foo"]], ["1.1"])
 
+    def test_aarch64_builds_are_inspected(self):
+        # the same recipe built for linux-64 and linux-aarch64 ties on
+        # version + build_number; a stale pin on either platform must surface
+        pkg = lambda build, deps: {  # noqa: E731
+            "name": "foo", "version": "1.0", "build_number": 0,
+            "build": build, "depends": deps,
+        }
+        self._fake_repodata({
+            "linux-64": {"packages": {"a": pkg("h0_0", ["bar <3"])}},
+            "linux-aarch64": {"packages": {"b": pkg("h1_0", ["bar <2"])}},
+            "noarch": {"packages": {}},
+        })
+        picked, failed = drift.latest_builds()
+        self.assertEqual(failed, [])
+        rows = drift.detect(picked, {"bar": "2.5"})
+        self.assertEqual({(r[0], r[3]) for r in rows}, {("foo", "<2")})
+
     def test_fetch_failure_is_reported(self):
         self._fake_repodata({
             "linux-64": RuntimeError("boom"),
+            "linux-aarch64": {"packages": {}},
             "noarch": {"packages": {}},
         })
         _picked, failed = drift.latest_builds()
@@ -439,11 +459,11 @@ class MainTest(unittest.TestCase):
             return drift.main()
 
     def test_partial_repodata_is_refused(self):
-        with fake_repodata({"linux-64": {}, "noarch": OSError("boom")}):
+        with fake_repodata({"linux-64": {}, "linux-aarch64": {}, "noarch": OSError("boom")}):
             self.assertEqual(self.run_main(), 2)
 
     def test_clean_channel_exits_zero(self):
-        with fake_repodata({"linux-64": {}, "noarch": {}}), \
+        with fake_repodata({"linux-64": {}, "linux-aarch64": {}, "noarch": {}}), \
                 mock.patch.object(drift, "conda_forge_versions", return_value={}), \
                 mock.patch.object(drift, "variant_pins", return_value=({}, {})):
             self.assertEqual(self.run_main(), 0)
@@ -453,7 +473,7 @@ class MainTest(unittest.TestCase):
             "name": "alpha", "version": "1", "build": "h0", "build_number": 0,
             "depends": ["gsl >=2.7,<2.8.0a0"],
         }}}
-        with fake_repodata({"linux-64": repodata, "noarch": {}}), \
+        with fake_repodata({"linux-64": repodata, "linux-aarch64": {}, "noarch": {}}), \
                 mock.patch.object(drift, "conda_forge_versions",
                                   return_value={"gsl": "2.8"}), \
                 mock.patch.object(drift, "variant_pins", return_value=({}, {})), \

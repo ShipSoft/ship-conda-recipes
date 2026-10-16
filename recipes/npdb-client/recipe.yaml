@@ -16,9 +16,9 @@ source:
 
 build:
   number: ${{ build_number }}
+  # linux-64 only: not part of the arm64 port (see "Platforms" in the README).
   skip:
-    - win
-    - osx
+    - target_platform != "linux-64"
 
 outputs:
 

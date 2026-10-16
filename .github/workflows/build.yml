@@ -46,6 +46,7 @@ jobs:
         https://prefix.dev/ship-experiment/stable
         conda-forge
       variant-config: global-variants.yaml
+      platforms: '["linux-64", "linux-aarch64"]'
 
   all-checks:
     name: All checks passed

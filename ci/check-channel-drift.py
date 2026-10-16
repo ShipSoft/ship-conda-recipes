@@ -52,7 +52,7 @@ from recipe_parsing import read_variants, recipe_names
 
 SHIP_REPODATA = "https://prefix.dev/ship-experiment/stable/{subdir}/repodata.json"
 CONDA_FORGE_CHANNELDATA = "https://conda.anaconda.org/conda-forge/channeldata.json"
-SUBDIRS = ("linux-64", "noarch")
+SUBDIRS = ("linux-64", "linux-aarch64", "noarch")
 RECIPES_DIR = Path("recipes")
 
 # (package, dependency) pairs to ignore, for deliberate pins that lag

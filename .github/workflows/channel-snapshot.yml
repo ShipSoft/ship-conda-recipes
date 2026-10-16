@@ -33,7 +33,7 @@ jobs:
           channel_url="https://prefix.dev/ship-experiment/stable"
           {
             echo "# prefix.dev/ship-experiment/stable channel snapshot"
-            for subdir in linux-64 noarch; do
+            for subdir in linux-64 linux-aarch64 noarch; do
               repodata=$(curl -fsSL --retry 3 "${channel_url}/${subdir}/repodata.json")
               count=$(echo "$repodata" | jq '."packages.conda" | length')
               [ "$count" = "0" ] && continue
