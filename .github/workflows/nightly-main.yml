@@ -1,14 +1,14 @@
 name: Nightly main builds
 
 # Build the main branch of each ShipSoft library that aegir, Shannon and
-# Trout use, and upload it to prefix.dev/ship-nightly. Consumer repos run
-# advisory PR jobs against these builds (ShipSoft/.github
+# Trout use, and upload it to prefix.dev/ship-experiment/nightly. Consumer
+# repos run advisory PR jobs against these builds (ShipSoft/.github
 # pixi-main-deps.yml), so a PR can be tested against an unreleased library
 # change without waiting for a release.
 #
 # Each library builds against *released* dependencies only (ship +
-# conda-forge, never ship-nightly), so a consumer job swaps exactly one
-# library for its main build. The recipe is the release recipe with the
+# conda-forge, never the nightly channel), so a consumer job swaps exactly
+# one library for its main build. The recipe is the release recipe with the
 # source switched to the main commit; see scripts/mainify-recipe.py.
 
 on:
@@ -21,7 +21,7 @@ on:
         type: string
         default: ''
       force:
-        description: 'Rebuild even if this commit is already on ship-nightly'
+        description: 'Rebuild even if this commit is already on the nightly channel'
         type: boolean
         default: false
   pull_request:
@@ -37,7 +37,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  NIGHTLY_CHANNEL: ship-nightly
+  NIGHTLY_CHANNEL: ship-experiment/nightly
 
 jobs:
   matrix:
@@ -155,7 +155,7 @@ jobs:
       - name: Build with rattler-build
         if: steps.todo.outputs.build == 'true'
         run: |
-          # Released dependencies only: ship-nightly is deliberately not a
+          # Released dependencies only: the nightly channel is deliberately not a
           # build channel (see header). The recipe tests check the release's
           # file list, which main is free to change (e.g. Geometry dropping
           # its TOML configs), so skip them; the consumer jobs test the build.
@@ -187,7 +187,7 @@ jobs:
             fi
           } >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Upload to prefix.dev/ship-nightly
+      - name: Upload to prefix.dev/ship-experiment/nightly
         if: github.event_name != 'pull_request' && steps.todo.outputs.build == 'true'
         # Trusted publishing: prefix.dev accepts this workflow's OIDC token
         # (id-token: write above), so no API key is passed.

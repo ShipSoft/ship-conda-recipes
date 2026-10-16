@@ -13,7 +13,7 @@ release tarball:
   `pixi list` and builds of different commits never share a filename.
 
 The version stays at the last release. Consumers select these builds by
-channel (prefix.dev/ship-nightly), not by version.
+channel (prefix.dev/ship-experiment/nightly), not by version.
 
 Used by .github/workflows/nightly-main.yml.
 

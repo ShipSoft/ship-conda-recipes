@@ -175,7 +175,7 @@ pixi run rattler-build build --recipe recipes/<package-name> \
 `.github/workflows/nightly-main.yml` builds the `main` branch of the
 ShipSoft libraries used by aegir, Shannon and Trout (ship-random,
 shipdatamodel, shipgeometry, shipgeometryservice, field-service) every night
-and uploads them to [prefix.dev/ship-nightly](https://prefix.dev/channels/ship-nightly).
+and uploads them to [prefix.dev/ship-experiment/nightly](https://prefix.dev/channels/@ship-experiment/nightly).
 Consumer repos run advisory PR jobs against these builds, so a PR can use an
 unreleased library change before it is released.
 
@@ -183,7 +183,7 @@ unreleased library change before it is released.
 the source becomes the main commit, the build number is the commit count on
 main, and the build string is `main_<sha7>_<hash>`. The version stays at the
 last release. Each library builds against released dependencies only, never
-against other ship-nightly packages, and the recipe tests are skipped because
+against other nightly packages, and the recipe tests are skipped because
 they check the release's file list. A commit already on the channel is not
 rebuilt; dispatch the workflow with `force` to rebuild it.
 
