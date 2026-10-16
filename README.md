@@ -169,3 +169,28 @@ To build a single recipe:
 pixi run rattler-build build --recipe recipes/<package-name> \
     --channel https://prefix.dev/ship --channel conda-forge
 ```
+
+## Nightly main builds
+
+`.github/workflows/nightly-main.yml` builds the `main` branch of the
+ShipSoft libraries used by aegir, Shannon and Trout (ship-random,
+shipdatamodel, shipgeometry, shipgeometryservice, field-service) every night
+and uploads them to [prefix.dev/ship-nightly](https://prefix.dev/channels/ship-nightly).
+Consumer repos run advisory PR jobs against these builds, so a PR can use an
+unreleased library change before it is released.
+
+`scripts/mainify-recipe.py` derives each build from the release recipe here:
+the source becomes the main commit, the build number is the commit count on
+main, and the build string is `main_<sha7>_<hash>`. The version stays at the
+last release. Each library builds against released dependencies only, never
+against other ship-nightly packages. A commit already on the channel is not
+rebuilt; dispatch the workflow with `force` to rebuild it.
+
+To build one library's main locally:
+
+```bash
+pixi exec --spec python --spec ruamel.yaml python scripts/mainify-recipe.py \
+    recipes/ship-random ship-random <sha> <commit-count> /tmp/ship-random-main
+pixi run rattler-build build --recipe /tmp/ship-random-main \
+    --channel https://prefix.dev/ship --channel conda-forge
+```
