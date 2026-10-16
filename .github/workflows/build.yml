@@ -28,7 +28,11 @@ jobs:
     with:
       recipe: ${{ inputs.recipe || '' }}
       force: ${{ inputs.force || false }}
-      upload: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+      # Manual dispatches on main upload too, so a recipe can be released on
+      # its own (e.g. a dependency before the consumers that pin it).
+      upload: >-
+        ${{ (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+        && github.ref == 'refs/heads/main' }}
       channel-name: ship-experiment/stable
       extra-channels: |
         https://prefix.dev/ship-experiment/stable
