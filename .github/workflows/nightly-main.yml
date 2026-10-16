@@ -70,6 +70,9 @@ jobs:
     name: ${{ matrix.lib.recipe }}
     runs-on: ubuntu-latest
     timeout-minutes: 120
+    permissions:
+      contents: read
+      id-token: write  # trusted publishing to prefix.dev
     strategy:
       fail-fast: false
       matrix:
@@ -186,15 +189,14 @@ jobs:
 
       - name: Upload to prefix.dev/ship-nightly
         if: github.event_name != 'pull_request' && steps.todo.outputs.build == 'true'
-        env:
-          PREFIX_DEV_API_KEY: ${{ secrets.PREFIX_DEV_API_KEY }}
+        # Trusted publishing: prefix.dev accepts this workflow's OIDC token
+        # (id-token: write above), so no API key is passed.
         run: |
           set -euo pipefail
           shopt -s nullglob
           uploaded=0
           for pkg in output/linux-64/*.conda output/noarch/*.conda; do
             pixi run rattler-build upload prefix \
-              --api-key "$PREFIX_DEV_API_KEY" \
               -c "$NIGHTLY_CHANNEL" \
               --skip-existing "$pkg"
             uploaded=$((uploaded + 1))
