@@ -10,7 +10,7 @@ source:
   sha256: 8697734e91c95de31de8e8d8ccbff66f15f8131745c63affab7551eee6326a47
 
 build:
-  number: 2
+  number: 3
   skip:
     - win
   script: build.sh
@@ -88,7 +88,7 @@ about:
     digitised-hit output of the Shannon digitisation framework and provides
     ACTS-based spectrometer track finding and fitting, per-subdetector
     reconstruction modules, and RNTuple/histogram output.
-  license: LGPL-3.0-or-later
+  license: LGPL-3.0-or-later AND MPL-2.0
   license_file:
     - LICENSES/LGPL-3.0-or-later.txt
     - LICENSES/MPL-2.0.txt
