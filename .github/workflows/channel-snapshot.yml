@@ -12,6 +12,7 @@ permissions:
 jobs:
   snapshot:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v7
 
@@ -21,10 +22,8 @@ jobs:
           channel_url="https://prefix.dev/ship-experiment/stable"
           {
             echo "# prefix.dev/ship-experiment/stable channel snapshot"
-            echo
-            echo "_Updated: $(date -u +%Y-%m-%d)_"
             for subdir in linux-64 noarch; do
-              repodata=$(curl -fsSL "${channel_url}/${subdir}/repodata.json" 2>/dev/null) || continue
+              repodata=$(curl -fsSL --retry 3 "${channel_url}/${subdir}/repodata.json")
               count=$(echo "$repodata" | jq '."packages.conda" | length')
               [ "$count" = "0" ] && continue
               echo
