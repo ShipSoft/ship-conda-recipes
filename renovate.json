@@ -26,14 +26,19 @@
       "datasourceTemplate": "gitlab-tags",
       "registryUrlTemplate": "https://gitlab.cern.ch",
       "extractVersionTemplate": "^v?(?<version>.+)$"
+    },
+    {
+      "customType": "regex",
+      "description": "field-service: the combination manager above latches onto the vendored covfie source, so match the field_service URL explicitly",
+      "managerFilePatterns": ["/(^|/)recipes/field-service/recipe\\.yaml$/"],
+      "matchStrings": [
+        "context:\\n\\s+version:\\s*\"(?<currentValue>[^\"]+)\"[\\s\\S]*?url:\\s*https://github\\.com/(?<packageName>ShipSoft/field_service)/archive/"
+      ],
+      "datasourceTemplate": "github-tags",
+      "extractVersionTemplate": "^v?(?<version>.+)$"
     }
   ],
   "packageRules": [
-    {
-      "description": "Use loose versioning for HEP tag schemes",
-      "matchManagers": ["custom.regex"],
-      "versioning": "loose"
-    },
     {
       "description": "Packages pinned to commits, branches or fork tags, not release tags",
       "matchPackageNames": [
