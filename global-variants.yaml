@@ -1,0 +1,15 @@
+# Variant pins applied to every build in this repository, on top of each
+# recipe's own variants.yaml (keys here win; the recipe files don't set
+# these). Passed with --variant-config / -m by build.yml, nightly-main.yml
+# and the pixi build tasks.
+#
+# Compiler versions follow conda-forge's global pinning
+# (conda-forge-pinning-feedstock, recipe/conda_build_config.yaml). Without
+# them rattler-build takes the newest compiler, and packages built with a
+# newer GCC than their consumers can fail to link: std::format code built
+# with GCC 16 leaves symbols that a GCC 15 link can't resolve. Move these
+# together with conda-forge.
+c_compiler_version:
+  - "15"
+cxx_compiler_version:
+  - "15"

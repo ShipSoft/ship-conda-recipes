@@ -12,7 +12,7 @@ source:
   sha256: 14b02629c503539ec6f60bd8f48cacc2161264ac0e4520c51932ada6b1dc9f04
 
 build:
-  number: 11
+  number: 12
   script: build.sh
 
 requirements:

@@ -10,7 +10,7 @@ source:
   sha256: 07689995a67e4298acd844783914d80c9fd448d4054065f485a7de9d5e39235b
 
 build:
-  number: 0
+  number: 1
   noarch: generic
   skip:
     - win

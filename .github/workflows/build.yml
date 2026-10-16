@@ -25,6 +25,7 @@ jobs:
       force: ${{ inputs.force || false }}
       upload: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
       channel-name: ship
+      variant-config: global-variants.yaml
     secrets:
       prefix-dev-api-key: ${{ secrets.PREFIX_DEV_API_KEY }}
 
