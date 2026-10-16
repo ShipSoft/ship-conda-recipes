@@ -1,0 +1,199 @@
+name: Nightly main builds
+
+# Build the main branch of each ShipSoft library that aegir, Shannon and
+# Trout use, and upload it to prefix.dev/ship-nightly. Consumer repos run
+# advisory PR jobs against these builds (ShipSoft/.github
+# pixi-main-deps.yml), so a PR can be tested against an unreleased library
+# change without waiting for a release.
+#
+# Each library builds against *released* dependencies only (ship +
+# conda-forge, never ship-nightly), so a consumer job swaps exactly one
+# library for its main build. The recipe is the release recipe with the
+# source switched to the main commit; see scripts/mainify-recipe.py.
+
+on:
+  schedule:
+    - cron: '30 2 * * *'
+  workflow_dispatch:
+    inputs:
+      recipe:
+        description: 'Single recipe to build (e.g. ship-random); empty = all'
+        type: string
+        default: ''
+      force:
+        description: 'Rebuild even if this commit is already on ship-nightly'
+        type: boolean
+        default: false
+  pull_request:
+    paths:
+      - '.github/workflows/nightly-main.yml'
+      - 'scripts/mainify-recipe.py'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: nightly-main-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  NIGHTLY_CHANNEL: ship-nightly
+
+jobs:
+  matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      libs: ${{ steps.select.outputs.libs }}
+    steps:
+      - id: select
+        env:
+          ONLY: ${{ inputs.recipe || '' }}
+        run: |
+          set -euo pipefail
+          libs='[
+            {"recipe": "ship-random", "repo": "ship-random"},
+            {"recipe": "shipdatamodel", "repo": "data-model"},
+            {"recipe": "shipgeometry", "repo": "Geometry"},
+            {"recipe": "shipgeometryservice", "repo": "geometry_service"},
+            {"recipe": "field-service", "repo": "field_service"}
+          ]'
+          libs=$(jq -c --arg only "$ONLY" \
+            'map(select($only == "" or .recipe == $only))' <<< "$libs")
+          if [ "$libs" = "[]" ]; then
+            echo "::error::unknown recipe '$ONLY'"
+            exit 1
+          fi
+          echo "libs=$libs" >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: matrix
+    name: ${{ matrix.lib.recipe }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        lib: ${{ fromJSON(needs.matrix.outputs.libs) }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - uses: prefix-dev/setup-pixi@v0.11.0
+        with:
+          locked: true
+
+      - name: Resolve main
+        id: main
+        env:
+          REPO: ${{ matrix.lib.repo }}
+        run: |
+          set -euo pipefail
+          # Blobless clone: enough for the SHA and the commit count.
+          git clone --quiet --filter=blob:none --no-checkout --single-branch \
+            --branch main "https://github.com/ShipSoft/$REPO.git" "$RUNNER_TEMP/upstream"
+          sha=$(git -C "$RUNNER_TEMP/upstream" rev-parse HEAD)
+          count=$(git -C "$RUNNER_TEMP/upstream" rev-list --count HEAD)
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
+          echo "count=$count" >> "$GITHUB_OUTPUT"
+          echo "ShipSoft/$REPO main: $sha (commit $count)"
+
+      - name: Check whether this commit is already built
+        id: todo
+        env:
+          RECIPE: ${{ matrix.lib.recipe }}
+          SHA: ${{ steps.main.outputs.sha }}
+          FORCE: ${{ inputs.force || false }}
+        run: |
+          set -euo pipefail
+          # PR runs always build, since building is what they test. Otherwise
+          # skip a commit whose packages are already on the channel; they
+          # carry the commit in the build string (main_<sha7>_<hash>).
+          if [ "$GITHUB_EVENT_NAME" = pull_request ] || [ "$FORCE" = true ]; then
+            echo "build=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          found=0
+          for subdir in linux-64 noarch; do
+            repodata=$(curl -sfL "https://prefix.dev/$NIGHTLY_CHANNEL/$subdir/repodata.json" || echo '{}')
+            n=$(jq --arg s "main_${SHA:0:7}_" --arg r "$RECIPE" \
+              '[((.packages // {}) + (.["packages.conda"] // {})) | to_entries[].value
+                | select((.name | startswith($r)) and (.build | startswith($s)))]
+               | length' <<< "$repodata")
+            found=$((found + n))
+          done
+          if [ "$found" -eq 0 ]; then
+            echo "build=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "build=false" >> "$GITHUB_OUTPUT"
+            echo "Already on $NIGHTLY_CHANNEL ($found package(s)); skipping." |
+              tee -a "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Write main recipe
+        if: steps.todo.outputs.build == 'true'
+        env:
+          RECIPE: ${{ matrix.lib.recipe }}
+          REPO: ${{ matrix.lib.repo }}
+          SHA: ${{ steps.main.outputs.sha }}
+          COUNT: ${{ steps.main.outputs.count }}
+        run: |
+          pixi exec --spec python=3.13 --spec ruamel.yaml \
+            python scripts/mainify-recipe.py "recipes/$RECIPE" "$REPO" "$SHA" "$COUNT" \
+            "$RUNNER_TEMP/recipe"
+          {
+            echo "## $RECIPE from ShipSoft/$REPO@${SHA:0:7}"
+            echo
+            echo '```diff'
+            diff -u "recipes/$RECIPE/recipe.yaml" "$RUNNER_TEMP/recipe/recipe.yaml" || true
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Build with rattler-build
+        if: steps.todo.outputs.build == 'true'
+        run: |
+          # Released dependencies only: ship-nightly is deliberately not a
+          # build channel (see header).
+          pixi run rattler-build build --recipe "$RUNNER_TEMP/recipe" \
+            --channel https://prefix.dev/ship --channel conda-forge
+
+      - name: Build summary
+        if: always() && steps.todo.outputs.build == 'true'
+        run: |
+          {
+            echo
+            shopt -s nullglob
+            files=(output/linux-64/*.conda output/noarch/*.conda)
+            if [ "${#files[@]}" -eq 0 ]; then
+              echo "_No \`.conda\` artifacts produced._"
+            else
+              echo "| File | Size |"
+              echo "|------|------|"
+              for f in "${files[@]}"; do
+                size=$(stat -c%s "$f")
+                if [ "$size" -ge 1048576 ]; then
+                  hsize="$(awk -v s="$size" 'BEGIN{printf "%.1f MiB", s/1048576}')"
+                else
+                  hsize="$(awk -v s="$size" 'BEGIN{printf "%.0f KiB", s/1024}')"
+                fi
+                echo "| \`$(basename "$f")\` | $hsize |"
+              done
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload to prefix.dev/ship-nightly
+        if: github.event_name != 'pull_request' && steps.todo.outputs.build == 'true'
+        env:
+          PREFIX_DEV_API_KEY: ${{ secrets.PREFIX_DEV_API_KEY }}
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          uploaded=0
+          for pkg in output/linux-64/*.conda output/noarch/*.conda; do
+            pixi run rattler-build upload prefix \
+              --api-key "$PREFIX_DEV_API_KEY" \
+              -c "$NIGHTLY_CHANNEL" \
+              --skip-existing "$pkg"
+            uploaded=$((uploaded + 1))
+          done
+          echo "Uploaded $uploaded package(s) to prefix.dev/$NIGHTLY_CHANNEL."
