@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
 """Detect ship-channel packages whose conda-forge pins have gone stale.
 
-For every package published to the prefix.dev/ship channel we look at the
-build the solver would actually pick (highest version, then highest build
-number) and inspect its ``depends`` entries. When a dependency carries an
-upper version bound (a ``<`` / ``<=`` from an upstream ``run_exports`` pin)
-and the *current* conda-forge release of that dependency has moved past the
-bound, the ship build is stale: a fresh rebuild would pin a newer range, so
-the package needs rebuilding to stay co-installable with freshly built
-siblings (e.g. in the dev-source workflows).
+For every package published to the prefix.dev/ship-experiment/stable
+channel we look at the build the solver would actually pick (highest
+version, then highest build number) and inspect its ``depends`` entries.
+When a dependency carries an upper version bound (a ``<`` / ``<=`` from an
+upstream ``run_exports`` pin) and the *current* conda-forge release of that
+dependency has moved past the bound, the ship build is stale: a fresh
+rebuild would pin a newer range, so the package needs rebuilding to stay
+co-installable with freshly built siblings (e.g. in the dev-source
+workflows).
 
 This catches drift that the binary dev-build signal misses: a free ``*``
 solve simply co-selects the older, mutually-compatible builds and stays
@@ -46,7 +47,7 @@ from pathlib import Path
 
 from rattler import Version
 
-SHIP_REPODATA = "https://prefix.dev/ship/{subdir}/repodata.json"
+SHIP_REPODATA = "https://prefix.dev/ship-experiment/stable/{subdir}/repodata.json"
 CONDA_FORGE_CHANNELDATA = "https://conda.anaconda.org/conda-forge/channeldata.json"
 SUBDIRS = ("linux-64", "noarch")
 RECIPES_DIR = Path("recipes")

@@ -14,7 +14,7 @@ name: Production GENIE splines
 #   merge   merges all partial XMLs with gspladd, builds the
 #           genie-splines-ship recipe with the merged XML injected
 #           (see recipes/genie-splines-ship/build.sh), and uploads the
-#           package to prefix.dev/ship.
+#           package to prefix.dev/ship-experiment/stable.
 #
 # Stage-2 batching uses a measured per-nuclide cost model (see the
 # plan job); its predictions are only good to ~2x on CI runners, and
@@ -69,7 +69,7 @@ on:
         type: string
         default: '100'
       upload:
-        description: Upload the built package to prefix.dev/ship
+        description: Upload the built package to prefix.dev/ship-experiment/stable
         type: boolean
         default: true
       stage1-run-id:
@@ -187,7 +187,7 @@ jobs:
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
-      - name: Install GENIE from the ship channel
+      - name: Install GENIE from the stable channel
         uses: prefix-dev/setup-pixi@v0.11.2
         with:
           locked: true
@@ -235,7 +235,7 @@ jobs:
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
-      - name: Install GENIE from the ship channel
+      - name: Install GENIE from the stable channel
         uses: prefix-dev/setup-pixi@v0.11.2
         with:
           locked: true
@@ -282,6 +282,10 @@ jobs:
            (needs.stage2.result == 'skipped' && inputs.stage2-run-id != '')) }}
     runs-on: ubuntu-latest
     timeout-minutes: 120
+    permissions:
+      contents: read
+      actions: read
+      id-token: write  # trusted publishing to prefix.dev
     defaults:
       run:
         shell: bash -eo pipefail {0}
@@ -289,7 +293,7 @@ jobs:
       - uses: actions/checkout@v7
         with:
           # Read-only checkout; do not persist the GITHUB_TOKEN into the
-          # workspace alongside PREFIX_DEV_API_KEY handling and uploads.
+          # workspace of a job that uploads packages.
           persist-credentials: false
       # default env: rattler-build (build/upload). genie env: gspladd merge.
       - uses: prefix-dev/setup-pixi@v0.11.2
@@ -351,7 +355,7 @@ jobs:
           GENIE_SPLINES_BUILD_NUMBER: ${{ inputs.build-number }}
         run: |
           pixi run rattler-build build --recipe recipes/genie-splines-ship \
-            --channel https://prefix.dev/ship --channel conda-forge
+            --channel https://prefix.dev/ship-experiment/stable --channel conda-forge
       - name: Upload package artifact
         uses: actions/upload-artifact@v7
         with:
@@ -360,12 +364,15 @@ jobs:
           if-no-files-found: error
       - name: Upload to prefix.dev
         if: ${{ inputs.upload }}
+        # Trusted publishing: prefix.dev accepts this workflow's OIDC token
+        # (id-token: write above), so no API key is passed.
         env:
-          PREFIX_DEV_API_KEY: ${{ secrets.PREFIX_DEV_API_KEY }}
+          # A failed OIDC exchange is only logged at debug level; the upload
+          # then goes out anonymously and fails with a bare 403.
+          RUST_LOG: rattler_networking=debug
         run: |
           shopt -s nullglob
           for pkg in output/noarch/*.conda; do
             pixi run rattler-build upload prefix \
-              --api-key "$PREFIX_DEV_API_KEY" \
-              -c ship --skip-existing "$pkg"
+              -c ship-experiment/stable --skip-existing "$pkg"
           done

@@ -3,7 +3,8 @@
 Conda recipes for SHiP experiment packages not available on conda-forge.
 
 Built with [rattler-build](https://prefix-dev.github.io/rattler-build/) and hosted
-on a [prefix.dev](https://prefix.dev) channel.
+on [prefix.dev/ship-experiment/stable](https://prefix.dev/channels/@ship-experiment/stable).
+The old `prefix.dev/ship` channel no longer receives uploads.
 
 ## Packages
 
@@ -179,7 +180,7 @@ To build a single recipe:
 ```bash
 pixi run rattler-build build --recipe recipes/<package-name> \
     --variant-config global-variants.yaml \
-    --channel https://prefix.dev/ship --channel conda-forge
+    --channel https://prefix.dev/ship-experiment/stable --channel conda-forge
 ```
 
 ## Nightly main builds
@@ -206,5 +207,5 @@ pixi exec --spec python --spec ruamel.yaml python scripts/mainify-recipe.py \
     recipes/ship-random ship-random <sha> <commit-count> /tmp/ship-random-main
 pixi run rattler-build build --recipe /tmp/ship-random-main \
     --variant-config global-variants.yaml \
-    --channel https://prefix.dev/ship --channel conda-forge
+    --channel https://prefix.dev/ship-experiment/stable --channel conda-forge
 ```
