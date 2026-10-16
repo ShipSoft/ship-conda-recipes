@@ -5,15 +5,26 @@ on:
     - cron: '0 6 * * 1'  # Mondays, 06:00 UTC
   workflow_dispatch:
 
+# Writes go through the app token below; GITHUB_TOKEN only reads.
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read
 
 jobs:
   snapshot:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
+      # An app token, unlike GITHUB_TOKEN, lets the PR trigger the
+      # build and lint workflows.
+      - name: Create app token
+        id: app-token
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.APP_CLIENT_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          permission-contents: write
+          permission-pull-requests: write
+
       - uses: actions/checkout@v7
 
       - name: Generate channel snapshot
@@ -47,7 +58,7 @@ jobs:
       - name: Open / update snapshot PR
         uses: peter-evans/create-pull-request@v8
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ steps.app-token.outputs.token }}
           commit-message: 'chore(snapshot): refresh prefix.dev/ship-experiment/stable channel snapshot'
           title: 'chore: refresh channel snapshot'
           body: |
