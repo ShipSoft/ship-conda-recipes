@@ -191,6 +191,10 @@ jobs:
         if: github.event_name != 'pull_request' && steps.todo.outputs.build == 'true'
         # Trusted publishing: prefix.dev accepts this workflow's OIDC token
         # (id-token: write above), so no API key is passed.
+        env:
+          # A failed OIDC exchange is only logged at debug level; the upload
+          # then goes out anonymously and fails with a bare 403.
+          RUST_LOG: rattler_networking=debug
         run: |
           set -euo pipefail
           shopt -s nullglob
