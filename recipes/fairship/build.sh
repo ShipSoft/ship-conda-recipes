@@ -11,6 +11,6 @@ cmake ${CMAKE_ARGS} ${SRC_DIR} \
     -DCMAKE_CXX_STANDARD=${root_cxx_standard} \
     -DCMAKE_INSTALL_LIBDIR=lib \
     -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
-    "-DCMAKE_CXX_FLAGS=-isystem ${PREFIX}/include/geant4vmc -isystem ${PREFIX}/include/Geant4"
+    "-DCMAKE_CXX_FLAGS=${CXXFLAGS} -isystem ${PREFIX}/include/geant4vmc -isystem ${PREFIX}/include/Geant4"
 cmake --build . -j${CPU_COUNT}
 cmake --install .

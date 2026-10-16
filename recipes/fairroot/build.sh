@@ -11,7 +11,7 @@ mkdir -p build && cd build
 cmake ${CMAKE_ARGS} ${SRC_DIR} \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_CXX_STANDARD=${root_cxx_standard} \
-    -DCMAKE_CXX_FLAGS="-fPIC -O2" \
+    -DCMAKE_CXX_FLAGS="${CXXFLAGS} -fPIC" \
     -DCMAKE_CATCH_DISCOVER_TESTS_DISCOVERY_MODE=PRE_TEST \
     -DCMAKE_INSTALL_LIBDIR=lib \
     -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
