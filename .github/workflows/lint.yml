@@ -8,8 +8,20 @@ on:
     branches: [main]
   workflow_dispatch:
 
+permissions:
+  contents: read
+
+# Supersede in-flight PR runs on a new push; never cancel main or merge-queue runs.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   prek:
+    # Lets the shared workflow comment on the PR when hooks fail.
+    permissions:
+      contents: read
+      pull-requests: write
     uses: ShipSoft/.github/.github/workflows/prek.yml@main
   commit-check:
     permissions:
