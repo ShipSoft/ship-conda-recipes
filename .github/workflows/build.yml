@@ -20,14 +20,20 @@ on:
 jobs:
   build:
     uses: ShipSoft/.github/.github/workflows/rattler-build-and-upload.yml@main
+    # Trusted publishing to prefix.dev: no API key is passed, the upload
+    # uses this workflow's OIDC token.
+    permissions:
+      contents: read
+      id-token: write
     with:
       recipe: ${{ inputs.recipe || '' }}
       force: ${{ inputs.force || false }}
       upload: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
-      channel-name: ship
+      channel-name: ship-experiment/stable
+      extra-channels: |
+        https://prefix.dev/ship-experiment/stable
+        conda-forge
       variant-config: global-variants.yaml
-    secrets:
-      prefix-dev-api-key: ${{ secrets.PREFIX_DEV_API_KEY }}
 
   all-checks:
     name: All checks passed

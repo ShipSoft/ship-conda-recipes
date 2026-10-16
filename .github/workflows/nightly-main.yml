@@ -6,7 +6,7 @@ name: Nightly main builds
 # pixi-main-deps.yml), so a PR can be tested against an unreleased library
 # change without waiting for a release.
 #
-# Each library builds against *released* dependencies only (ship +
+# Each library builds against *released* dependencies only (stable +
 # conda-forge, never the nightly channel), so a consumer job swaps exactly
 # one library for its main build. The recipe is the release recipe with the
 # source switched to the main commit; see scripts/mainify-recipe.py.
@@ -161,7 +161,7 @@ jobs:
           # its TOML configs), so skip them; the consumer jobs test the build.
           pixi run rattler-build build --recipe "$RUNNER_TEMP/recipe" \
             --variant-config global-variants.yaml \
-            --channel https://prefix.dev/ship --channel conda-forge \
+            --channel https://prefix.dev/ship-experiment/stable --channel conda-forge \
             --test skip
 
       - name: Build summary
