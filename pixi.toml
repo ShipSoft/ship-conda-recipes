@@ -5,7 +5,9 @@ channels = ["conda-forge"]
 platforms = ["linux-64"]
 
 [dependencies]
-rattler-build = ">=0.35"
+# Floor at the version CI is locked to; older releases lack features the
+# recipes use (staging outputs, the current variant syntax).
+rattler-build = ">=0.76"
 
 [tasks]
 # Build every recipe under recipes/. rattler-build resolves cross-recipe
@@ -32,12 +34,14 @@ prek = "*"
 python = ">=3.11"
 yamllint = "*"
 shellcheck = "*"
+actionlint = "*"
 reuse = "*"
 commitizen = "*"
 
 [feature.lint.tasks]
 lint = "prek run --all-files"
-# Offline invariant behind the root_base lockstep; also wired as a prek hook.
+# Offline invariant behind the root_base lockstep. The checker and these tests
+# both run as prek hooks.
 test-lockstep = "python ci/test_check_variant_lockstep.py"
 # Install the git hooks and route them through `pixi run` so the conda-provided
 # hook tools are on PATH at commit time (required on NixOS, where the tools are
@@ -57,7 +61,6 @@ done
 # don't pull ROOT.
 [feature.genie]
 channels = ["https://prefix.dev/ship-experiment/stable", "conda-forge"]
-platforms = ["linux-64"]
 
 [feature.genie.dependencies]
 # Keep the version in sync with recipes/genie and recipes/genie-splines-ship.
