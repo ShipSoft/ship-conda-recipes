@@ -12,7 +12,9 @@ import io
 import tempfile
 import textwrap
 import unittest
+import urllib.error
 from pathlib import Path
+from unittest import mock
 
 _spec = importlib.util.spec_from_file_location(
     "check_channel_drift", Path(__file__).with_name("check-channel-drift.py")
@@ -67,24 +69,25 @@ class VersionOrderTest(unittest.TestCase):
         self.assertFalse(drift.exceeds("1.0.dev1", "<", "1.0"))
 
 
+def fake_repodata(per_subdir):
+    """Patch drift.fetch_json to serve (or raise) a payload per subdir."""
+
+    def fake_fetch(url):
+        for subdir, payload in per_subdir.items():
+            if subdir in url:
+                if isinstance(payload, Exception):
+                    raise payload
+                return payload
+        raise AssertionError(f"unexpected url {url}")
+
+    return mock.patch.object(drift, "fetch_json", side_effect=fake_fetch)
+
+
 class SelectionTest(unittest.TestCase):
-    def _fake_repodata(self, monkey, per_subdir):
-        def fake_fetch(url):
-            for subdir, payload in per_subdir.items():
-                if subdir in url:
-                    if isinstance(payload, Exception):
-                        raise payload
-                    return payload
-            raise AssertionError(f"unexpected url {url}")
-
-        monkey(drift, "fetch_json", fake_fetch)
-
-    def setUp(self):
-        self._orig = drift.fetch_json
-        self.addCleanup(lambda: setattr(drift, "fetch_json", self._orig))
-
-    def _set_fetch(self, mod, name, fn):
-        setattr(mod, name, fn)
+    def _fake_repodata(self, per_subdir):
+        patcher = fake_repodata(per_subdir)
+        patcher.start()
+        self.addCleanup(patcher.stop)
 
     def test_retains_tied_build_variants(self):
         # two builds tied on version + build_number but with distinct build
@@ -93,7 +96,7 @@ class SelectionTest(unittest.TestCase):
             "name": "foo", "version": "1.0", "build_number": 0,
             "build": build, "depends": deps,
         }
-        self._fake_repodata(self._set_fetch, {
+        self._fake_repodata({
             "linux-64": {"packages": {
                 "foo-a.tar.bz2": pkg("cxx20_h0_0", ["bar <2"]),
                 "foo-b.tar.bz2": pkg("cxx23_h1_0", ["bar <3"]),
@@ -114,7 +117,7 @@ class SelectionTest(unittest.TestCase):
             "name": "foo", "version": ver, "build_number": bn,
             "build": build, "depends": [],
         }
-        self._fake_repodata(self._set_fetch, {
+        self._fake_repodata({
             "linux-64": {"packages": {
                 "a": pkg("1.0", 0, "h0_0"),
                 "b": pkg("1.0", 0, "h1_0"),
@@ -126,7 +129,7 @@ class SelectionTest(unittest.TestCase):
         self.assertEqual([r["version"] for r in picked["foo"]], ["1.1"])
 
     def test_fetch_failure_is_reported(self):
-        self._fake_repodata(self._set_fetch, {
+        self._fake_repodata({
             "linux-64": RuntimeError("boom"),
             "noarch": {"packages": {}},
         })
@@ -299,6 +302,14 @@ class VariantPinTest(_TempRecipes):
         drift.bump_affected([self.row("gamma", "root_base")])
         self.assertIn("  number: 3\n", recipe.read_text())
 
+    def test_matrix_over_a_real_dependency_still_flags_drift(self):
+        # A multi-valued key is a build matrix even when it names a package:
+        # a rebuild does refresh that dependency's pin, so it is bumped.
+        recipe = self.simple("delta", 'python:\n  - "3.12"\n  - "3.13"\n')
+        self.assertEqual(drift.variant_pinned_deps(recipe), frozenset())
+        drift.bump_affected([self.row("delta", "python")])
+        self.assertIn("  number: 3\n", recipe.read_text())
+
     def test_split_rows_partitions_on_the_owning_recipe(self):
         self.simple("alpha", ROOT_PIN)
         stale, pinned = drift.split_rows([
@@ -360,6 +371,86 @@ class VariantPinTest(_TempRecipes):
         self.assertIn("not rewritten", report)
         alpha = (self.recipes / "alpha" / "variants.yaml").read_text()
         self.assertIn('  - "6.40.2"\n', alpha)
+
+
+class FetchRetryTest(unittest.TestCase):
+    """Transient failures are retried; definite answers are not."""
+
+    def setUp(self):
+        patcher = mock.patch.object(drift.time, "sleep")
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
+    def http_error(self, code):
+        err = urllib.error.HTTPError("https://x", code, "err", {}, io.BytesIO())
+        self.addCleanup(err.close)
+        return err
+
+    def response(self, payload):
+        resp = mock.MagicMock()
+        resp.__enter__.return_value = io.BytesIO(payload)
+        return resp
+
+    def test_server_error_is_retried(self):
+        with mock.patch.object(
+            drift.urllib.request,
+            "urlopen",
+            side_effect=[self.http_error(503), self.response(b'{"ok": 1}')],
+        ) as urlopen:
+            self.assertEqual(drift.fetch_json("https://x"), {"ok": 1})
+        self.assertEqual(urlopen.call_count, 2)
+
+    def test_client_error_is_not_retried(self):
+        with mock.patch.object(
+            drift.urllib.request, "urlopen", side_effect=self.http_error(404)
+        ) as urlopen:
+            with self.assertRaises(urllib.error.HTTPError):
+                drift.fetch_json("https://x")
+        self.assertEqual(urlopen.call_count, 1)
+
+    def test_gives_up_after_the_last_attempt(self):
+        with mock.patch.object(
+            drift.urllib.request,
+            "urlopen",
+            side_effect=urllib.error.URLError("down"),
+        ) as urlopen:
+            with self.assertRaises(urllib.error.URLError):
+                drift.fetch_json("https://x", attempts=3)
+        self.assertEqual(urlopen.call_count, 3)
+
+
+class MainTest(unittest.TestCase):
+    """Exit codes: 2 on partial data, 1 on drift (check mode), else 0."""
+
+    def run_main(self, argv=()):
+        with mock.patch.object(drift.sys, "argv", ["check-channel-drift", *argv]), \
+                contextlib.redirect_stdout(io.StringIO()), \
+                contextlib.redirect_stderr(io.StringIO()), \
+                mock.patch.dict(drift.os.environ, {"GITHUB_STEP_SUMMARY": ""}):
+            return drift.main()
+
+    def test_partial_repodata_is_refused(self):
+        with fake_repodata({"linux-64": {}, "noarch": OSError("boom")}):
+            self.assertEqual(self.run_main(), 2)
+
+    def test_clean_channel_exits_zero(self):
+        with fake_repodata({"linux-64": {}, "noarch": {}}), \
+                mock.patch.object(drift, "conda_forge_versions", return_value={}), \
+                mock.patch.object(drift, "variant_pins", return_value=({}, {})):
+            self.assertEqual(self.run_main(), 0)
+
+    def test_drift_fails_check_mode_but_not_bump_mode(self):
+        repodata = {"packages.conda": {"a.conda": {
+            "name": "alpha", "version": "1", "build": "h0", "build_number": 0,
+            "depends": ["gsl >=2.7,<2.8.0a0"],
+        }}}
+        with fake_repodata({"linux-64": repodata, "noarch": {}}), \
+                mock.patch.object(drift, "conda_forge_versions",
+                                  return_value={"gsl": "2.8"}), \
+                mock.patch.object(drift, "variant_pins", return_value=({}, {})), \
+                mock.patch.object(drift, "bump_affected", return_value=""):
+            self.assertEqual(self.run_main(), 1)
+            self.assertEqual(self.run_main(["--bump-recipes"]), 0)
 
 
 class ArgumentTest(unittest.TestCase):

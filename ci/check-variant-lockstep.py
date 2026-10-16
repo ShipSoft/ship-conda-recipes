@@ -21,9 +21,9 @@ drift PRs:
 rootegpythia6 hit both halves at once (PRs #169 and #170). This check is what
 catches that at review time, offline and without touching the channel.
 
-The recipe/variants parsing is deliberately regex-based and stdlib-only so the
-hook runs in the lint environment; ci/check-channel-drift.py parses the same
-files the same way but needs py-rattler, so the two cannot share a module.
+The recipe/variants parsing (ci/recipe_parsing.py) is deliberately regex-based
+and stdlib-only so the hook runs in the lint environment; ci/check-channel-drift.py
+shares it.
 
 Usage: python ci/check-variant-lockstep.py [recipes-dir]
 """
@@ -34,26 +34,12 @@ import re
 import sys
 from pathlib import Path
 
+from recipe_parsing import read_variants, recipe_names
+
 # Variant keys held in lockstep across recipes. A key listed here must be
 # pinned by every recipe that (a) is linked by a pinning recipe and (b) names
 # the key's package in its own host: block.
 LOCKSTEP_KEYS = ("root_base",)
-
-
-def read_variants(path: Path) -> dict[str, list[str]]:
-    """Parse a variants.yaml into ``key -> [value, ...]``."""
-    out: dict[str, list[str]] = {}
-    key = None
-    for line in path.read_text().splitlines():
-        m = re.match(r"^([A-Za-z0-9._-]+):\s*$", line)
-        if m:
-            key = m.group(1)
-            out.setdefault(key, [])
-            continue
-        m = re.match(r"^\s+-\s*(.+?)\s*$", line)
-        if m and key:
-            out[key].append(m.group(1).strip("\"'"))
-    return out
 
 
 def pinned(recipe: Path, key: str) -> str | None:
@@ -71,14 +57,7 @@ def pinned(recipe: Path, key: str) -> str | None:
 
 def output_names(recipe: Path) -> set[str]:
     """Every package name a recipe publishes."""
-    return {
-        m.group(1)
-        for m in (
-            re.match(r"^\s*name:\s*([A-Za-z0-9._-]+)\s*$", line)
-            for line in recipe.read_text().splitlines()
-        )
-        if m
-    }
+    return set(recipe_names(recipe))
 
 
 def host_deps(recipe: Path) -> set[str]:
