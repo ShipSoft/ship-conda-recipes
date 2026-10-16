@@ -17,9 +17,9 @@ on:
     - cron: '0 4 * * 1'  # Mondays, 04:00 UTC (ahead of the channel snapshot)
   workflow_dispatch:
 
+# Writes go through the app token below; GITHUB_TOKEN only reads.
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read
 
 # Serialize scheduled and manual runs so overlapping invocations queue rather
 # than race on the shared channel-drift branch / PR.
@@ -52,6 +52,17 @@ jobs:
             paths: recipes/**/variants.yaml
             commit: 'chore: bump variant pins behind conda-forge'
     steps:
+      # An app token, unlike GITHUB_TOKEN, lets the PR trigger the
+      # build and lint workflows.
+      - name: Create app token
+        id: app-token
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.APP_CLIENT_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          permission-contents: write
+          permission-pull-requests: write
+
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
@@ -71,7 +82,7 @@ jobs:
       - name: Open / update ${{ matrix.leg }} PR
         uses: peter-evans/create-pull-request@v8
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ steps.app-token.outputs.token }}
           commit-message: ${{ matrix.commit }}
           title: ${{ matrix.commit }}
           body-path: pr-body.md
