@@ -22,9 +22,13 @@ requirements:
     - cmake
     - make
   host:
-    - gsl-lite
+    # Contracts backend (MP_UNITS_API_CONTRACTS=MS-GSL in build.sh). ms-gsl
+    # is built for every platform we target; gsl-lite only for linux-64.
+    - ms-gsl
   run:
-    - gsl-lite
+    # mp-unitsConfig.cmake calls find_dependency(Microsoft.GSL), so consumers
+    # need ms-gsl present at configure time.
+    - ms-gsl
   run_exports:
     - ${{ pin_subpackage('mp-units', upper_bound='x.x') }}
 
@@ -32,6 +36,21 @@ tests:
   - script:
       - test -d $PREFIX/include/mp-units
       - test -f $PREFIX/lib/cmake/mp-units/mp-unitsConfig.cmake
+      - grep -q "MP_UNITS_API_CONTRACTS MS-GSL" $PREFIX/lib/cmake/mp-units/mp-unitsConfig.cmake
+  # Build a consumer via find_package(mp-units), exercising the
+  # find_dependency(Microsoft.GSL) path.
+  - files:
+      recipe:
+        - test/
+    requirements:
+      run:
+        - ${{ compiler('cxx') }}
+        - cmake
+        - make
+    script:
+      - cmake -S test -B build -DCMAKE_PREFIX_PATH=${PREFIX}
+      - cmake --build build
+      - ./build/mp_units_consumer
 
 about:
   homepage: https://mpusz.github.io/mp-units/
