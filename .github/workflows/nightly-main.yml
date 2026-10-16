@@ -118,7 +118,7 @@ jobs:
             repodata=$(curl -sfL "https://prefix.dev/$NIGHTLY_CHANNEL/$subdir/repodata.json" || echo '{}')
             n=$(jq --arg s "main_${SHA:0:7}_" --arg r "$RECIPE" \
               '[((.packages // {}) + (.["packages.conda"] // {})) | to_entries[].value
-                | select((.name | startswith($r)) and (.build | startswith($s)))]
+                | select(.name == $r and (.build | startswith($s)))]
                | length' <<< "$repodata")
             found=$((found + n))
           done
@@ -153,9 +153,12 @@ jobs:
         if: steps.todo.outputs.build == 'true'
         run: |
           # Released dependencies only: ship-nightly is deliberately not a
-          # build channel (see header).
+          # build channel (see header). The recipe tests check the release's
+          # file list, which main is free to change (e.g. Geometry dropping
+          # its TOML configs), so skip them; the consumer jobs test the build.
           pixi run rattler-build build --recipe "$RUNNER_TEMP/recipe" \
-            --channel https://prefix.dev/ship --channel conda-forge
+            --channel https://prefix.dev/ship --channel conda-forge \
+            --test skip
 
       - name: Build summary
         if: always() && steps.todo.outputs.build == 'true'
