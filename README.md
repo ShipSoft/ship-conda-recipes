@@ -183,7 +183,8 @@ unreleased library change before it is released.
 the source becomes the main commit, the build number is the commit count on
 main, and the build string is `main_<sha7>_<hash>`. The version stays at the
 last release. Each library builds against released dependencies only, never
-against other ship-nightly packages. A commit already on the channel is not
+against other ship-nightly packages, and the recipe tests are skipped because
+they check the release's file list. A commit already on the channel is not
 rebuilt; dispatch the workflow with `force` to rebuild it.
 
 To build one library's main locally:
