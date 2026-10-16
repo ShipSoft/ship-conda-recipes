@@ -61,9 +61,6 @@ jobs:
           environments: drift
           locked: true
 
-      - name: Test the drift script
-        run: pixi run -e drift test-drift
-
       - name: Detect drift and apply ${{ matrix.leg }} bumps
         id: drift
         run: |

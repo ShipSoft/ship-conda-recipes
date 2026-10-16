@@ -33,7 +33,13 @@ repos:
         language: system
         entry: shellcheck
         args: [--severity=warning]
-        files: recipes/.*/build\.sh$
+        types: [shell]
+
+      - id: actionlint
+        name: actionlint
+        language: system
+        entry: actionlint
+        files: ^\.github/workflows/.*\.ya?ml$
 
       - id: reuse
         name: reuse lint
@@ -48,6 +54,21 @@ repos:
         entry: python ci/check-variant-lockstep.py
         pass_filenames: false
         files: ^recipes/[^/]+/(recipe|variants)\.yaml$
+
+      - id: test-lockstep
+        name: variant lockstep checker tests
+        language: system
+        entry: python ci/test_check_variant_lockstep.py
+        pass_filenames: false
+        files: ^ci/(check-variant-lockstep|test_check_variant_lockstep|recipe_parsing)\.py$
+
+      # Needs py-rattler, so it runs in the drift environment.
+      - id: test-drift
+        name: channel-drift checker tests
+        language: system
+        entry: pixi run --locked -e drift test-drift
+        pass_filenames: false
+        files: ^ci/(check-channel-drift|test_check_channel_drift|recipe_parsing)\.py$
 
       - id: commitizen
         name: commitizen (conventional commits)
