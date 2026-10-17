@@ -26,7 +26,9 @@ requirements:
     # renamed, so it cannot build against 0.6.
     - shipdatamodel >=0.5,<0.6
     - shipgeometry
-    - shipgeometryservice >=0.3
+    # 0.5 puts a `namespace ship = SHiP;` alias in the old header paths,
+    # which clashes with data-model <0.6.
+    - shipgeometryservice >=0.3,<0.5
     # The placement helpers and the ACTS adapter first ship in 0.3.0;
     # 0.4 needs data-model 0.6.
     - field-service-core >=0.3,<0.4

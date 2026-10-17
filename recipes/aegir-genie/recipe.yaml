@@ -26,7 +26,9 @@ requirements:
     # renamed, so it cannot build against 0.6.
     - shipdatamodel <0.6
     - phlex >=0.4.1
-    - shipgeometryservice >=0.3
+    # 0.5 puts a `namespace ship = SHiP;` alias in the old header paths,
+    # which clashes with data-model <0.6.
+    - shipgeometryservice >=0.3,<0.5
     # genie_source builds on aegir's installed generator-source helper
     # (aegir::source_helper, first installed in 0.4.0).
     - aegir >=0.4
