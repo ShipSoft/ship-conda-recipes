@@ -53,6 +53,10 @@ from recipe_parsing import read_variants, recipe_names
 SHIP_REPODATA = "https://prefix.dev/ship-experiment/stable/{subdir}/repodata.json"
 CONDA_FORGE_CHANNELDATA = "https://conda.anaconda.org/conda-forge/channeldata.json"
 SUBDIRS = ("linux-64", "linux-aarch64", "noarch")
+# Subdirs that may not exist on the channel yet. prefix.dev answers 404 for a
+# subdir nobody has uploaded to, and for these that means "no packages", not a
+# failed fetch. linux-aarch64 stays here until its first upload lands.
+OPTIONAL_SUBDIRS = frozenset({"linux-aarch64"})
 RECIPES_DIR = Path("recipes")
 
 # (package, dependency) pairs to ignore, for deliberate pins that lag
@@ -155,7 +159,8 @@ def latest_builds() -> tuple[dict[str, list[dict]], list[str]]:
 
     Returns ``(picked, failed)`` where ``failed`` lists any subdir whose
     repodata could not be fetched; callers must not report a clean no-drift
-    result while sources are missing.
+    result while sources are missing. A 404 for a subdir in
+    ``OPTIONAL_SUBDIRS`` counts as an empty subdir, not a failure.
     """
     fetched: dict[str, list[dict]] = {}
     failed: list[str] = []
@@ -163,6 +168,13 @@ def latest_builds() -> tuple[dict[str, list[dict]], list[str]]:
         try:
             repodata = fetch_json(SHIP_REPODATA.format(subdir=subdir))
         except Exception as exc:  # noqa: BLE001 - transient / network / 403
+            if (
+                subdir in OPTIONAL_SUBDIRS
+                and isinstance(exc, urllib.error.HTTPError)
+                and exc.code == 404
+            ):
+                print(f"note: no {subdir} repodata on the channel yet", file=sys.stderr)
+                continue
             print(f"error: could not fetch {subdir} repodata: {exc}", file=sys.stderr)
             failed.append(subdir)
             continue
