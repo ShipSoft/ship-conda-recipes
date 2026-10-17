@@ -130,14 +130,34 @@ def _rank_cmp(a: dict, b: dict) -> int:
     return (an > bn) - (an < bn)
 
 
+def _retain(variants: list[dict], rec: dict) -> None:
+    """Fold ``rec`` into the records tied at the max version/build_number."""
+    if not variants:
+        variants.append(rec)
+        return
+    order = _rank_cmp(rec, variants[0])
+    if order > 0:  # strictly higher — supersede all retained ties
+        variants[:] = [rec]
+    elif order == 0 and all(
+        v.get("build") != rec.get("build") for v in variants
+    ):  # tie on version+build_number — retain distinct build strings
+        variants.append(rec)
+
+
 def latest_builds() -> tuple[dict[str, list[dict]], list[str]]:
     """name -> the records the solver could pick (all tied at max version/build).
+
+    Selection runs once per solver view, i.e. each platform subdir plus
+    noarch, because a solver only ever sees one platform. Ranking all subdirs
+    together would let a newer linux-64 build hide a lagging linux-aarch64
+    one. The per-view picks are merged, keeping a noarch record that several
+    views share only once.
 
     Returns ``(picked, failed)`` where ``failed`` lists any subdir whose
     repodata could not be fetched; callers must not report a clean no-drift
     result while sources are missing.
     """
-    picked: dict[str, list[dict]] = {}
+    fetched: dict[str, list[dict]] = {}
     failed: list[str] = []
     for subdir in SUBDIRS:
         try:
@@ -147,19 +167,19 @@ def latest_builds() -> tuple[dict[str, list[dict]], list[str]]:
             failed.append(subdir)
             continue
         records = {**repodata.get("packages", {}), **repodata.get("packages.conda", {})}
-        for rec in records.values():
-            name = rec["name"]
-            variants = picked.setdefault(name, [])
-            if not variants:
-                variants.append(rec)
-                continue
-            order = _rank_cmp(rec, variants[0])
-            if order > 0:  # strictly higher — supersede all retained ties
-                variants[:] = [rec]
-            elif order == 0 and all(
-                v.get("build") != rec.get("build") for v in variants
-            ):  # tie on version+build_number — retain distinct build strings
-                variants.append(rec)
+        fetched[subdir] = list(records.values())
+
+    noarch = fetched.get("noarch", [])
+    picked: dict[str, list[dict]] = {}
+    for subdir, records in fetched.items():
+        if subdir == "noarch":
+            continue
+        view: dict[str, list[dict]] = {}
+        for rec in records + noarch:
+            _retain(view.setdefault(rec["name"], []), rec)
+        for name, variants in view.items():
+            merged = picked.setdefault(name, [])
+            merged += [r for r in variants if all(r is not m for m in merged)]
     return picked, failed
 
 
