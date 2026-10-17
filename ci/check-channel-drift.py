@@ -237,22 +237,24 @@ def rewrite_variant_pin(path: Path, key: str, old: str, new: str) -> str | None:
     """Return variants.yaml text with ``key``'s value ``old`` -> ``new``.
 
     Returns None when the pin is not present as expected, so callers can treat
-    a lockstep rewrite as all-or-nothing.
+    a lockstep rewrite as all-or-nothing. Accepts the same trailing comments
+    as ``read_variants`` and keeps them, along with the value's quoting.
     """
     lines = path.read_text().splitlines(keepends=True)
     in_key = False
     for i, line in enumerate(lines):
         body = line.rstrip("\n")
-        if re.match(rf"^{re.escape(key)}:\s*$", body):
+        if re.match(rf"^{re.escape(key)}:(?:\s+#.*)?\s*$", body):
             in_key = True
             continue
         if not in_key:
             continue
-        m = re.match(r"^(\s+-\s*)([\"']?)(.+?)([\"']?)\s*$", body)
+        m = re.match(r"^(\s+-\s*)([\"']?)(.+?)([\"']?)(\s+#.*)?\s*$", body)
         if m:
             if m.group(3) != old:
                 return None
-            lines[i] = f"{m.group(1)}{m.group(2)}{new}{m.group(4)}\n"
+            comment = m.group(5) or ""
+            lines[i] = f"{m.group(1)}{m.group(2)}{new}{m.group(4)}{comment}\n"
             return "".join(lines)
         if body and not body.startswith((" ", "\t")):
             in_key = False

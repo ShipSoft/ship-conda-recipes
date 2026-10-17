@@ -360,6 +360,15 @@ class VariantPinTest(_TempRecipes):
         plain = drift.render(rows, variant_rows, {})
         self.assertNotIn("This PR", plain)
 
+    def test_bump_variants_keeps_trailing_comments(self):
+        variants = self.simple(
+            "alpha", 'root_base:  # the ROOT series\n  - "6.40.2"  # lockstep\n'
+        ).parent / "variants.yaml"
+        text = drift.rewrite_variant_pin(variants, "root_base", "6.40.2", "6.40.04")
+        self.assertEqual(
+            text, 'root_base:  # the ROOT series\n  - "6.40.04"  # lockstep\n'
+        )
+
     def test_partial_lockstep_is_refused(self):
         self.simple("alpha", ROOT_PIN)
         stray = self.simple("beta", ROOT_PIN)
