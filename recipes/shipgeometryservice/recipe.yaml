@@ -1,5 +1,5 @@
 context:
-  version: "0.4.0"
+  version: "0.5.0"
 
 package:
   name: shipgeometryservice
@@ -7,10 +7,10 @@ package:
 
 source:
   url: https://github.com/ShipSoft/geometry_service/archive/refs/tags/v${{ version }}.tar.gz
-  sha256: 824cd7e12ba086dd572d69f82d35bef0b6b30efeb26353a487175ba0f1a2a095
+  sha256: 6e42469d01f4fc9bc75a20a0449a70cbad35d5acd045ad57e16ddf5c86dfee2b
 
 build:
-  number: 3
+  number: 0
   skip:
     - win
   script: build.sh
@@ -43,7 +43,14 @@ tests:
   - script:
       - test -f $PREFIX/lib/libSHiPGeometryService.so
       - test -f $PREFIX/lib/cmake/SHiPGeometryService/SHiPGeometryServiceConfig.cmake
+      - test -f $PREFIX/include/SHiP/GeometryService/GeometryService.h
+      - test -f $PREFIX/include/SHiP/GeometryService/IGeometryService.h
+      - test -f $PREFIX/include/SHiP/GeometryService/G4RayScanner.h
+      - test -f $PREFIX/include/SHiP/GeometryService/GeometryThread.h
+      - grep -q "SHiP::GeometryService" $PREFIX/lib/cmake/SHiPGeometryService/SHiPGeometryServiceTargets.cmake
+      # Forwarders for the pre-0.5.0 paths, removed in 0.6.0.
       - test -f $PREFIX/include/GeometryService/SHiPGeometryService.h
+      - test -f $PREFIX/include/GeometryService/IGeometryService.h
       - test -f $PREFIX/include/GeometryService/G4RayScanner.h
       - test -f $PREFIX/include/GeometryService/GeometryThread.h
 
