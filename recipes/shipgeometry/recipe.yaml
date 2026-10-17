@@ -32,6 +32,11 @@ requirements:
     # workarounds" in the README for the remove-when conditions.
     - eigen-abi-devel
     - nlohmann_json
+    - mp-units
+  run:
+    # SHiPGeometryConfig.cmake calls find_dependency(mp-units), so consumers
+    # need it in their host env at configure time.
+    - mp-units
   run_exports:
     - ${{ pin_subpackage('shipgeometry', upper_bound='x.x') }}
 
