@@ -101,23 +101,26 @@ two keys in their `variants.yaml`:
   `build.sh` as `$root_cxx_standard`. cxx20 serves consumers of the default
   ROOT builds (e.g. FairShip); cxx23 serves the phlex/aegir stack (phlex pins
   `root_cxx_standard ==23`).
-- `root_base` must be pinned explicitly as well (currently `6.40.04`). A bare
+- `root_base` must be pinned explicitly as well (currently `6.40.04` in the
+  published recipes under `recipes/`). A bare
   `root_base` host spec resolves, under `root_cxx_standard` 23, to the legacy
   pre-cxx-split `root_base` 6.36.06 — that build declares no
   `root_cxx_standard` dependency, so it spuriously satisfies the C++23 marker
   and the solver prefers it. Pinning keeps every recipe on the same ROOT
-  series, as conda-forge's global `root_base` pin does. Bump all
-  `variants.yaml` in lockstep when conda-forge moves ROOT past 6.40.04.
+  series, as conda-forge's global `root_base` pin does. Bump every
+  `variants.yaml` under `recipes/` in lockstep when conda-forge moves ROOT
+  past 6.40.04. `recipes-dev/phlex` is not part of the lockstep: it keeps its
+  own series pin (`6.40`), matched to the SHiP stack's lock file.
 
 Because `root_base` is pinned by us rather than tracked to conda-forge, a
 rebuild reproduces the same pin — so the channel-drift check reports it apart
 from genuine stale pins and never bumps `build.number` for it. When conda-forge
 moves past the pin, the check opens a separate `variant-drift` PR advancing it
-across every `variants.yaml` at once. That PR is a real ROOT upgrade rather than
+across every `variants.yaml` under `recipes/` at once. That PR is a real ROOT upgrade rather than
 a routine refresh, so review it on its own merits. No `build.number` bump
 accompanies it: changing a variant changes the build hash, so the build string
-is new and `--skip-existing` will not skip the rebuild. Every ROOT-linking
-recipe carries the pin, rootegpythia6 included: fairship and genie list
+is new and `--skip-existing` will not skip the rebuild. Every published
+ROOT-linking recipe carries the pin, rootegpythia6 included: fairship and genie list
 rootegpythia6 in `host:` and pin `root_base` themselves, so a rootegpythia6
 left to float to conda-forge's current ROOT either makes their host env
 unsolvable or sends the solver back to a pre-`root_base` build from the
