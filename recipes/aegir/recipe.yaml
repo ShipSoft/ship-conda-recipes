@@ -26,7 +26,9 @@ requirements:
     # renamed, so it cannot build against 0.6.
     - shipdatamodel >=0.5,<0.6
     - phlex >=0.4.1
-    - shipgeometryservice >=0.3
+    # 0.5 puts a `namespace ship = SHiP;` alias in the old header paths,
+    # which clashes with data-model <0.6.
+    - shipgeometryservice >=0.3,<0.5
     - field-service-core >=0.2
     - field-service-g4 >=0.2
     # SHiPFieldService::MapIO, used by field_map_provider.
