@@ -147,6 +147,49 @@ class SelectionTest(unittest.TestCase):
         rows = drift.detect(picked, {"bar": "2.5"})
         self.assertEqual({(r[0], r[3]) for r in rows}, {("foo", "<2")})
 
+    def test_newer_aarch64_build_does_not_hide_linux64(self):
+        # aarch64 being a version ahead must not drop the linux-64 build,
+        # whose stale pin still has to surface
+        pkg = lambda ver, deps: {  # noqa: E731
+            "name": "foo", "version": ver, "build_number": 0,
+            "build": "h0_0", "depends": deps,
+        }
+        self._fake_repodata({
+            "linux-64": {"packages": {"a": pkg("1.0", ["bar <2"])}},
+            "linux-aarch64": {"packages": {"b": pkg("1.1", ["bar <3"])}},
+            "noarch": {"packages": {}},
+        })
+        picked, _ = drift.latest_builds()
+        self.assertEqual(sorted(r["version"] for r in picked["foo"]), ["1.0", "1.1"])
+        rows = drift.detect(picked, {"bar": "2.5"})
+        self.assertEqual({(r[1]["version"], r[3]) for r in rows}, {("1.0", "<2")})
+
+    @staticmethod
+    def _http_error(code):
+        return urllib.error.HTTPError("https://prefix.dev", code, "x", {}, None)
+
+    def test_missing_aarch64_subdir_counts_as_empty(self):
+        # prefix.dev answers 404 until the first linux-aarch64 upload
+        self._fake_repodata({
+            "linux-64": {"packages": {}},
+            "linux-aarch64": self._http_error(404),
+            "noarch": {"packages": {}},
+        })
+        with contextlib.redirect_stderr(io.StringIO()):
+            _picked, failed = drift.latest_builds()
+        self.assertEqual(failed, [])
+
+    def test_other_fetch_errors_still_fail(self):
+        # only a 404 on an optional subdir is forgiven
+        self._fake_repodata({
+            "linux-64": self._http_error(404),
+            "linux-aarch64": self._http_error(503),
+            "noarch": {"packages": {}},
+        })
+        with contextlib.redirect_stderr(io.StringIO()):
+            _picked, failed = drift.latest_builds()
+        self.assertEqual(failed, ["linux-64", "linux-aarch64"])
+
     def test_lagging_platform_is_selected_per_view(self):
         # linux-64 has moved on to build 1 while linux-aarch64 is still on
         # build 0; each platform's solver still picks its own latest, so the
