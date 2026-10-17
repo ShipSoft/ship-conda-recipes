@@ -23,14 +23,19 @@ if [[ "$ref" =~ ^[0-9]+$ ]]; then
     sha=$(gh api "repos/$REPO/pulls/$ref" --jq .head.sha 2>/dev/null) ||
         sha=$(git ls-remote "https://github.com/$REPO.git" "refs/pull/$ref/head" | cut -f1)
 else
-    # Branch or tag (matched exactly, so `main` cannot hit `foo/main`;
-    # annotated tags resolve to the peeled commit). Otherwise treat the
-    # argument as a commit SHA.
+    # Branch or tag, matched exactly so `main` cannot hit `foo/main`. A
+    # branch wins over a tag of the same name; annotated tags resolve to
+    # the peeled commit. Otherwise treat the argument as a commit SHA.
     refs=$(git ls-remote "https://github.com/$REPO.git" \
         "refs/heads/$ref" "refs/tags/$ref" "refs/tags/$ref^{}")
-    sha=$(awk '$2 ~ /\^\{\}$/ {print $1; exit}' <<< "$refs")
-    [[ -n "$sha" ]] || sha=$(head -n1 <<< "$refs" | cut -f1)
-    [[ -n "$sha" ]] || sha=$ref
+    pick() { awk -v r="$1" '$2 == r {print $1; exit}' <<< "$refs"; }
+    branch=$(pick "refs/heads/$ref")
+    tag=$(pick "refs/tags/$ref^{}")
+    [[ -n "$tag" ]] || tag=$(pick "refs/tags/$ref")
+    if [[ -n "$branch" && -n "$tag" ]]; then
+        echo "warning: '$ref' is both a branch and a tag in $REPO; using the branch" >&2
+    fi
+    sha=${branch:-${tag:-$ref}}
 fi
 if [[ -z "$sha" ]]; then
     echo "error: could not resolve '$ref' in $REPO" >&2
