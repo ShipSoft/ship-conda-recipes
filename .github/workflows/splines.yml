@@ -115,8 +115,11 @@ jobs:
           # Fail fast before the multi-hour stage1/stage2 compute if the
           # build number is below the production floor (>= 100 so
           # production packages win solver tie-breaks over smoke builds).
-          if ! [[ "$BUILD_NUMBER" =~ ^[0-9]+$ ]] || (( BUILD_NUMBER < 100 )); then
-            echo "::error::build-number must be an integer >= 100 (production floor); got $BUILD_NUMBER."
+          # No leading zeros: bash would read them as octal, and the raw
+          # value becomes the package build number. Nine digits keeps the
+          # comparison well inside bash's integer range.
+          if ! [[ "$BUILD_NUMBER" =~ ^[1-9][0-9]{0,8}$ ]] || (( BUILD_NUMBER < 100 )); then
+            echo "::error::build-number must be an integer >= 100 without leading zeros; got $BUILD_NUMBER."
             exit 1
           fi
       - name: Balance nuclide batches by predicted cost
@@ -318,11 +321,23 @@ jobs:
           BATCHES: ${{ needs.plan.outputs.batches }}
         run: |
           # Reused stage-2 artifacts come from an earlier run that may have
-          # partially failed; never package an incomplete spline set.
-          expected=$(( 6 * $(jq length <<< "$BATCHES") ))
-          found=$(find partials -name '*.xml' | wc -l)
-          if [ "$found" -ne "$expected" ]; then
-            echo "::error::expected $expected partial spline files (6 flavours x batches), found $found."
+          # partially failed or used a different batch plan; require exactly
+          # the partials this plan produces (6 flavours x batch ids).
+          expected=$(
+            for id in $(jq -r '.[].id' <<< "$BATCHES"); do
+              for flavour in 12 -12 14 -14 16 -16; do
+                echo "gxspl-partial-${flavour}-${id}.xml"
+              done
+            done | sort
+          )
+          found=$(find partials -maxdepth 1 -name '*.xml' -printf '%f\n' | sort)
+          missing=$(comm -23 <(echo "$expected") <(echo "$found"))
+          unexpected=$(comm -13 <(echo "$expected") <(echo "$found"))
+          if [ -n "$missing" ] || [ -n "$unexpected" ]; then
+            [ -z "$missing" ] ||
+              echo "::error::missing partial splines: $(paste -sd' ' <<< "$missing")"
+            [ -z "$unexpected" ] ||
+              echo "::error::unexpected partial splines: $(paste -sd' ' <<< "$unexpected")"
             exit 1
           fi
       - name: Merge partial splines with gspladd
