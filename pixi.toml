@@ -21,7 +21,7 @@ build-aegir = "rattler-build build --recipe recipes/aegir --variant-config globa
 
 # Build the phlex package from an upstream PR (or any git ref) into the local
 # dev channel ../ship-local-channel for consumption by downstream dev
-# environments. Usage: pixi run build-phlex-pr <pr-number|branch|sha>
+# environments. Usage: pixi run build-phlex-pr <pr-number|branch|tag|sha>
 build-phlex-pr = "scripts/build-phlex-pr.sh"
 
 # Linting / formatting toolchain. prek orchestrates the hooks; the tools come
