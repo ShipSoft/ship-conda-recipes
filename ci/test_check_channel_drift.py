@@ -147,6 +147,38 @@ class SelectionTest(unittest.TestCase):
         rows = drift.detect(picked, {"bar": "2.5"})
         self.assertEqual({(r[0], r[3]) for r in rows}, {("foo", "<2")})
 
+    def test_lagging_platform_is_selected_per_view(self):
+        # linux-64 has moved on to build 1 while linux-aarch64 is still on
+        # build 0; each platform's solver still picks its own latest, so the
+        # stale aarch64 pin must not be hidden by the newer linux-64 build
+        pkg = lambda bn, build, deps: {  # noqa: E731
+            "name": "foo", "version": "1.0", "build_number": bn,
+            "build": build, "depends": deps,
+        }
+        self._fake_repodata({
+            "linux-64": {"packages": {"a": pkg(1, "h0_1", ["bar <3"])}},
+            "linux-aarch64": {"packages": {"b": pkg(0, "h1_0", ["bar <2"])}},
+            "noarch": {"packages": {}},
+        })
+        picked, _ = drift.latest_builds()
+        self.assertEqual(sorted(r["build"] for r in picked["foo"]), ["h0_1", "h1_0"])
+        rows = drift.detect(picked, {"bar": "2.5"})
+        self.assertEqual({(r[0], r[3]) for r in rows}, {("foo", "<2")})
+
+    def test_noarch_record_shared_by_views_is_kept_once(self):
+        rec = {
+            "name": "baz", "version": "1.0", "build_number": 0,
+            "build": "pyh0_0", "depends": ["bar <2"],
+        }
+        self._fake_repodata({
+            "linux-64": {"packages": {}},
+            "linux-aarch64": {"packages": {}},
+            "noarch": {"packages": {"baz": rec}},
+        })
+        picked, _ = drift.latest_builds()
+        self.assertEqual(picked["baz"], [rec])
+        self.assertEqual(len(drift.detect(picked, {"bar": "2.5"})), 1)
+
     def test_fetch_failure_is_reported(self):
         self._fake_repodata({
             "linux-64": RuntimeError("boom"),
