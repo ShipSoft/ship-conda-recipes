@@ -1,5 +1,5 @@
 context:
-  version: "0.3.0"
+  version: "0.4.0"
 
 package:
   name: ship-random
@@ -7,7 +7,7 @@ package:
 
 source:
   url: https://github.com/ShipSoft/ship-random/archive/refs/tags/v${{ version }}.tar.gz
-  sha256: 4d16175fb69e8ea77bc5059b872b7397d4ff084eee892461f2b84cf7a15356e2
+  sha256: 254625c7411a8d0a162da42164dbe329993d46773237ab8a63e641125316a1af
 
 build:
   number: 0
