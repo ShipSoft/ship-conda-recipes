@@ -1,5 +1,5 @@
 context:
-  version: "0.4.0"
+  version: "0.4.1"
 
 package:
   name: shannon
@@ -7,7 +7,7 @@ package:
 
 source:
   url: https://github.com/ShipSoft/Shannon/archive/refs/tags/v${{ version }}.tar.gz
-  sha256: 3ddc23d12c36f3c740524e92c0eee550e2b43fe945c6cc5eac6290c05e731546
+  sha256: 3b7dace1637f3c8d14548b5e4ffdcbdc45088af9fb31fb8eada6594841500833
 
 build:
   number: 0
