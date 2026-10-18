@@ -31,7 +31,7 @@ requirements:
     - shipdatamodel >=0.6
     - phlex >=0.4.1
     # SHiP::random::PhiloxRng, the per-event reseeding RNG.
-    - ship-random >=0.2
+    - ship-random >=0.2,<0.3
     - root_base >=6.40
     # phlex/shipdatamodel are C++23; pin the matching ROOT variant.
     - root_cxx_standard ==23

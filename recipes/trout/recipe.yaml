@@ -40,7 +40,7 @@ requirements:
     - field-service-acts >=0.3,<0.4
     - phlex >=0.4.1
     # SHiP::random::PhiloxRng, for make_test_input.
-    - ship-random >=0.2
+    - ship-random >=0.2,<0.3
     # Upstream ACTS from conda-forge, not the acts-ship fork snapshot.
     - acts-core
     - root_base >=6.40

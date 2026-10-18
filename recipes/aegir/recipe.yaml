@@ -51,7 +51,7 @@ requirements:
     - pythia8 >=8.312
     - random123
     # SHiP::random::PhiloxRng, the generators' per-event RNG.
-    - ship-random >=0.2
+    - ship-random >=0.2,<0.3
     - libboost-devel
     - tbb-devel
     - spdlog
