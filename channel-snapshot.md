@@ -1,6 +1,4 @@
-# prefix.dev/ship channel snapshot
-
-_Updated: 2026-10-12_
+# prefix.dev/ship-experiment/stable channel snapshot
 
 ## linux-64
 
@@ -42,6 +40,12 @@ _Updated: 2026-10-12_
 | acts-ship | 0.0.0.dev20260813+99440c4 | `ha28ff26_6` | 6 | 2026-09-23 |
 | acts-ship | 0.0.0.dev20260813+99440c4 | `h0518e97_7` | 7 | 2026-09-29 |
 | acts-ship | 0.0.0.dev20260813+99440c4 | `h6adce4a_7` | 7 | 2026-09-29 |
+| acts-ship | 0.0.0.dev20261013+9609d1b | `h0518e97_7` | 7 | 2026-10-13 |
+| acts-ship | 0.0.0.dev20261013+9609d1b | `h6adce4a_7` | 7 | 2026-10-13 |
+| acts-ship | 0.0.0.dev20261013+9609d1b | `h0518e97_8` | 8 | 2026-10-15 |
+| acts-ship | 0.0.0.dev20261013+9609d1b | `h6adce4a_8` | 8 | 2026-10-15 |
+| acts-ship | 0.0.0.dev20261013+9609d1b | `h18d1abb_10` | 10 | 2026-10-16 |
+| acts-ship | 0.0.0.dev20261013+9609d1b | `h88d25f5_10` | 10 | 2026-10-16 |
 | aegir | 0.2.0 | `hb0f4dca_1` | 1 | 2026-06-19 |
 | aegir | 0.2.0 | `hb0f4dca_2` | 2 | 2026-06-26 |
 | aegir | 0.2.0 | `hb0f4dca_3` | 3 | 2026-07-04 |
@@ -54,6 +58,9 @@ _Updated: 2026-10-12_
 | aegir | 0.3.0 | `hb0f4dca_6` | 6 | 2026-09-08 |
 | aegir | 0.3.0 | `hb0f4dca_7` | 7 | 2026-09-23 |
 | aegir | 0.3.0 | `hb0f4dca_8` | 8 | 2026-09-29 |
+| aegir | 0.4.0 | `hb0f4dca_0` | 0 | 2026-10-13 |
+| aegir | 0.4.0 | `hb0f4dca_1` | 1 | 2026-10-15 |
+| aegir | 0.4.0 | `h1c7f545_2` | 2 | 2026-10-17 |
 | aegir-genie | 0.1.0 | `hb0f4dca_0` | 0 | 2026-07-20 |
 | aegir-genie | 0.2.0 | `hb0f4dca_0` | 0 | 2026-07-25 |
 | aegir-genie | 0.2.0 | `hb0f4dca_1` | 1 | 2026-08-11 |
@@ -64,6 +71,9 @@ _Updated: 2026-10-12_
 | aegir-genie | 0.2.0 | `hb0f4dca_6` | 6 | 2026-09-08 |
 | aegir-genie | 0.2.0 | `hb0f4dca_7` | 7 | 2026-09-23 |
 | aegir-genie | 0.2.0 | `hb0f4dca_8` | 8 | 2026-09-29 |
+| aegir-genie | 0.3.0 | `hb0f4dca_0` | 0 | 2026-10-14 |
+| aegir-genie | 0.3.0 | `hb0f4dca_1` | 1 | 2026-10-15 |
+| aegir-genie | 0.3.0 | `h1c7f545_2` | 2 | 2026-10-17 |
 | fairroot | 19.0.1 | `hb0f4dca_9` | 9 | 2026-06-13 |
 | fairroot | 19.0.1 | `hb0f4dca_10` | 10 | 2026-06-14 |
 | fairroot | 19.0.1 | `hb0f4dca_11` | 11 | 2026-06-26 |
@@ -85,6 +95,10 @@ _Updated: 2026-10-12_
 | fairroot | 19.0.1 | `ha28ff26_18` | 18 | 2026-09-23 |
 | fairroot | 19.0.1 | `h0518e97_19` | 19 | 2026-09-29 |
 | fairroot | 19.0.1 | `h6adce4a_19` | 19 | 2026-09-29 |
+| fairroot | 19.0.1 | `h0518e97_20` | 20 | 2026-10-15 |
+| fairroot | 19.0.1 | `h6adce4a_20` | 20 | 2026-10-15 |
+| fairroot | 19.0.1 | `h18d1abb_22` | 22 | 2026-10-17 |
+| fairroot | 19.0.1 | `h88d25f5_22` | 22 | 2026-10-17 |
 | fairship | 26.05.7 | `hb0f4dca_4` | 4 | 2026-06-13 |
 | fairship | 26.05.7 | `hb0f4dca_5` | 5 | 2026-06-14 |
 | fairship | 26.06 | `hb0f4dca_0` | 0 | 2026-06-18 |
@@ -111,6 +125,10 @@ _Updated: 2026-10-12_
 | fairship | 26.09 | `ha28ff26_8` | 8 | 2026-09-23 |
 | fairship | 26.09 | `h0518e97_9` | 9 | 2026-09-29 |
 | fairship | 26.09 | `h6adce4a_9` | 9 | 2026-09-29 |
+| fairship | 26.09 | `h0518e97_10` | 10 | 2026-10-15 |
+| fairship | 26.09 | `h6adce4a_10` | 10 | 2026-10-15 |
+| fairship | 26.09 | `h18d1abb_12` | 12 | 2026-10-17 |
+| fairship | 26.09 | `h88d25f5_12` | 12 | 2026-10-17 |
 | field-service | 0.1.0 | `h83dfeff_0` | 0 | 2026-06-19 |
 | field-service | 0.1.0 | `hb9574b7_0` | 0 | 2026-06-19 |
 | field-service | 0.1.0 | `h73f9d4e_1` | 1 | 2026-06-26 |
@@ -130,6 +148,18 @@ _Updated: 2026-10-12_
 | field-service | 0.1.0.dev0 | `hd1b55c3_3` | 3 | 2026-06-18 |
 | field-service | 0.2.0 | `hbda4f27_0` | 0 | 2026-10-01 |
 | field-service | 0.2.0 | `hc75c75e_0` | 0 | 2026-10-01 |
+| field-service | 0.3.0 | `h6528fa2_0` | 0 | 2026-10-13 |
+| field-service | 0.3.0 | `h6b3f094_0` | 0 | 2026-10-13 |
+| field-service | 0.4.0 | `h2044e3a_0` | 0 | 2026-10-13 |
+| field-service | 0.4.0 | `h54e5981_0` | 0 | 2026-10-13 |
+| field-service | 0.4.0 | `h5bdeed2_1` | 1 | 2026-10-17 |
+| field-service | 0.4.0 | `hfa13274_1` | 1 | 2026-10-17 |
+| field-service-acts | 0.3.0 | `h9630ee7_0` | 0 | 2026-10-13 |
+| field-service-acts | 0.3.0 | `h9f1fc34_0` | 0 | 2026-10-13 |
+| field-service-acts | 0.4.0 | `h410d9e9_0` | 0 | 2026-10-13 |
+| field-service-acts | 0.4.0 | `ha9ae14c_0` | 0 | 2026-10-13 |
+| field-service-acts | 0.4.0 | `hafd7d45_1` | 1 | 2026-10-17 |
+| field-service-acts | 0.4.0 | `hcb06c38_1` | 1 | 2026-10-17 |
 | field-service-core | 0.1.0 | `h0566472_0` | 0 | 2026-06-19 |
 | field-service-core | 0.1.0 | `hc97bc57_0` | 0 | 2026-06-19 |
 | field-service-core | 0.1.0 | `h0566472_1` | 1 | 2026-06-26 |
@@ -149,6 +179,12 @@ _Updated: 2026-10-12_
 | field-service-core | 0.1.0.dev0 | `hc97bc57_3` | 3 | 2026-06-18 |
 | field-service-core | 0.2.0 | `h0518e97_0` | 0 | 2026-10-01 |
 | field-service-core | 0.2.0 | `h6adce4a_0` | 0 | 2026-10-01 |
+| field-service-core | 0.3.0 | `h0518e97_0` | 0 | 2026-10-13 |
+| field-service-core | 0.3.0 | `h6adce4a_0` | 0 | 2026-10-13 |
+| field-service-core | 0.4.0 | `h0518e97_0` | 0 | 2026-10-13 |
+| field-service-core | 0.4.0 | `h6adce4a_0` | 0 | 2026-10-13 |
+| field-service-core | 0.4.0 | `h18d1abb_1` | 1 | 2026-10-17 |
+| field-service-core | 0.4.0 | `h88d25f5_1` | 1 | 2026-10-17 |
 | field-service-g4 | 0.1.0 | `hc496693_0` | 0 | 2026-06-19 |
 | field-service-g4 | 0.1.0 | `hf4ec559_0` | 0 | 2026-06-19 |
 | field-service-g4 | 0.1.0 | `h798224f_1` | 1 | 2026-06-26 |
@@ -168,8 +204,20 @@ _Updated: 2026-10-12_
 | field-service-g4 | 0.1.0.dev0 | `he69e5d4_3` | 3 | 2026-06-18 |
 | field-service-g4 | 0.2.0 | `h4c13c63_0` | 0 | 2026-10-01 |
 | field-service-g4 | 0.2.0 | `h7ffe25b_0` | 0 | 2026-10-01 |
+| field-service-g4 | 0.3.0 | `h9630ee7_0` | 0 | 2026-10-13 |
+| field-service-g4 | 0.3.0 | `h9f1fc34_0` | 0 | 2026-10-13 |
+| field-service-g4 | 0.4.0 | `h410d9e9_0` | 0 | 2026-10-13 |
+| field-service-g4 | 0.4.0 | `ha9ae14c_0` | 0 | 2026-10-13 |
+| field-service-g4 | 0.4.0 | `hafd7d45_1` | 1 | 2026-10-17 |
+| field-service-g4 | 0.4.0 | `hcb06c38_1` | 1 | 2026-10-17 |
 | field-service-mapio | 0.2.0 | `h4c13c63_0` | 0 | 2026-10-01 |
 | field-service-mapio | 0.2.0 | `h7ffe25b_0` | 0 | 2026-10-01 |
+| field-service-mapio | 0.3.0 | `h9630ee7_0` | 0 | 2026-10-13 |
+| field-service-mapio | 0.3.0 | `h9f1fc34_0` | 0 | 2026-10-13 |
+| field-service-mapio | 0.4.0 | `h410d9e9_0` | 0 | 2026-10-13 |
+| field-service-mapio | 0.4.0 | `ha9ae14c_0` | 0 | 2026-10-13 |
+| field-service-mapio | 0.4.0 | `hafd7d45_1` | 1 | 2026-10-17 |
+| field-service-mapio | 0.4.0 | `hcb06c38_1` | 1 | 2026-10-17 |
 | field-service-tools | 0.1.0 | `hc496693_0` | 0 | 2026-06-19 |
 | field-service-tools | 0.1.0 | `hf4ec559_0` | 0 | 2026-06-19 |
 | field-service-tools | 0.1.0 | `h798224f_1` | 1 | 2026-06-26 |
@@ -189,6 +237,12 @@ _Updated: 2026-10-12_
 | field-service-tools | 0.1.0.dev0 | `he69e5d4_3` | 3 | 2026-06-18 |
 | field-service-tools | 0.2.0 | `h10e6422_0` | 0 | 2026-10-01 |
 | field-service-tools | 0.2.0 | `h6c5dc73_0` | 0 | 2026-10-01 |
+| field-service-tools | 0.3.0 | `h32913e2_0` | 0 | 2026-10-13 |
+| field-service-tools | 0.3.0 | `h4c048ec_0` | 0 | 2026-10-13 |
+| field-service-tools | 0.4.0 | `h1f094de_0` | 0 | 2026-10-13 |
+| field-service-tools | 0.4.0 | `h84e1b0d_0` | 0 | 2026-10-13 |
+| field-service-tools | 0.4.0 | `h0bdebe1_1` | 1 | 2026-10-17 |
+| field-service-tools | 0.4.0 | `h49b89bf_1` | 1 | 2026-10-17 |
 | geant3 | 4.5 | `hb0f4dca_4` | 4 | 2026-06-13 |
 | geant3 | 4.5 | `hb0f4dca_5` | 5 | 2026-06-14 |
 | geant3 | 4.5 | `hb0f4dca_6` | 6 | 2026-06-26 |
@@ -198,6 +252,8 @@ _Updated: 2026-10-12_
 | geant3 | 4.5 | `h6adce4a_8` | 8 | 2026-09-24 |
 | geant3 | 4.5 | `h6afcf60_8` | 8 | 2026-09-08 |
 | geant3 | 4.5 | `ha28ff26_8` | 8 | 2026-09-08 |
+| geant3 | 4.5 | `h03f39e9_10` | 10 | 2026-10-16 |
+| geant3 | 4.5 | `hf85b193_10` | 10 | 2026-10-16 |
 | genfit | 2.3.0 | `hb0f4dca_3` | 3 | 2026-05-27 |
 | genfit | 2.3.0 | `hb0f4dca_4` | 4 | 2026-06-08 |
 | genfit | 2.3.0 | `hb0f4dca_5` | 5 | 2026-06-10 |
@@ -221,6 +277,10 @@ _Updated: 2026-10-12_
 | genfit | 2.3.0 | `ha28ff26_15` | 15 | 2026-09-23 |
 | genfit | 2.3.0 | `h0518e97_16` | 16 | 2026-09-29 |
 | genfit | 2.3.0 | `h6adce4a_16` | 16 | 2026-09-29 |
+| genfit | 2.3.0 | `h0518e97_17` | 17 | 2026-10-15 |
+| genfit | 2.3.0 | `h6adce4a_17` | 17 | 2026-10-15 |
+| genfit | 2.3.0 | `h18d1abb_19` | 19 | 2026-10-16 |
+| genfit | 2.3.0 | `h88d25f5_19` | 19 | 2026-10-16 |
 | genie | 3.06.02 | `pythia6_253f86f_0` | 0 | 2026-07-06 |
 | genie | 3.06.02 | `pythia8_211fdef_0` | 0 | 2026-07-06 |
 | genie | 3.06.02 | `pythia6_5d7d477_1` | 1 | 2026-07-20 |
@@ -263,14 +323,20 @@ _Updated: 2026-10-12_
 | genie | 3.06.02 | `pythia6_bfe31c9_9` | 9 | 2026-09-29 |
 | genie | 3.06.02 | `pythia8_07b49c4_9` | 9 | 2026-09-29 |
 | genie | 3.06.02 | `pythia8_6d69a71_9` | 9 | 2026-09-29 |
+| genie | 3.06.02 | `pythia6_9471653_10` | 10 | 2026-10-17 |
+| genie | 3.06.02 | `pythia6_ed79eeb_10` | 10 | 2026-10-17 |
+| genie | 3.06.02 | `pythia8_3937f17_10` | 10 | 2026-10-17 |
+| genie | 3.06.02 | `pythia8_e50125d_10` | 10 | 2026-10-17 |
 | libjsonnet | 0.22.0 | `hb0f4dca_0` | 0 | 2026-06-09 |
 | libjsonnet | 0.22.0 | `hb0f4dca_1` | 1 | 2026-06-10 |
 | mp-units | 2.5.0 | `hb0f4dca_0` | 0 | 2026-06-05 |
 | mp-units | 2.5.0 | `hb0f4dca_1` | 1 | 2026-06-10 |
 | mp-units | 2.5.0 | `hb0f4dca_4` | 4 | 2026-06-13 |
 | mp-units | 2.5.0 | `hb0f4dca_5` | 5 | 2026-06-14 |
+| mp-units | 2.5.0 | `h1c7f545_6` | 6 | 2026-10-16 |
 | npdb-client | 0.2.10 | `hb0f4dca_0` | 0 | 2026-06-17 |
 | npdb-client | 0.3.0 | `hb0f4dca_0` | 0 | 2026-06-26 |
+| npdb-client | 0.3.0 | `h80bbdca_1` | 1 | 2026-10-17 |
 | photospp | 3.64 | `hb0f4dca_0` | 0 | 2026-05-26 |
 | photospp | 3.64 | `hb0f4dca_1` | 1 | 2026-06-10 |
 | photospp | 3.64 | `hb0f4dca_2` | 2 | 2026-06-13 |
@@ -282,13 +348,17 @@ _Updated: 2026-10-12_
 | photospp | 3.64 | `h6adce4a_6` | 6 | 2026-09-24 |
 | photospp | 3.64 | `h6afcf60_6` | 6 | 2026-09-08 |
 | photospp | 3.64 | `ha28ff26_6` | 6 | 2026-09-08 |
+| photospp | 3.64 | `h18d1abb_8` | 8 | 2026-10-16 |
+| photospp | 3.64 | `h88d25f5_8` | 8 | 2026-10-16 |
 | pythia6 | 6.4.28 | `hb0f4dca_3` | 3 | 2026-05-27 |
 | pythia6 | 6.4.28 | `hb0f4dca_4` | 4 | 2026-06-10 |
 | pythia6 | 6.4.28 | `hb0f4dca_5` | 5 | 2026-06-13 |
 | pythia6 | 6.4.28 | `hb0f4dca_6` | 6 | 2026-06-14 |
 | pythia6 | 6.4.28 | `hb0f4dca_7` | 7 | 2026-10-01 |
+| pythia6 | 6.4.28 | `h80bbdca_9` | 9 | 2026-10-16 |
 | python-npdb-client | 0.2.10 | `hb0f4dca_0` | 0 | 2026-06-17 |
 | python-npdb-client | 0.3.0 | `hb0f4dca_0` | 0 | 2026-06-26 |
+| python-npdb-client | 0.3.0 | `h80bbdca_1` | 1 | 2026-10-17 |
 | rootegpythia6 | 0.1 | `hb0f4dca_5` | 5 | 2026-06-11 |
 | rootegpythia6 | 0.1 | `hb0f4dca_6` | 6 | 2026-06-13 |
 | rootegpythia6 | 0.1 | `hb0f4dca_7` | 7 | 2026-06-14 |
@@ -303,6 +373,8 @@ _Updated: 2026-10-12_
 | rootegpythia6 | 0.1 | `hc97bc57_10` | 10 | 2026-09-08 |
 | rootegpythia6 | 0.1 | `h0518e97_11` | 11 | 2026-10-01 |
 | rootegpythia6 | 0.1 | `h6adce4a_11` | 11 | 2026-10-01 |
+| rootegpythia6 | 0.1 | `h18d1abb_12` | 12 | 2026-10-17 |
+| rootegpythia6 | 0.1 | `h88d25f5_12` | 12 | 2026-10-17 |
 | shannon | 0.2.0 | `hb0f4dca_0` | 0 | 2026-07-23 |
 | shannon | 0.2.0 | `hb0f4dca_1` | 1 | 2026-08-17 |
 | shannon | 0.2.0 | `hb0f4dca_2` | 2 | 2026-08-25 |
@@ -310,6 +382,11 @@ _Updated: 2026-10-12_
 | shannon | 0.2.0 | `hb0f4dca_4` | 4 | 2026-09-08 |
 | shannon | 0.2.0 | `hb0f4dca_5` | 5 | 2026-09-23 |
 | shannon | 0.2.0 | `hb0f4dca_6` | 6 | 2026-09-29 |
+| shannon | 0.3.0 | `hb0f4dca_0` | 0 | 2026-10-14 |
+| shannon | 0.3.0 | `hb0f4dca_1` | 1 | 2026-10-15 |
+| shannon | 0.3.0 | `h1c7f545_2` | 2 | 2026-10-17 |
+| shannon | 0.4.0 | `h1c7f545_0` | 0 | 2026-10-17 |
+| shannon | 0.4.1 | `h1c7f545_0` | 0 | 2026-10-18 |
 | shipdatamodel | 0.1.0 | `hb0f4dca_0` | 0 | 2026-06-19 |
 | shipdatamodel | 0.1.0 | `h0566472_1` | 1 | 2026-06-19 |
 | shipdatamodel | 0.1.0 | `hc97bc57_1` | 1 | 2026-06-19 |
@@ -331,6 +408,10 @@ _Updated: 2026-10-12_
 | shipdatamodel | 0.4.0 | `ha28ff26_1` | 1 | 2026-09-08 |
 | shipdatamodel | 0.5.0 | `h0518e97_0` | 0 | 2026-09-29 |
 | shipdatamodel | 0.5.0 | `h6adce4a_0` | 0 | 2026-09-29 |
+| shipdatamodel | 0.6.0 | `h0518e97_0` | 0 | 2026-10-13 |
+| shipdatamodel | 0.6.0 | `h6adce4a_0` | 0 | 2026-10-13 |
+| shipdatamodel | 0.6.0 | `h18d1abb_1` | 1 | 2026-10-17 |
+| shipdatamodel | 0.6.0 | `h88d25f5_1` | 1 | 2026-10-17 |
 | shipgeometry | 0.1.0 | `hb0f4dca_0` | 0 | 2026-06-05 |
 | shipgeometry | 0.1.0 | `hb0f4dca_1` | 1 | 2026-06-05 |
 | shipgeometry | 0.1.0 | `hb0f4dca_2` | 2 | 2026-06-10 |
@@ -342,6 +423,8 @@ _Updated: 2026-10-12_
 | shipgeometry | 0.2.1 | `hb0f4dca_1` | 1 | 2026-06-26 |
 | shipgeometry | 0.2.1 | `hb0f4dca_2` | 2 | 2026-07-22 |
 | shipgeometry | 0.2.1 | `hb0f4dca_3` | 3 | 2026-08-11 |
+| shipgeometry | 0.2.1 | `hb0f4dca_4` | 4 | 2026-10-15 |
+| shipgeometry | 0.2.1 | `h1c7f545_5` | 5 | 2026-10-17 |
 | shipgeometryservice | 0.1.0 | `hb0f4dca_0` | 0 | 2026-06-18 |
 | shipgeometryservice | 0.1.0 | `hb0f4dca_1` | 1 | 2026-06-26 |
 | shipgeometryservice | 0.2.0 | `hb0f4dca_0` | 0 | 2026-07-16 |
@@ -349,8 +432,43 @@ _Updated: 2026-10-12_
 | shipgeometryservice | 0.3.0 | `hb0f4dca_1` | 1 | 2026-07-22 |
 | shipgeometryservice | 0.4.0 | `hb0f4dca_0` | 0 | 2026-08-11 |
 | shipgeometryservice | 0.4.0 | `hb0f4dca_1` | 1 | 2026-09-07 |
+| shipgeometryservice | 0.4.0 | `hb0f4dca_2` | 2 | 2026-10-15 |
+| shipgeometryservice | 0.4.0 | `h1c7f545_3` | 3 | 2026-10-17 |
+| shipgeometryservice | 0.5.0 | `h1c7f545_0` | 0 | 2026-10-17 |
 | trout | 0.1.0 | `hb0f4dca_0` | 0 | 2026-09-22 |
 | trout | 0.1.0 | `hb0f4dca_1` | 1 | 2026-09-29 |
+| trout | 0.2.0 | `hb0f4dca_0` | 0 | 2026-10-14 |
+| trout | 0.2.0 | `hb0f4dca_1` | 1 | 2026-10-15 |
+| trout | 0.2.0 | `h1c7f545_3` | 3 | 2026-10-17 |
+
+## linux-aarch64
+
+| Package | Version | Build | Build number | Uploaded |
+|---------|---------|-------|--------------|----------|
+| field-service | 0.4.0 | `h6577d60_1` | 1 | 2026-10-17 |
+| field-service | 0.4.0 | `h65c4afe_1` | 1 | 2026-10-17 |
+| field-service-acts | 0.4.0 | `h659d423_1` | 1 | 2026-10-17 |
+| field-service-acts | 0.4.0 | `h772daaa_1` | 1 | 2026-10-17 |
+| field-service-core | 0.4.0 | `h1acc638_1` | 1 | 2026-10-17 |
+| field-service-core | 0.4.0 | `he694b7a_1` | 1 | 2026-10-17 |
+| field-service-g4 | 0.4.0 | `h659d423_1` | 1 | 2026-10-17 |
+| field-service-g4 | 0.4.0 | `h772daaa_1` | 1 | 2026-10-17 |
+| field-service-mapio | 0.4.0 | `h659d423_1` | 1 | 2026-10-17 |
+| field-service-mapio | 0.4.0 | `h772daaa_1` | 1 | 2026-10-17 |
+| field-service-tools | 0.4.0 | `h8eaf479_1` | 1 | 2026-10-17 |
+| field-service-tools | 0.4.0 | `hc1a24e0_1` | 1 | 2026-10-17 |
+| genie | 3.06.02 | `pythia6_5932b76_10` | 10 | 2026-10-17 |
+| genie | 3.06.02 | `pythia6_fbe428a_10` | 10 | 2026-10-17 |
+| genie | 3.06.02 | `pythia8_1d2b347_10` | 10 | 2026-10-17 |
+| genie | 3.06.02 | `pythia8_206c8a8_10` | 10 | 2026-10-17 |
+| mp-units | 2.5.0 | `h300e7cd_6` | 6 | 2026-10-17 |
+| pythia6 | 6.4.28 | `hd069163_9` | 9 | 2026-10-17 |
+| rootegpythia6 | 0.1 | `h1acc638_12` | 12 | 2026-10-17 |
+| rootegpythia6 | 0.1 | `he694b7a_12` | 12 | 2026-10-17 |
+| shipdatamodel | 0.6.0 | `h1acc638_1` | 1 | 2026-10-17 |
+| shipdatamodel | 0.6.0 | `he694b7a_1` | 1 | 2026-10-17 |
+| shipgeometry | 0.2.1 | `h300e7cd_5` | 5 | 2026-10-17 |
+| shipgeometryservice | 0.5.0 | `h300e7cd_0` | 0 | 2026-10-17 |
 
 ## noarch
 
@@ -368,3 +486,6 @@ _Updated: 2026-10-12_
 | ship-ci-metrics | 0.1.0 | `pyh4616a5c_0` | 0 | 2026-07-03 |
 | ship-random | 0.1.0 | `h4616a5c_0` | 0 | 2026-10-05 |
 | ship-random | 0.2.0 | `h4616a5c_0` | 0 | 2026-10-05 |
+| ship-random | 0.2.0 | `hcf0848a_1` | 1 | 2026-10-17 |
+| ship-random | 0.3.0 | `hcf0848a_0` | 0 | 2026-10-17 |
+| ship-random | 0.4.0 | `hcf0848a_0` | 0 | 2026-10-18 |
