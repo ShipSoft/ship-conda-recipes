@@ -1,5 +1,5 @@
 context:
-  version: "0.2.0"
+  version: "0.3.0"
 
 package:
   name: trout
@@ -7,15 +7,12 @@ package:
 
 source:
   url: https://github.com/ShipSoft/Trout/archive/refs/tags/v${{ version }}.tar.gz
-  sha256: 8697734e91c95de31de8e8d8ccbff66f15f8131745c63affab7551eee6326a47
+  sha256: a7475c01f6afe75ae76b471c647dfad018f9c53d9f6c7c8340d88648dffd130b
 
 build:
-  number: 4
+  number: 0
   skip:
     - win
-    # No shipdatamodel <0.6 build exists for linux-aarch64. Drop this once
-    # the recipe moves to a release that supports data-model 0.6.
-    - target_platform == "linux-aarch64"
   script: build.sh
 
 requirements:
@@ -26,21 +23,18 @@ requirements:
     - cmake
     - make
   host:
-    # 0.2.x still uses the camelCase field names that data-model 0.6
-    # renamed, so it cannot build against 0.6.
-    - shipdatamodel >=0.5,<0.6
+    # 0.3.x uses the snake_case field names and SHiP namespace of data-model 0.6.
+    - shipdatamodel >=0.6
     - shipgeometry
-    # 0.5 puts a `namespace ship = SHiP;` alias in the old header paths,
-    # which clashes with data-model <0.6.
-    - shipgeometryservice >=0.3,<0.5
-    # The placement helpers and the ACTS adapter first ship in 0.3.0;
-    # 0.4 needs data-model 0.6.
-    - field-service-core >=0.3,<0.4
-    - field-service-mapio >=0.3,<0.4
-    - field-service-acts >=0.3,<0.4
+    - shipgeometryservice >=0.5
+    # 0.4 moved into the SHiP namespace, and a 0.x minor may break the API.
+    - field-service-core >=0.4,<0.5
+    - field-service-mapio >=0.4,<0.5
+    - field-service-acts >=0.4,<0.5
     - phlex >=0.4.1
     # SHiP::random::PhiloxRng, for make_test_input.
-    - ship-random >=0.2,<0.3
+    # find_package(SHiPRandom 0.4) accepts only 0.4.x (SameMinorVersion).
+    - ship-random >=0.4,<0.5
     # Upstream ACTS from conda-forge, not the acts-ship fork snapshot.
     - acts-core
     - root_base >=6.40
