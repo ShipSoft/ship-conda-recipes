@@ -10,7 +10,7 @@ source:
   sha256: 3b7dace1637f3c8d14548b5e4ffdcbdc45088af9fb31fb8eada6594841500833
 
 build:
-  number: 0
+  number: 1
   skip:
     - win
     # No shipdatamodel <0.6 build exists for linux-aarch64. Drop this once

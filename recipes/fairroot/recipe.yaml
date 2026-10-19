@@ -12,7 +12,7 @@ source:
     - fix-boost-serialization.patch
 
 build:
-  number: 22
+  number: 23
   # linux-64 only: not part of the arm64 port (see "Platforms" in the README).
   skip:
     - target_platform != "linux-64"
