@@ -1,5 +1,5 @@
 context:
-  version: "0.5.0"
+  version: "0.6.0"
 
 package:
   name: shipgeometryservice
@@ -7,7 +7,7 @@ package:
 
 source:
   url: https://github.com/ShipSoft/geometry_service/archive/refs/tags/v${{ version }}.tar.gz
-  sha256: 6e42469d01f4fc9bc75a20a0449a70cbad35d5acd045ad57e16ddf5c86dfee2b
+  sha256: e9862ea02bd18bec6ce223afb4cda8ef1a6ee8eb391443ed360283f0f5539dfd
 
 build:
   number: 0
@@ -49,18 +49,15 @@ tests:
       - test -f $PREFIX/include/SHiP/GeometryService/G4RayScanner.h
       - test -f $PREFIX/include/SHiP/GeometryService/GeometryThread.h
       - grep -q "SHiP::GeometryService" $PREFIX/lib/cmake/SHiPGeometryService/SHiPGeometryServiceTargets.cmake
-      # Forwarders for the pre-0.5.0 paths, removed in 0.6.0.
-      - test -f $PREFIX/include/GeometryService/SHiPGeometryService.h
-      - test -f $PREFIX/include/GeometryService/IGeometryService.h
-      - test -f $PREFIX/include/GeometryService/G4RayScanner.h
-      - test -f $PREFIX/include/GeometryService/GeometryThread.h
+      # 0.6.0 removed the pre-0.5.0 forwarding headers.
+      - test ! -e $PREFIX/include/GeometryService
 
 about:
   homepage: https://github.com/ShipSoft/geometry_service
   repository: https://github.com/ShipSoft/geometry_service
-  summary: Framework-agnostic C++20 service wrapping the SHiP GeoModel geometry
+  summary: Framework-agnostic C++23 service wrapping the SHiP GeoModel geometry
   description: |
-    SHiPGeometryService is a framework-agnostic C++20 library that
+    SHiPGeometryService is a framework-agnostic C++23 library that
     wraps the SHiP GeoModel geometry behind a stable, abstract
     interface (IGeometryService) inspired by DD4hep's IGeoSvc and
     ALICE O2's GeometryManager. It supports loading the geometry
