@@ -26,7 +26,9 @@ requirements:
     # 0.3.x uses the snake_case field names and SHiP namespace of data-model 0.6.
     - shipdatamodel >=0.6
     - shipgeometry
-    - shipgeometryservice >=0.5
+    # 0.3.x calls geant4WorldLogical() through a pointer, which 0.6 replaced
+    # with a reference.
+    - shipgeometryservice >=0.5,<0.6
     # 0.4 moved into the SHiP namespace, and a 0.x minor may break the API.
     - field-service-core >=0.4,<0.5
     - field-service-mapio >=0.4,<0.5
