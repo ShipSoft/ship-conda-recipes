@@ -1,5 +1,5 @@
 context:
-  version: "0.3.0"
+  version: "0.3.1"
 
 package:
   name: trout
@@ -7,7 +7,7 @@ package:
 
 source:
   url: https://github.com/ShipSoft/Trout/archive/refs/tags/v${{ version }}.tar.gz
-  sha256: a7475c01f6afe75ae76b471c647dfad018f9c53d9f6c7c8340d88648dffd130b
+  sha256: d33721a3cd2bc1691f6a7a60722a5e8cb34f8136cf1b967b619d617701ccde94
 
 build:
   number: 0
@@ -26,9 +26,8 @@ requirements:
     # 0.3.x uses the snake_case field names and SHiP namespace of data-model 0.6.
     - shipdatamodel >=0.6
     - shipgeometry
-    # 0.3.x calls geant4WorldLogical() through a pointer, which 0.6 replaced
-    # with a reference.
-    - shipgeometryservice >=0.5,<0.6
+    # 0.3.1 takes the world from geant4WorldLogical() as a reference (0.6).
+    - shipgeometryservice >=0.6,<0.7
     # 0.4 moved into the SHiP namespace, and a 0.x minor may break the API.
     - field-service-core >=0.4,<0.5
     - field-service-mapio >=0.4,<0.5
