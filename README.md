@@ -66,16 +66,12 @@ string changes, so the rebuilds supersede the old builds.
 ### Platforms
 
 Everything is built for linux-64. The Amaru stack is also built for
-linux-aarch64: shipdatamodel, shipgeometry, shipgeometryservice,
-field-service, mp-units, and the GENIE chain (genie, pythia6, rootegpythia6).
-osx-arm64 is planned. `build.yml` runs one native job per platform
-(`platforms` in the shared rattler-build workflow), and `nightly-main.yml`
-does the same for each library.
-
-aegir, aegir-genie, shannon and trout are part of the stack but skip
-linux-aarch64 for now. Their current releases need `shipdatamodel <0.6`, and
-no such build exists for linux-aarch64. Each recipe drops its skip when it
-moves to a release that supports data-model 0.6.
+linux-aarch64: aegir, aegir-genie, shannon, trout, shipdatamodel,
+shipgeometry, shipgeometryservice, field-service, mp-units, and the GENIE
+chain (genie, pythia6, rootegpythia6). osx-arm64 is planned. `build.yml` runs
+one native job per platform (`platforms` in the shared rattler-build
+workflow), `nightly-main.yml` does the same for each library, and the aegir
+dev builds run on both runners.
 
 The FairShip stack (fairship, fairroot, geant3, genfit, photospp, acts-ship)
 and npdb-client stay linux-64 only. Their recipes skip every other platform
