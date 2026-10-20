@@ -13,9 +13,6 @@ build:
   number: 0
   skip:
     - win
-    # No shipdatamodel <0.6 build exists for linux-aarch64. Drop this once
-    # the recipe moves to a release that supports data-model 0.6.
-    - target_platform == "linux-aarch64"
   script: build.sh
 
 requirements:
