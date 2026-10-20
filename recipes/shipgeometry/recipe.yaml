@@ -1,5 +1,5 @@
 context:
-  version: "0.2.1"
+  version: "0.3.0"
 
 package:
   name: shipgeometry
@@ -7,11 +7,10 @@ package:
 
 source:
   url: https://github.com/ShipSoft/Geometry/archive/refs/tags/v${{ version }}.tar.gz
-  sha256: 54c12d59d19d6161fb9bc29129c1e7cded4200c39f0db5e374e14fd70398cd08
+  sha256: 35da251ad43852906f663dfcb8802ff8dc9b5a142916d01e1640af2d833d2252
 
 build:
-  # Rebuild with the GCC 15 pin from global-variants.yaml.
-  number: 5
+  number: 0
   skip:
     - win
   script: build.sh
@@ -27,7 +26,12 @@ requirements:
     - geomodel-core
     - geomodel-tools
     - sqlite
-    - tomlplusplus
+    # 0.3.0 retyped the subsystem constants with mp-units quantities;
+    # SHiPGeometryConfig.cmake find_dependency()s it, so consumers need it too
+    # and its run_exports carry it to run.
+    - mp-units
+    # Logging in the executables only; PRIVATE to them, so build-time only.
+    - spdlog
     # GeoModel consumers need both in host — see "Known upstream
     # workarounds" in the README for the remove-when conditions.
     - eigen-abi-devel
@@ -37,23 +41,34 @@ requirements:
 
 tests:
   - script:
-      - test -f $PREFIX/lib/libSHiPGeometry.so
-      - test -f $PREFIX/lib/libCavern.so
-      - test -f $PREFIX/lib/libTarget.so
-      - test -f $PREFIX/lib/libMuonShield.so
-      - test -f $PREFIX/lib/libMagnet.so
-      - test -f $PREFIX/lib/libDecayVolume.so
-      - test -f $PREFIX/lib/libTrackers.so
-      - test -f $PREFIX/lib/libCalorimeter.so
-      - test -f $PREFIX/lib/libUpstreamTagger.so
-      - test -f $PREFIX/lib/libTimingDetector.so
-      - test -f $PREFIX/lib/libNeutrinoDetector.so
+      # 0.3.0 renamed every library: the detector-assembly target is
+      # ship_geometry and the subsystems are ship_geometry_<name>, so that a
+      # source build does not put a target called Target or Magnet in the
+      # consumer's global namespace.
+      - test -f $PREFIX/lib/libship_geometry.so
+      - test -f $PREFIX/lib/libship_geometry_cavern.so
+      - test -f $PREFIX/lib/libship_geometry_target.so
+      - test -f $PREFIX/lib/libship_geometry_muonshield.so
+      - test -f $PREFIX/lib/libship_geometry_magnet.so
+      - test -f $PREFIX/lib/libship_geometry_decayvolume.so
+      - test -f $PREFIX/lib/libship_geometry_trackers.so
+      - test -f $PREFIX/lib/libship_geometry_calorimeter.so
+      - test -f $PREFIX/lib/libship_geometry_upstreamtagger.so
+      - test -f $PREFIX/lib/libship_geometry_timingdetector.so
+      - test -f $PREFIX/lib/libship_geometry_neutrinodetector.so
       - test -f $PREFIX/bin/build_geometry
       - test -f $PREFIX/bin/validate_geometry
       - test -f $PREFIX/lib/cmake/SHiPGeometry/SHiPGeometryConfig.cmake
-      - test -f $PREFIX/share/SHiPGeometry/sbt.toml
-      - test -f $PREFIX/share/SHiPGeometry/calo.toml
-      - test -f $PREFIX/share/SHiPGeometry/TimingDetector/timing_detector.gmx
+      # The canonical header root, and the pre-0.3.0 forwarders that keep
+      # existing consumers compiling until 0.4.0.
+      - test -f $PREFIX/include/SHiP/geometry/DetectorBuilder.h
+      - test -f $PREFIX/include/SHiP/geometry/Materials.h
+      - test -f $PREFIX/include/SHiP/geometry/Cavern/CavernFactory.h
+      - test -f $PREFIX/include/SHiPGeometry/SHiPGeometry.h
+      - test -f $PREFIX/include/Cavern/CavernFactory.h
+      # Exported target names, which no file test would notice regressing.
+      - grep -q "SHiP::Geometry" $PREFIX/lib/cmake/SHiPGeometry/SHiPGeometryTargets.cmake
+      - grep -q "SHiP::GeometryCavern" $PREFIX/lib/cmake/SHiPGeometry/SHiPGeometryTargets.cmake
 
 about:
   homepage: https://github.com/ShipSoft/Geometry
