@@ -1,5 +1,5 @@
 context:
-  version: "0.3.0"
+  version: "0.4.0"
 
 package:
   name: aegir-genie
@@ -7,15 +7,12 @@ package:
 
 source:
   url: https://github.com/ShipSoft/aegir-genie/archive/refs/tags/v${{ version }}.tar.gz
-  sha256: f222fee430970ff01cdbf6806708cea86636e063b6218970472bf1744caf52ee
+  sha256: 3c9b6894a933d4e1297d2493ad81399aca5793e9a2c31eafdeb4f1f5896aaa64
 
 build:
-  number: 3
+  number: 0
   skip:
     - win
-    # No shipdatamodel <0.6 build exists for linux-aarch64. Drop this once
-    # the recipe moves to a release that supports data-model 0.6.
-    - target_platform == "linux-aarch64"
   script: build.sh
 
 requirements:
@@ -26,18 +23,18 @@ requirements:
     - cmake
     - make
   host:
-    # 0.3.x still uses the camelCase field names that data-model 0.6
-    # renamed, so it cannot build against 0.6.
-    - shipdatamodel <0.6
+    # The SHiP packages are capped at the next minor, which may break the API
+    # while they are 0.x, matching the find_package ranges in CMakeLists.txt.
+    - shipdatamodel >=0.6,<0.7
     - phlex >=0.4.1
-    # 0.5 puts a `namespace ship = SHiP;` alias in the old header paths,
-    # which clashes with data-model <0.6.
-    - shipgeometryservice >=0.3,<0.5
+    # In step with aegir 0.5: both plugins load into one process and share
+    # one copy of the library and its geometry thread.
+    - shipgeometryservice >=0.6,<0.7
     # genie_source builds on aegir's installed generator-source helper
-    # (aegir::source_helper, first installed in 0.4.0).
-    - aegir >=0.4
+    # (aegir::source_helper), declared in SHiP::aegir since 0.5.
+    - aegir >=0.5,<0.6
     # SHiP::random::PhiloxRng, the per-event reseeding RNG.
-    - ship-random >=0.2,<0.3
+    - ship-random >=0.4,<0.5
     - root_base >=6.40
     # phlex/shipdatamodel are C++23; pin the matching ROOT variant so genie
     # and phlex stay co-installable (an unconstrained solve drifts down to
@@ -71,7 +68,7 @@ requirements:
   run:
     # aegir has no run_exports. The genie workflows load aegir's plugins,
     # and aegir 0.x only promises a stable source helper within a minor.
-    - aegir >=0.4,<0.5
+    - aegir >=0.5,<0.6
 
 tests:
   - script:
