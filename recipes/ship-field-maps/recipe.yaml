@@ -1,0 +1,67 @@
+context:
+  version: "0.1.0"
+  # FairShip commit the maps are taken from; must match fairship.commit in
+  # the release's share/field/placements.json.
+  fairship_commit: 01466dcceb1e4917e460ae221fe03afc46357367
+  fairship_media: https://media.githubusercontent.com/media/ShipSoft/FairShip
+
+package:
+  name: ship-field-maps
+  version: ${{ version }}
+
+source:
+  - url: https://github.com/ShipSoft/field_maps/archive/refs/tags/v${{ version }}.tar.gz
+    sha256: 868649613595b2db495a1fcb3a6307c925a56322c89660de2d2fcc6db8b7b299
+  # FairShip keeps the maps in git-lfs, so its source tarballs hold only
+  # pointer files. Fetch the content from the LFS media host instead. The
+  # sha256 values repeat the ones in placements.json, which build_maps.py
+  # checks again.
+  - url: ${{ fairship_media }}/${{ fairship_commit }}/files/TRY_2026.root
+    sha256: 054a3aa40af9b16e6ff5d4c7e0e37bebe9663deb4057cdce7638149b9e7206b8
+    file_name: TRY_2026.root
+    target_directory: fairship
+  - url: ${{ fairship_media }}/${{ fairship_commit }}/files/2026_07_02_MainSpectrometerField_V21_2455.root
+    sha256: 5d3d71813718f41825fd5fead594d2aff2260b77c909e6e71a808ac15c535c1e
+    file_name: 2026_07_02_MainSpectrometerField_V21_2455.root
+    target_directory: fairship
+
+build:
+  number: 0
+  noarch: generic
+  script:
+    - python scripts/build_maps.py --prefix $PREFIX --input-dir fairship
+
+requirements:
+  build:
+    # fairship_to_fieldmap converts the maps at build time; the package
+    # itself is plain data and has no run dependencies.
+    - field-service-tools >=0.4.0
+    - python >=3.11
+
+tests:
+  - script:
+      - test -f $PREFIX/share/field/placements.json
+      - test -f $PREFIX/share/field/field_maps.libsonnet
+      - fieldmap_dump $PREFIX/share/field/muon_shield_TRY_2026.root
+      - fieldmap_dump $PREFIX/share/field/spectrometer_V21_2455.root
+      - echo "0 0 0" | fieldmap_dump $PREFIX/share/field/spectrometer_V21_2455.root spectrometer_V21_2455
+    requirements:
+      run:
+        - field-service-tools >=0.4.0
+
+about:
+  homepage: https://github.com/ShipSoft/field_maps
+  repository: https://github.com/ShipSoft/field_maps
+  summary: SHiP magnetic field maps in the SHiP field-map format, with their placements
+  description: |
+    The SHiP muon shield (TRY_2026) and spectrometer (V21_2455) field maps
+    from FairShip, converted to the SHiP field-map format and installed
+    under share/field/, where field_service resolves bare filenames.
+    placements.json and field_maps.libsonnet give each map's position
+    in the SHiP geometry.
+  license: LGPL-3.0-or-later
+  license_file: LICENSES/LGPL-3.0-or-later.txt
+
+extra:
+  recipe-maintainers:
+    - olantwin

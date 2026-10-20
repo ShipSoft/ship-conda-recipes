@@ -30,6 +30,7 @@ The old `prefix.dev/ship` channel no longer receives uploads.
 | rootegpythia6 | No (niche) |
 | shannon | No (SHiP-specific) |
 | ship-ci-metrics | No (SHiP-specific) |
+| ship-field-maps | No (SHiP-specific data) |
 | ship-random | No (SHiP-specific) |
 | shipdatamodel | No (SHiP-specific) |
 | shipgeometry | No (SHiP-specific) |
