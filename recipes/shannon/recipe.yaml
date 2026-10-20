@@ -1,5 +1,5 @@
 context:
-  version: "0.4.1"
+  version: "0.5.0"
 
 package:
   name: shannon
@@ -7,10 +7,10 @@ package:
 
 source:
   url: https://github.com/ShipSoft/Shannon/archive/refs/tags/v${{ version }}.tar.gz
-  sha256: 3b7dace1637f3c8d14548b5e4ffdcbdc45088af9fb31fb8eada6594841500833
+  sha256: 883a7a46e43bdf5283cca6d3140226f99d1d25fc99f3a71b1d4693144cb168a7
 
 build:
-  number: 1
+  number: 0
   skip:
     - win
     # No shipdatamodel <0.6 build exists for linux-aarch64. Drop this once
@@ -31,7 +31,7 @@ requirements:
     - shipdatamodel >=0.6
     - phlex >=0.4.1
     # SHiP::random::PhiloxRng, the per-event reseeding RNG.
-    - ship-random >=0.2,<0.3
+    - ship-random >=0.4,<0.5
     - root_base >=6.40
     # phlex/shipdatamodel are C++23; pin the matching ROOT variant.
     - root_cxx_standard ==23
