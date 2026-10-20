@@ -1,5 +1,5 @@
 context:
-  version: "0.4.0"
+  version: "0.5.0"
 
 package:
   name: aegir
@@ -7,15 +7,12 @@ package:
 
 source:
   url: https://github.com/ShipSoft/aegir/archive/refs/tags/v${{ version }}.tar.gz
-  sha256: 7d9274e33fec96a10baa0bbfabfd9b92b332cf8660919d58c3c00678f3d044af
+  sha256: f744cc528a209be7147fbc6281104db731416fa3f0869fe4f03491d6fc58f2c8
 
 build:
-  number: 3
+  number: 0
   skip:
     - win
-    # No shipdatamodel <0.6 build exists for linux-aarch64. Drop this once
-    # the recipe moves to a release that supports data-model 0.6.
-    - target_platform == "linux-aarch64"
   script: build.sh
 
 requirements:
@@ -26,17 +23,15 @@ requirements:
     - cmake
     - make
   host:
-    # 0.4.x still uses the camelCase field names that data-model 0.6
-    # renamed, so it cannot build against 0.6.
-    - shipdatamodel >=0.5,<0.6
+    # The SHiP packages are capped at the next minor, which may break the API
+    # while they are 0.x, matching the find_package ranges in CMakeLists.txt.
+    - shipdatamodel >=0.6,<0.7
     - phlex >=0.4.1
-    # 0.5 puts a `namespace ship = SHiP;` alias in the old header paths,
-    # which clashes with data-model <0.6.
-    - shipgeometryservice >=0.3,<0.5
-    - field-service-core >=0.2
-    - field-service-g4 >=0.2
-    # SHiPFieldService::MapIO, used by field_map_provider.
-    - field-service-mapio >=0.2
+    - shipgeometryservice >=0.6,<0.7
+    - field-service-core >=0.4,<0.5
+    - field-service-g4 >=0.4,<0.5
+    # SHiP::FieldServiceMapIO, used by field_map_provider.
+    - field-service-mapio >=0.4,<0.5
     - root_base >=6.40
     # phlex/shipdatamodel are C++23; pin the matching ROOT variant so aegir
     # and phlex stay co-installable (an unconstrained solve drifts down to
@@ -51,7 +46,7 @@ requirements:
     - pythia8 >=8.312
     - random123
     # SHiP::random::PhiloxRng, the generators' per-event RNG.
-    - ship-random >=0.2,<0.3
+    - ship-random >=0.4,<0.5
     - libboost-devel
     - tbb-devel
     - spdlog
