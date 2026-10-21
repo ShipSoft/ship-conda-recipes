@@ -1,5 +1,5 @@
 context:
-  version: "0.4.0"
+  version: "0.5.0"
 
 recipe:
   name: field-service
@@ -7,7 +7,7 @@ recipe:
 
 source:
   - url: https://github.com/ShipSoft/field_service/archive/refs/tags/v${{ version }}.tar.gz
-    sha256: d610639467579a66fa9b87f59fc6f2d4fd6bdc9d9e4d8ca85c7e6da261f26a41
+    sha256: 0e9745f266bf15e88740cffd1fb8bb510eb6433a3d6645228666e92b49fa7066
   # covfie is FetchContent'd by upstream CMake; vendor it so the build
   # stays offline. Pinned to the same tag the CMakeLists.txt uses.
   - url: https://github.com/acts-project/covfie/archive/refs/tags/v0.16.0.tar.gz
@@ -15,7 +15,7 @@ source:
     target_directory: covfie_src
 
 build:
-  number: 1
+  number: 0
 
 outputs:
   - staging:
@@ -55,6 +55,8 @@ outputs:
       - libboost-devel
       - eigen
       - root_base
+      # Placement manifests (MapIO, header-only, private).
+      - nlohmann_json
       - root_cxx_standard
 
   - package:
@@ -63,11 +65,8 @@ outputs:
     build:
       files:
         - lib/libSHiPFieldService.so*
-        - include/FieldService/IFieldSource.h
         - include/SHiP/FieldService/IFieldSource.h
-        - include/FieldService/CovfieFieldSource.h
         - include/SHiP/FieldService/CovfieFieldSource.h
-        - include/FieldService/FieldMap.h
         - include/SHiP/FieldService/FieldMap.h
         - lib/cmake/SHiPFieldService/SHiPFieldServiceConfig.cmake
         - lib/cmake/SHiPFieldService/SHiPFieldServiceConfigVersion.cmake
@@ -100,11 +99,8 @@ outputs:
     tests:
       - script:
           - test -f $PREFIX/lib/libSHiPFieldService.so
-          - test -f $PREFIX/include/FieldService/IFieldSource.h
           - test -f $PREFIX/include/SHiP/FieldService/IFieldSource.h
-          - test -f $PREFIX/include/FieldService/CovfieFieldSource.h
           - test -f $PREFIX/include/SHiP/FieldService/CovfieFieldSource.h
-          - test -f $PREFIX/include/FieldService/FieldMap.h
           - test -f $PREFIX/include/SHiP/FieldService/FieldMap.h
           - test -f $PREFIX/lib/cmake/SHiPFieldService/SHiPFieldServiceConfig.cmake
           - test -f $PREFIX/lib/cmake/SHiPFieldService/SHiPFieldServiceTargets.cmake
@@ -115,7 +111,6 @@ outputs:
     build:
       files:
         - lib/libSHiPFieldServiceMapIO.so*
-        - include/FieldService/FieldMapIO.h
         - include/SHiP/FieldService/FieldMapIO.h
         - lib/cmake/SHiPFieldService/SHiPFieldServiceMapIOTargets.cmake
         - lib/cmake/SHiPFieldService/SHiPFieldServiceMapIOTargets-*.cmake
@@ -141,7 +136,6 @@ outputs:
     tests:
       - script:
           - test -f $PREFIX/lib/libSHiPFieldServiceMapIO.so
-          - test -f $PREFIX/include/FieldService/FieldMapIO.h
           - test -f $PREFIX/include/SHiP/FieldService/FieldMapIO.h
           - test -f $PREFIX/lib/cmake/SHiPFieldService/SHiPFieldServiceMapIOTargets.cmake
 
@@ -150,7 +144,6 @@ outputs:
     inherit: field-service-build
     build:
       files:
-        - include/FieldService/G4MagFieldAdapter.h
         - include/SHiP/FieldService/G4MagFieldAdapter.h
         - lib/cmake/SHiPFieldService/SHiPFieldServiceG4AdapterTargets.cmake
         - lib/cmake/SHiPFieldService/SHiPFieldServiceG4AdapterTargets-*.cmake
@@ -176,7 +169,6 @@ outputs:
           - root_cxx_standard
     tests:
       - script:
-          - test -f $PREFIX/include/FieldService/G4MagFieldAdapter.h
           - test -f $PREFIX/include/SHiP/FieldService/G4MagFieldAdapter.h
           - test -f $PREFIX/lib/cmake/SHiPFieldService/SHiPFieldServiceG4AdapterTargets.cmake
 
@@ -185,7 +177,6 @@ outputs:
     inherit: field-service-build
     build:
       files:
-        - include/FieldService/ActsFieldAdapter.h
         - include/SHiP/FieldService/ActsFieldAdapter.h
         - lib/cmake/SHiPFieldService/SHiPFieldServiceActsAdapterTargets.cmake
     requirements:
@@ -213,7 +204,6 @@ outputs:
           - root_cxx_standard
     tests:
       - script:
-          - test -f $PREFIX/include/FieldService/ActsFieldAdapter.h
           - test -f $PREFIX/include/SHiP/FieldService/ActsFieldAdapter.h
           - test -f $PREFIX/lib/cmake/SHiPFieldService/SHiPFieldServiceActsAdapterTargets.cmake
 
