@@ -1,0 +1,69 @@
+schema_version: 1
+
+context:
+  name: evtgen
+  version: 2.02.03
+
+package:
+  name: ${{ name|lower }}
+  version: ${{ version|replace(".0", ".") }}
+
+source:
+  url: "https://evtgen.hepforge.org/downloads?f=EvtGen-0${{ version }}.tar.gz"
+  file_name: EvtGen-0${{ version }}.tar.gz
+  sha256: b642700b703190e3304edb98ff464622db5d03c1cfc5d275ba4a628227d7d6d0
+
+build:
+  number: 0
+  # Rebuilt here only so FairShip's evtgen links the ship channel's pythia8
+  # (conda-forge's is built against 8.312). FairShip stack: linux-64 only.
+  skip:
+    - target_platform != "linux-64"
+
+requirements:
+  build:
+    - ${{ compiler('c') }}
+    - ${{ compiler('cxx') }}
+    - if: linux
+      then: sysroot_${{ target_platform }} 2.17.*
+    - cmake
+    - make
+  host:
+    - pythia8
+    - hepmc3
+    - photos
+    - tauloa
+  run:
+    - ${{ pin_compatible('hepmc3') }}
+  run_exports:
+    - ${{ pin_subpackage('evtgen', upper_bound='x.x') }}
+
+tests:
+  - script:
+      - if: unix
+        then: test -f $PREFIX/lib/libEvtGen$SHLIB_EXT
+      - if: unix
+        then: test -f $PREFIX/lib/libEvtGenExternal$SHLIB_EXT
+      # The Pythia interface must link the pythia8 from this environment.
+      - if: linux
+        then: ldd $PREFIX/lib/libEvtGenExternal.so | grep -q "libpythia8.so => $PREFIX/lib/"
+
+about:
+  license: GPL-3.0-or-later
+  license_file: COPYING
+  summary: A Monte Carlo event generator that simulates the decays of heavy flavour particles
+  description: |
+    EvtGen is a Monte Carlo event generator that simulates the decays of heavy
+    flavour particles, primarily B and D mesons. It contains a range of decay
+    models for intermediate and final states containing scalar, vector and
+    tensor mesons or resonances, as well as leptons, photons and baryons. Decay
+    amplitudes are used to generate each branch of a given full decay tree,
+    taking into account angular and time-dependent correlations which allows
+    for the simulation of CP-violating processes.
+  homepage: https://evtgen.hepforge.org/
+  repository: https://phab.hepforge.org/source/evtgen/
+  documentation: https://evtgen.hepforge.org/doc/
+
+extra:
+  recipe-maintainers:
+    - chrisburr
