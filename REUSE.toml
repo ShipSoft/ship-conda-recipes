@@ -8,3 +8,9 @@ path = "**"
 precedence = "aggregate"
 SPDX-FileCopyrightText = "CERN for the benefit of the SHiP Collaboration"
 SPDX-License-Identifier = "BSD-3-Clause"
+
+[[annotations]]
+path = ["recipes/pythia8/**", "recipes/evtgen/**"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "conda-forge contributors"
+SPDX-License-Identifier = "BSD-3-Clause"
