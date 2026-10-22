@@ -1,5 +1,5 @@
 context:
-  version: "0.1.0"
+  version: "0.1.1"
   # FairShip commit the maps are taken from; must match fairship.commit in
   # the release's share/field/placements.json.
   fairship_commit: 01466dcceb1e4917e460ae221fe03afc46357367
@@ -11,7 +11,7 @@ package:
 
 source:
   - url: https://github.com/ShipSoft/field_maps/archive/refs/tags/v${{ version }}.tar.gz
-    sha256: 868649613595b2db495a1fcb3a6307c925a56322c89660de2d2fcc6db8b7b299
+    sha256: 4ab196d90eee1e83f9029e088c3aef336a75bc885ea65810114803430ac906ed
   # FairShip keeps the maps in git-lfs, so its source tarballs hold only
   # pointer files. Fetch the content from the LFS media host instead. The
   # sha256 values repeat the ones in placements.json, which build_maps.py
@@ -34,8 +34,9 @@ build:
 requirements:
   build:
     # fairship_to_fieldmap converts the maps at build time; the package
-    # itself is plain data and has no run dependencies.
-    - field-service-tools >=0.4.0
+    # itself is plain data and has no run dependencies. 0.5.0 adds --source,
+    # which build_maps.py uses to record each map's FairShip URL.
+    - field-service-tools >=0.5.0
     - python >=3.11
 
 tests:
@@ -45,6 +46,10 @@ tests:
       - fieldmap_dump $PREFIX/share/field/muon_shield_TRY_2026.root
       - fieldmap_dump $PREFIX/share/field/spectrometer_V21_2455.root
       - echo "0 0 0" | fieldmap_dump $PREFIX/share/field/spectrometer_V21_2455.root spectrometer_V21_2455
+      # Provenance names the FairShip file at the pinned commit.
+      - >-
+        fieldmap_dump $PREFIX/share/field/muon_shield_TRY_2026.root
+        | grep -q "source: *https://github.com/ShipSoft/FairShip/blob/${{ fairship_commit }}/files/TRY_2026.root"
     requirements:
       run:
         - field-service-tools >=0.4.0
