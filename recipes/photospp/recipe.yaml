@@ -10,7 +10,7 @@ source:
   sha256: d42cb01eca6eea517dc6a729cd34db515d6894e6f4bab73072cb5a6fa9b93d63
 
 build:
-  number: 8
+  number: 9
   # linux-64 only: not part of the arm64 port (see "Platforms" in the README).
   skip:
     - target_platform != "linux-64"

@@ -1,0 +1,145 @@
+schema_version: 1
+
+context:
+  file_version: "8318"
+  version: ${{ file_version[0] + "." + file_version[1:] }}
+  build: 0
+
+package:
+  name: pythia8
+  version: ${{ version }}
+
+source:
+  url: https://gitlab.com/Pythia8/releases/-/archive/pythia${{ file_version }}/releases-pythia${{ file_version }}.tar.gz
+  sha256: a7fe2c2343b911376b1590b71a0125dd562aac267daa5c75d61cf6f7a77fe515
+
+build:
+  # Prioritize builds with a higher microarch level.
+  # microarch_level 4 not supported yet.
+  # c.f. https://github.com/conda-forge/microarch-level-feedstock/issues/5
+  number: ${{ build + 100 * (microarch_level | default("1") | int) if unix and x86_64 else build }}
+  skip: win
+
+requirements:
+  build:
+    - if: build_platform != target_platform
+      then:
+        - python
+        - cross-python_${{ target_platform }}
+    - if: unix and x86_64
+      then: x86_64-microarch-level ==${{ microarch_level }}
+    - ${{ compiler('c') }}
+    - ${{ compiler('cxx') }}
+    - if: linux
+      then: sysroot_${{ target_platform }} 2.17.*
+    - rsync
+    - make
+    - sed
+  host:
+    - python
+    - if: linux and match(python, "<3.9")
+      then: libxcrypt
+    - pybind11
+    - lhapdf
+    - fastjet-cxx
+    - fastjet-cxx-devel
+    - hepmc2
+    # Cap HepMC3 below 3.3.1: conda-forge `photos` (and so `evtgen`) is still
+    # built against hepmc3 3.3.0 and pins `hepmc3 <3.3.1`. An unpinned build
+    # picks up hepmc3 3.3.1 and can't share an environment with evtgen. Same
+    # cap as acts-ship; drop it once photos/evtgen migrate to hepmc3 3.3.1.
+    - hepmc3 <3.3.1
+    # zlib controlled through https://github.com/conda-forge/conda-forge-pinning-feedstock/
+    - zlib
+  run:
+    - python
+    # Pythia8Plugins/FastJet3.h includes the FastJet headers, which only
+    # fastjet-cxx-devel ships.
+    - fastjet-cxx-devel
+    # hepmc3 3.3.0 has no run_exports, so nothing else pulls it in.
+    - ${{ pin_compatible('hepmc3', upper_bound='x.x') }}
+    # zlib needed to be compatible with cxx-compiler
+    - zlib
+  run_exports:
+    - pythia8 >=${{ version }},<${{ file_version[0] }}.${{ (file_version[1] | int) + 1 }}00.0a0
+
+tests:
+  - package_contents:
+      bin:
+        - pythia8-config
+      lib:
+        - pythia8
+      include:
+        - Pythia8/Pythia.h
+      files:
+        exists:
+          # pythia8 gives its plugin libraries a .so suffix on every
+          # platform, so the lib: shorthand does not match them on macOS
+          # where it looks for .dylib.
+          - lib/libpythia8lhapdf6.so
+          - share/Pythia8/examples/Makefile
+          - share/Pythia8/examples/Makefile.inc
+        not_exists:
+          - share/Pythia8/htmldoc
+          - share/Pythia8/pdfdoc
+
+  - python:
+      imports:
+        - pythia8
+  - files:
+      source:
+        - examples/Makefile
+        - examples/main101.cc
+        - examples/main131.cc
+        - examples/main132.cc
+        - examples/main132.cmnd
+        - examples/main133.cc
+        - examples/main133.cmnd
+        - examples/main134.cc
+        - examples/main134.cmnd
+        - examples/main135.cc
+        - examples/main161.cc
+        - examples/main161.cmnd
+        - examples/main201.cc
+        - examples/main212.cc
+        - examples/w+_production_lhc_0.lhe
+        - examples/ttbar.lhe
+        - examples/ttbar2.lhe
+        - examples/wbj_lhef3.lhe
+      recipe:
+        - run_test.sh
+    requirements:
+      run:
+        - cxx-compiler
+        - lhapdf >=6.2
+        - fastjet-cxx
+        - fastjet-cxx-devel
+        - hepmc2
+        - hepmc3
+        - make
+        - sed
+    script: bash run_test.sh
+
+about:
+  license: GPL-2.0-only
+  license_file: COPYING
+  summary: A tool for the generation of events in high-energy collisions
+  description: |
+    The Pythia program is a standard tool for the generation of events in
+    high-energy collisions, comprising a coherent set of physics models for
+    the evolution from a few-body hard process to a complex multiparticle
+    final state. It contains a library of hard processes, models for initial-
+    and final-state parton showers, matching and merging methods between hard
+    processes and parton showers, multiparton interactions, beam remnants,
+    string fragmentation and particle decays. It also has a set of utilities
+    and several interfaces to external programs.
+  homepage: https://pythia.org/
+  repository: https://gitlab.com/Pythia8/releases
+  documentation: https://pythia.org/
+
+extra:
+  recipe-maintainers:
+    - chrisburr
+    - henryiii
+    - ph-ilten
+    - matthewfeickert

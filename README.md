@@ -13,6 +13,7 @@ The old `prefix.dev/ship` channel no longer receives uploads.
 | acts-ship | No (SHiP fork of conda-forge `acts-core`) |
 | aegir | No (SHiP-specific) |
 | aegir-genie | No (SHiP-specific, links GPL GENIE) |
+| evtgen | Temporary (conda-forge's links pythia8 8.312, see below) |
 | fairroot | No (carries patch) |
 | fairship | No (SHiP-specific) |
 | field-service | No (SHiP-specific) |
@@ -26,6 +27,7 @@ The old `prefix.dev/ship` channel no longer receives uploads.
 | npdb-client | No (SHiP-specific, split recipe with `python-npdb-client`) |
 | photospp | Yes |
 | pythia6 | No (ShipSoft fork) |
+| pythia8 | Temporary (conda-forge is behind, see below) |
 | random123 | Yes (conda-forge feedstock) |
 | rootegpythia6 | No (niche) |
 | shannon | No (SHiP-specific) |
@@ -51,6 +53,38 @@ Previously packaged here, now consumed directly from conda-forge:
 - [GeoModel](https://github.com/conda-forge/geomodel-feedstock)
 - [geant4-vmc](https://github.com/conda-forge/geant4-vmc-feedstock)
 
+### Temporary overrides of conda-forge
+
+conda-forge ships these, but too old for SHiP. The recipes are copies of the
+conda-forge feedstocks with as few changes as possible, and they go away once
+conda-forge catches up.
+
+- **pythia8 8.318**: conda-forge has 8.312, and SHiP productions see physics
+  differences from 8.316 onward. The 8.316 bump is
+  [pythia8-feedstock#74](https://github.com/conda-forge/pythia8-feedstock/pull/74).
+  Changes from the feedstock: hepmc3 capped below 3.3.1 so it can share an
+  environment with conda-forge `photos`/`evtgen`, plus the `fastjet-cxx-devel`
+  dependency from #74. `run_exports` is the feedstock's
+  (`>=8.318,<8.400.0a0`).
+- **evtgen 2.2.3**: the same version as conda-forge, rebuilt against our
+  pythia8. conda-forge's build links 8.312 and accepts any 8.3 release at
+  runtime, but Pythia doesn't keep ABI between releases. linux-64 only, like
+  the rest of the FairShip stack.
+
+The ship channel comes first and solves use strict channel priority, so while
+our pythia8 is on the channel, no solve sees conda-forge's. Once conda-forge
+ships pythia8 ≥ 8.318 (and an evtgen built against it):
+
+1. Delete `recipes/pythia8` and `recipes/evtgen` and their table rows.
+2. Refresh the downstream lockfiles (FairShip, aegir) so they no longer point
+   at the ship-channel builds.
+3. Delete the ship-channel pythia8 and evtgen builds with the prefix.dev
+   delete API. A UI yank isn't enough: the builds stay in the repodata and keep
+   shadowing conda-forge.
+
+Consumers need no rebuild: their `pythia8 >=8.318,<8.400.0a0` pin accepts
+conda-forge's build.
+
 ## Recipe conventions
 
 ### Compiler versions (`global-variants.yaml`)
@@ -69,12 +103,12 @@ string changes, so the rebuilds supersede the old builds.
 Everything is built for linux-64. The Amaru stack is also built for
 linux-aarch64: aegir, aegir-genie, shannon, trout, shipdatamodel,
 shipgeometry, shipgeometryservice, field-service, mp-units, and the GENIE
-chain (genie, pythia6, rootegpythia6). osx-arm64 is planned. `build.yml` runs
+chain (genie, pythia6, pythia8, rootegpythia6). osx-arm64 is planned. `build.yml` runs
 one native job per platform (`platforms` in the shared rattler-build
 workflow), `nightly-main.yml` does the same for each library, and the aegir
 dev builds run on both runners.
 
-The FairShip stack (fairship, fairroot, geant3, genfit, photospp, acts-ship)
+The FairShip stack (fairship, fairroot, evtgen, geant3, genfit, photospp, acts-ship)
 and npdb-client stay linux-64 only. Their recipes skip every other platform
 with `target_platform != "linux-64"`, so a `--recipe-dir` build on an arm64
 runner leaves them out. noarch recipes need no skip. Each CI job builds the

@@ -34,6 +34,8 @@ repos:
         entry: shellcheck
         args: [--severity=warning]
         types: [shell]
+        # The csh activation scripts copied from conda-forge feedstocks.
+        exclude: \.csh$
 
       - id: actionlint
         name: actionlint

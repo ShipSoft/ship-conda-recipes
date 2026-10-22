@@ -1,0 +1,11 @@
+microarch_level:
+  - "1"
+  - if: unix and x86_64
+    then: "3"
+# Python matrix of the conda-forge feedstock (its CI goes through conda-forge's
+# global pinning, which this repository doesn't use).
+python:
+  - 3.11.* *_cpython
+  - 3.12.* *_cpython
+  - 3.13.* *_cp313
+  - 3.14.* *_cp314
