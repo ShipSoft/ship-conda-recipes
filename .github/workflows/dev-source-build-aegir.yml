@@ -107,7 +107,7 @@ jobs:
       - name: Set up pixi (pinned — preview-feature tripwire)
         uses: prefix-dev/setup-pixi@v0.11.2
         with:
-          pixi-version: v0.82.0
+          pixi-version: v0.83.0
           cache: false
           manifest-path: aegir/pixi.toml
       - name: Build, install, smoke (dev environment)
