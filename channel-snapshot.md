@@ -46,6 +46,8 @@
 | acts-ship | 0.0.0.dev20261013+9609d1b | `h6adce4a_8` | 8 | 2026-10-15 |
 | acts-ship | 0.0.0.dev20261013+9609d1b | `h18d1abb_10` | 10 | 2026-10-16 |
 | acts-ship | 0.0.0.dev20261013+9609d1b | `h88d25f5_10` | 10 | 2026-10-16 |
+| acts-ship | 0.0.0.dev20261013+9609d1b | `h18d1abb_11` | 11 | 2026-10-19 |
+| acts-ship | 0.0.0.dev20261013+9609d1b | `h88d25f5_11` | 11 | 2026-10-19 |
 | aegir | 0.2.0 | `hb0f4dca_1` | 1 | 2026-06-19 |
 | aegir | 0.2.0 | `hb0f4dca_2` | 2 | 2026-06-26 |
 | aegir | 0.2.0 | `hb0f4dca_3` | 3 | 2026-07-04 |
@@ -61,6 +63,8 @@
 | aegir | 0.4.0 | `hb0f4dca_0` | 0 | 2026-10-13 |
 | aegir | 0.4.0 | `hb0f4dca_1` | 1 | 2026-10-15 |
 | aegir | 0.4.0 | `h1c7f545_2` | 2 | 2026-10-17 |
+| aegir | 0.4.0 | `h1c7f545_3` | 3 | 2026-10-19 |
+| aegir | 0.5.0 | `h1c7f545_0` | 0 | 2026-10-20 |
 | aegir-genie | 0.1.0 | `hb0f4dca_0` | 0 | 2026-07-20 |
 | aegir-genie | 0.2.0 | `hb0f4dca_0` | 0 | 2026-07-25 |
 | aegir-genie | 0.2.0 | `hb0f4dca_1` | 1 | 2026-08-11 |
@@ -74,6 +78,8 @@
 | aegir-genie | 0.3.0 | `hb0f4dca_0` | 0 | 2026-10-14 |
 | aegir-genie | 0.3.0 | `hb0f4dca_1` | 1 | 2026-10-15 |
 | aegir-genie | 0.3.0 | `h1c7f545_2` | 2 | 2026-10-17 |
+| aegir-genie | 0.3.0 | `h1c7f545_3` | 3 | 2026-10-19 |
+| aegir-genie | 0.4.0 | `h1c7f545_0` | 0 | 2026-10-20 |
 | fairroot | 19.0.1 | `hb0f4dca_9` | 9 | 2026-06-13 |
 | fairroot | 19.0.1 | `hb0f4dca_10` | 10 | 2026-06-14 |
 | fairroot | 19.0.1 | `hb0f4dca_11` | 11 | 2026-06-26 |
@@ -99,6 +105,8 @@
 | fairroot | 19.0.1 | `h6adce4a_20` | 20 | 2026-10-15 |
 | fairroot | 19.0.1 | `h18d1abb_22` | 22 | 2026-10-17 |
 | fairroot | 19.0.1 | `h88d25f5_22` | 22 | 2026-10-17 |
+| fairroot | 19.0.1 | `h18d1abb_23` | 23 | 2026-10-19 |
+| fairroot | 19.0.1 | `h88d25f5_23` | 23 | 2026-10-19 |
 | fairship | 26.05.7 | `hb0f4dca_4` | 4 | 2026-06-13 |
 | fairship | 26.05.7 | `hb0f4dca_5` | 5 | 2026-06-14 |
 | fairship | 26.06 | `hb0f4dca_0` | 0 | 2026-06-18 |
@@ -129,6 +137,8 @@
 | fairship | 26.09 | `h6adce4a_10` | 10 | 2026-10-15 |
 | fairship | 26.09 | `h18d1abb_12` | 12 | 2026-10-17 |
 | fairship | 26.09 | `h88d25f5_12` | 12 | 2026-10-17 |
+| fairship | 26.09 | `h18d1abb_13` | 13 | 2026-10-19 |
+| fairship | 26.09 | `h88d25f5_13` | 13 | 2026-10-19 |
 | field-service | 0.1.0 | `h83dfeff_0` | 0 | 2026-06-19 |
 | field-service | 0.1.0 | `hb9574b7_0` | 0 | 2026-06-19 |
 | field-service | 0.1.0 | `h73f9d4e_1` | 1 | 2026-06-26 |
@@ -154,12 +164,16 @@
 | field-service | 0.4.0 | `h54e5981_0` | 0 | 2026-10-13 |
 | field-service | 0.4.0 | `h5bdeed2_1` | 1 | 2026-10-17 |
 | field-service | 0.4.0 | `hfa13274_1` | 1 | 2026-10-17 |
+| field-service | 0.5.0 | `h79b7895_0` | 0 | 2026-10-21 |
+| field-service | 0.5.0 | `h83282b4_0` | 0 | 2026-10-21 |
 | field-service-acts | 0.3.0 | `h9630ee7_0` | 0 | 2026-10-13 |
 | field-service-acts | 0.3.0 | `h9f1fc34_0` | 0 | 2026-10-13 |
 | field-service-acts | 0.4.0 | `h410d9e9_0` | 0 | 2026-10-13 |
 | field-service-acts | 0.4.0 | `ha9ae14c_0` | 0 | 2026-10-13 |
 | field-service-acts | 0.4.0 | `hafd7d45_1` | 1 | 2026-10-17 |
 | field-service-acts | 0.4.0 | `hcb06c38_1` | 1 | 2026-10-17 |
+| field-service-acts | 0.5.0 | `h4850774_0` | 0 | 2026-10-21 |
+| field-service-acts | 0.5.0 | `h748897c_0` | 0 | 2026-10-21 |
 | field-service-core | 0.1.0 | `h0566472_0` | 0 | 2026-06-19 |
 | field-service-core | 0.1.0 | `hc97bc57_0` | 0 | 2026-06-19 |
 | field-service-core | 0.1.0 | `h0566472_1` | 1 | 2026-06-26 |
@@ -185,6 +199,8 @@
 | field-service-core | 0.4.0 | `h6adce4a_0` | 0 | 2026-10-13 |
 | field-service-core | 0.4.0 | `h18d1abb_1` | 1 | 2026-10-17 |
 | field-service-core | 0.4.0 | `h88d25f5_1` | 1 | 2026-10-17 |
+| field-service-core | 0.5.0 | `h18d1abb_0` | 0 | 2026-10-21 |
+| field-service-core | 0.5.0 | `h88d25f5_0` | 0 | 2026-10-21 |
 | field-service-g4 | 0.1.0 | `hc496693_0` | 0 | 2026-06-19 |
 | field-service-g4 | 0.1.0 | `hf4ec559_0` | 0 | 2026-06-19 |
 | field-service-g4 | 0.1.0 | `h798224f_1` | 1 | 2026-06-26 |
@@ -210,6 +226,8 @@
 | field-service-g4 | 0.4.0 | `ha9ae14c_0` | 0 | 2026-10-13 |
 | field-service-g4 | 0.4.0 | `hafd7d45_1` | 1 | 2026-10-17 |
 | field-service-g4 | 0.4.0 | `hcb06c38_1` | 1 | 2026-10-17 |
+| field-service-g4 | 0.5.0 | `h4850774_0` | 0 | 2026-10-21 |
+| field-service-g4 | 0.5.0 | `h748897c_0` | 0 | 2026-10-21 |
 | field-service-mapio | 0.2.0 | `h4c13c63_0` | 0 | 2026-10-01 |
 | field-service-mapio | 0.2.0 | `h7ffe25b_0` | 0 | 2026-10-01 |
 | field-service-mapio | 0.3.0 | `h9630ee7_0` | 0 | 2026-10-13 |
@@ -218,6 +236,8 @@
 | field-service-mapio | 0.4.0 | `ha9ae14c_0` | 0 | 2026-10-13 |
 | field-service-mapio | 0.4.0 | `hafd7d45_1` | 1 | 2026-10-17 |
 | field-service-mapio | 0.4.0 | `hcb06c38_1` | 1 | 2026-10-17 |
+| field-service-mapio | 0.5.0 | `h4850774_0` | 0 | 2026-10-21 |
+| field-service-mapio | 0.5.0 | `h748897c_0` | 0 | 2026-10-21 |
 | field-service-tools | 0.1.0 | `hc496693_0` | 0 | 2026-06-19 |
 | field-service-tools | 0.1.0 | `hf4ec559_0` | 0 | 2026-06-19 |
 | field-service-tools | 0.1.0 | `h798224f_1` | 1 | 2026-06-26 |
@@ -243,6 +263,8 @@
 | field-service-tools | 0.4.0 | `h84e1b0d_0` | 0 | 2026-10-13 |
 | field-service-tools | 0.4.0 | `h0bdebe1_1` | 1 | 2026-10-17 |
 | field-service-tools | 0.4.0 | `h49b89bf_1` | 1 | 2026-10-17 |
+| field-service-tools | 0.5.0 | `h851e82d_0` | 0 | 2026-10-21 |
+| field-service-tools | 0.5.0 | `hfc1c7f4_0` | 0 | 2026-10-21 |
 | geant3 | 4.5 | `hb0f4dca_4` | 4 | 2026-06-13 |
 | geant3 | 4.5 | `hb0f4dca_5` | 5 | 2026-06-14 |
 | geant3 | 4.5 | `hb0f4dca_6` | 6 | 2026-06-26 |
@@ -387,6 +409,8 @@
 | shannon | 0.3.0 | `h1c7f545_2` | 2 | 2026-10-17 |
 | shannon | 0.4.0 | `h1c7f545_0` | 0 | 2026-10-17 |
 | shannon | 0.4.1 | `h1c7f545_0` | 0 | 2026-10-18 |
+| shannon | 0.4.1 | `h1c7f545_1` | 1 | 2026-10-19 |
+| shannon | 0.5.0 | `h1c7f545_0` | 0 | 2026-10-20 |
 | shipdatamodel | 0.1.0 | `hb0f4dca_0` | 0 | 2026-06-19 |
 | shipdatamodel | 0.1.0 | `h0566472_1` | 1 | 2026-06-19 |
 | shipdatamodel | 0.1.0 | `hc97bc57_1` | 1 | 2026-06-19 |
@@ -425,6 +449,7 @@
 | shipgeometry | 0.2.1 | `hb0f4dca_3` | 3 | 2026-08-11 |
 | shipgeometry | 0.2.1 | `hb0f4dca_4` | 4 | 2026-10-15 |
 | shipgeometry | 0.2.1 | `h1c7f545_5` | 5 | 2026-10-17 |
+| shipgeometry | 0.3.0 | `h1c7f545_0` | 0 | 2026-10-20 |
 | shipgeometryservice | 0.1.0 | `hb0f4dca_0` | 0 | 2026-06-18 |
 | shipgeometryservice | 0.1.0 | `hb0f4dca_1` | 1 | 2026-06-26 |
 | shipgeometryservice | 0.2.0 | `hb0f4dca_0` | 0 | 2026-07-16 |
@@ -435,28 +460,50 @@
 | shipgeometryservice | 0.4.0 | `hb0f4dca_2` | 2 | 2026-10-15 |
 | shipgeometryservice | 0.4.0 | `h1c7f545_3` | 3 | 2026-10-17 |
 | shipgeometryservice | 0.5.0 | `h1c7f545_0` | 0 | 2026-10-17 |
+| shipgeometryservice | 0.6.0 | `h1c7f545_0` | 0 | 2026-10-19 |
+| shipgeometryservice | 0.6.0 | `h1c7f545_1` | 1 | 2026-10-21 |
 | trout | 0.1.0 | `hb0f4dca_0` | 0 | 2026-09-22 |
 | trout | 0.1.0 | `hb0f4dca_1` | 1 | 2026-09-29 |
 | trout | 0.2.0 | `hb0f4dca_0` | 0 | 2026-10-14 |
 | trout | 0.2.0 | `hb0f4dca_1` | 1 | 2026-10-15 |
 | trout | 0.2.0 | `h1c7f545_3` | 3 | 2026-10-17 |
+| trout | 0.2.0 | `h1c7f545_4` | 4 | 2026-10-19 |
+| trout | 0.3.0 | `h1c7f545_0` | 0 | 2026-10-19 |
+| trout | 0.3.1 | `h1c7f545_0` | 0 | 2026-10-20 |
+| trout | 0.3.1 | `h1c7f545_1` | 1 | 2026-10-21 |
 
 ## linux-aarch64
 
 | Package | Version | Build | Build number | Uploaded |
 |---------|---------|-------|--------------|----------|
+| aegir | 0.5.0 | `h300e7cd_0` | 0 | 2026-10-20 |
+| aegir | 0.5.0 | `h300e7cd_1` | 1 | 2026-10-26 |
+| aegir-genie | 0.4.0 | `h300e7cd_0` | 0 | 2026-10-20 |
+| aegir-genie | 0.4.0 | `h300e7cd_1` | 1 | 2026-10-26 |
 | field-service | 0.4.0 | `h6577d60_1` | 1 | 2026-10-17 |
 | field-service | 0.4.0 | `h65c4afe_1` | 1 | 2026-10-17 |
+| field-service | 0.5.0 | `h35c1a3a_0` | 0 | 2026-10-21 |
+| field-service | 0.5.0 | `h4b56793_0` | 0 | 2026-10-21 |
 | field-service-acts | 0.4.0 | `h659d423_1` | 1 | 2026-10-17 |
 | field-service-acts | 0.4.0 | `h772daaa_1` | 1 | 2026-10-17 |
+| field-service-acts | 0.5.0 | `h36091a1_0` | 0 | 2026-10-21 |
+| field-service-acts | 0.5.0 | `h6c0c5cc_0` | 0 | 2026-10-21 |
 | field-service-core | 0.4.0 | `h1acc638_1` | 1 | 2026-10-17 |
 | field-service-core | 0.4.0 | `he694b7a_1` | 1 | 2026-10-17 |
+| field-service-core | 0.5.0 | `h1acc638_0` | 0 | 2026-10-21 |
+| field-service-core | 0.5.0 | `he694b7a_0` | 0 | 2026-10-21 |
 | field-service-g4 | 0.4.0 | `h659d423_1` | 1 | 2026-10-17 |
 | field-service-g4 | 0.4.0 | `h772daaa_1` | 1 | 2026-10-17 |
+| field-service-g4 | 0.5.0 | `h36091a1_0` | 0 | 2026-10-21 |
+| field-service-g4 | 0.5.0 | `h6c0c5cc_0` | 0 | 2026-10-21 |
 | field-service-mapio | 0.4.0 | `h659d423_1` | 1 | 2026-10-17 |
 | field-service-mapio | 0.4.0 | `h772daaa_1` | 1 | 2026-10-17 |
+| field-service-mapio | 0.5.0 | `h36091a1_0` | 0 | 2026-10-21 |
+| field-service-mapio | 0.5.0 | `h6c0c5cc_0` | 0 | 2026-10-21 |
 | field-service-tools | 0.4.0 | `h8eaf479_1` | 1 | 2026-10-17 |
 | field-service-tools | 0.4.0 | `hc1a24e0_1` | 1 | 2026-10-17 |
+| field-service-tools | 0.5.0 | `ha017585_0` | 0 | 2026-10-21 |
+| field-service-tools | 0.5.0 | `hc983733_0` | 0 | 2026-10-21 |
 | genie | 3.06.02 | `pythia6_5932b76_10` | 10 | 2026-10-17 |
 | genie | 3.06.02 | `pythia6_fbe428a_10` | 10 | 2026-10-17 |
 | genie | 3.06.02 | `pythia8_1d2b347_10` | 10 | 2026-10-17 |
@@ -465,10 +512,19 @@
 | pythia6 | 6.4.28 | `hd069163_9` | 9 | 2026-10-17 |
 | rootegpythia6 | 0.1 | `h1acc638_12` | 12 | 2026-10-17 |
 | rootegpythia6 | 0.1 | `he694b7a_12` | 12 | 2026-10-17 |
+| shannon | 0.5.0 | `h300e7cd_0` | 0 | 2026-10-20 |
+| shannon | 0.5.0 | `h300e7cd_1` | 1 | 2026-10-26 |
 | shipdatamodel | 0.6.0 | `h1acc638_1` | 1 | 2026-10-17 |
 | shipdatamodel | 0.6.0 | `he694b7a_1` | 1 | 2026-10-17 |
 | shipgeometry | 0.2.1 | `h300e7cd_5` | 5 | 2026-10-17 |
+| shipgeometry | 0.3.0 | `h300e7cd_0` | 0 | 2026-10-20 |
 | shipgeometryservice | 0.5.0 | `h300e7cd_0` | 0 | 2026-10-17 |
+| shipgeometryservice | 0.6.0 | `h300e7cd_0` | 0 | 2026-10-19 |
+| shipgeometryservice | 0.6.0 | `h300e7cd_1` | 1 | 2026-10-21 |
+| trout | 0.3.0 | `h300e7cd_0` | 0 | 2026-10-19 |
+| trout | 0.3.1 | `h300e7cd_0` | 0 | 2026-10-20 |
+| trout | 0.3.1 | `h300e7cd_1` | 1 | 2026-10-21 |
+| trout | 0.3.1 | `h300e7cd_2` | 2 | 2026-10-26 |
 
 ## noarch
 
@@ -484,6 +540,8 @@
 | random123 | 1.14.0 | `h4616a5c_0` | 0 | 2026-06-05 |
 | random123 | 1.14.0 | `h4616a5c_1` | 1 | 2026-06-14 |
 | ship-ci-metrics | 0.1.0 | `pyh4616a5c_0` | 0 | 2026-07-03 |
+| ship-field-maps | 0.1.0 | `h4616a5c_0` | 0 | 2026-10-20 |
+| ship-field-maps | 0.1.1 | `h4616a5c_0` | 0 | 2026-10-22 |
 | ship-random | 0.1.0 | `h4616a5c_0` | 0 | 2026-10-05 |
 | ship-random | 0.2.0 | `h4616a5c_0` | 0 | 2026-10-05 |
 | ship-random | 0.2.0 | `hcf0848a_1` | 1 | 2026-10-17 |
