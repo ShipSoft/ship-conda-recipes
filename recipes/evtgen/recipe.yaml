@@ -33,8 +33,6 @@ requirements:
     - hepmc3
     - photos
     - tauloa
-  run:
-    - ${{ pin_compatible('hepmc3') }}
   run_exports:
     - ${{ pin_subpackage('evtgen', upper_bound='x.x') }}
 
