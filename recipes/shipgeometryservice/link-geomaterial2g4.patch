@@ -1,0 +1,33 @@
+From 584e5835843b6a2b4feeda460fccc0f66ab7f78a Mon Sep 17 00:00:00 2001
+From: Oliver Lantwin <oliver.lantwin@cern.ch>
+Date: Wed, 28 Oct 2026 19:14:57 +0100
+Subject: [PATCH] fix: link GeoMaterial2G4 explicitly
+
+VolumeBuilder.h from GeoModel2G4 constructs a Geo2G4MaterialFactory
+inline, but GeoModel2G4 links GeoMaterial2G4 only privately. On Linux
+the library still gets loaded, but Apple's linker failed with an
+undefined Geo2G4MaterialFactory constructor. Link GeoMaterial2G4
+directly.
+
+Assisted-by: Claude Code:claude-opus-5-5
+---
+ CMakeLists.txt | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 26498cd..17c4175 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -102,6 +102,9 @@ target_link_libraries(
+         GeoModelIO::GeoModelDBManager
+         GeoModelIO::GeoModelRead
+         GeoModel2G4
++        # GeoModel2G4's VolumeBuilder.h constructs a Geo2G4MaterialFactory
++        # inline, but GeoModel2G4 links GeoMaterial2G4 only privately.
++        GeoMaterial2G4
+ )
+ 
+ # ----------------------------------------------------------------------------
+-- 
+2.54.0
+
