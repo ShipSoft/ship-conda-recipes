@@ -62,6 +62,20 @@ MAKE_OVERRIDES=(
     LD="${CXX}"
     LDFLAGS="${GENIE_LDFLAGS}"
 )
+if [[ "${target_platform}" == osx-* ]]; then
+    MAKE_OVERRIDES+=(
+        # On macOS the dylibs are linked with SOFLAGS only, without LDFLAGS,
+        # so ld can't resolve the @rpath install names of dependencies like
+        # log4cpp. Keep GENIE's flags and add conda's library path and rpath.
+        SOFLAGS="-dynamiclib -flat_namespace -single_module -undefined dynamic_lookup -L${PREFIX}/lib -Wl,-rpath,${PREFIX}/lib"
+        # conda-forge's libc++ 20 headers misspell the LLVM 20 availability
+        # attribute (fixed in libcxx-feedstock#265 on main, not on 20.x), which
+        # breaks any C++20 file that pulls in <charconv>. The annotations guard
+        # against an older system libc++, but conda's own libcxx >=20 is used at
+        # runtime, so turning them off is safe.
+        GOPT_WITH_CXX_USERDEF_FLAGS=-D_LIBCPP_DISABLE_AVAILABILITY
+    )
+fi
 make -j"${CPU_COUNT}" "${MAKE_OVERRIDES[@]}"
 
 # 'make install' is not parallel-safe (per upstream / spack recipe).
