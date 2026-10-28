@@ -10,7 +10,6 @@ The old `prefix.dev/ship` channel no longer receives uploads.
 
 | Package | Upstream candidate? |
 |---------|---------------------|
-| acts-ship | No (SHiP fork of conda-forge `acts-core`) |
 | aegir | No (SHiP-specific) |
 | aegir-genie | No (SHiP-specific, links GPL GENIE) |
 | evtgen | Temporary (conda-forge's links pythia8 8.312, see below) |
@@ -108,7 +107,7 @@ one native job per platform (`platforms` in the shared rattler-build
 workflow), `nightly-main.yml` does the same for each library, and the aegir
 dev builds run on both runners.
 
-The FairShip stack (fairship, fairroot, evtgen, geant3, genfit, photospp, acts-ship)
+The FairShip stack (fairship, fairroot, evtgen, geant3, genfit, photospp)
 and npdb-client stay linux-64 only. Their recipes skip every other platform
 with `target_platform != "linux-64"`, so a `--recipe-dir` build on an arm64
 runner leaves them out. noarch recipes need no skip. Each CI job builds the
