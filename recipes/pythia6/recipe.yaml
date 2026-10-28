@@ -37,8 +37,11 @@ requirements:
 tests:
   - script:
       - test -f $PREFIX/lib/libpythia6.${{ shlib_ext }}
-      - test -L $PREFIX/lib/libPythia6.${{ shlib_ext }}
-      - test -f $PREFIX/lib/libPythia6.${{ shlib_ext }}
+      # The libPythia6 compatibility symlink is Linux-only (see build.sh).
+      - if: linux
+        then:
+          - test -L $PREFIX/lib/libPythia6.so
+          - test -f $PREFIX/lib/libPythia6.so
 
 about:
   homepage: https://pythia.org/pythia6/
