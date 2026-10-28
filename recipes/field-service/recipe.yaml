@@ -18,6 +18,10 @@ source:
 
 build:
   number: 0
+  skip:
+    # The cxx20 variant serves the linux-64-only FairShip stack; on macOS
+    # everything that links ROOT (phlex, aegir, Shannon, Trout) is cxx23.
+    - osx and root_cxx_standard == "20"
 
 outputs:
   - staging:

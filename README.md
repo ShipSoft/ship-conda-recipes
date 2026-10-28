@@ -128,6 +128,15 @@ macOS needs two settings, both in `global-variants.yaml` behind `if: osx`:
 - deployment target 13.3 (`c_stdlib_version`). `std::format` of floating-point
   values needs `std::to_chars`, which libc++ only provides from macOS 13.3.
 
+The ROOT recipes skip their cxx20 variant on macOS: it only serves the
+linux-64 FairShip stack, and everything on macOS that links ROOT is cxx23.
+conda-forge's libc++ 20 headers also misspell the LLVM 20 availability
+attribute (fixed upstream in libcxx-feedstock#265, not on its 20.x branch),
+which breaks C++20 code that pulls in `<charconv>`, e.g. through `<chrono>`.
+Where C++20 is unavoidable (GENIE's build, the mp-units consumer test),
+`-D_LIBCPP_DISABLE_AVAILABILITY` works around it; conda's libcxx is the
+runtime, so the markup isn't needed.
+
 Library tests use a `shlib_ext` context variable (`dylib` on macOS, `so`
 elsewhere) for ordinary shared libraries. The phlex plugins are CMake `MODULE`
 libraries, which keep the `.so` suffix on macOS, so their tests don't change.
