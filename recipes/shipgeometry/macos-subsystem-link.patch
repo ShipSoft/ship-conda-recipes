@@ -1,0 +1,45 @@
+From f28e6f74a20c77ee4ee8b7c44ad5698d39d4e801 Mon Sep 17 00:00:00 2001
+From: Oliver Lantwin <oliver.lantwin@cern.ch>
+Date: Wed, 28 Oct 2026 17:37:37 +0100
+Subject: [PATCH] fix: link subsystem libraries on macOS
+
+Subsystem libraries call back into ship_geometry (Materials), and
+ship_geometry links every subsystem through the link anchors, so the
+two depend on each other. Linux shared libraries leave those symbols
+to the loader, but Apple's linker requires them to be resolved, so
+the macOS build failed with "Undefined symbols" for
+Materials::requireMaterial in ship_geometry_cavern. On Apple, link the
+subsystems with -undefined dynamic_lookup; ship_geometry is always
+loaded alongside them.
+
+Assisted-by: Claude Code:claude-opus-5-5
+---
+ cmake/ShipAddSubsystem.cmake | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/cmake/ShipAddSubsystem.cmake b/cmake/ShipAddSubsystem.cmake
+index ab458b0..e6b30d6 100644
+--- a/cmake/ShipAddSubsystem.cmake
++++ b/cmake/ShipAddSubsystem.cmake
+@@ -40,6 +40,18 @@ function(ship_add_subsystem NAME)
+     set_target_properties(${_target} PROPERTIES EXPORT_NAME Geometry${NAME})
+     add_library(SHiP::Geometry${NAME} ALIAS ${_target})
+ 
++    # Subsystems call back into ship_geometry (e.g. Materials), which in turn
++    # links every subsystem (see src/CMakeLists.txt), so neither can be linked
++    # first. Linux shared libraries leave those symbols to the loader; Apple's
++    # linker needs them resolved unless told to look them up at load time,
++    # when ship_geometry is always loaded alongside the subsystem.
++    if(APPLE)
++        target_link_options(
++            ${_target}
++            PRIVATE "LINKER:-undefined,dynamic_lookup"
++        )
++    endif()
++
+     target_include_directories(
+         ${_target}
+         PUBLIC
+-- 
+2.54.0
+

@@ -10,6 +10,11 @@ package:
 source:
   url: https://github.com/ShipSoft/Geometry/archive/refs/tags/v${{ version }}.tar.gz
   sha256: 35da251ad43852906f663dfcb8802ff8dc9b5a142916d01e1640af2d833d2252
+  patches:
+    # Subsystem libraries and ship_geometry depend on each other, which
+    # Apple's linker rejects; link the subsystems with -undefined
+    # dynamic_lookup on macOS. Drop at the next ShipSoft/Geometry release.
+    - macos-subsystem-link.patch
 
 build:
   number: 0
