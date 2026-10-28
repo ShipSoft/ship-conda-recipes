@@ -12,6 +12,10 @@ package:
 source:
   url: https://github.com/ShipSoft/ROOTEGPythia6/archive/refs/tags/${{ tag }}.tar.gz
   sha256: 14b02629c503539ec6f60bd8f48cacc2161264ac0e4520c51932ada6b1dc9f04
+  patches:
+    # FindPythia6.cmake and the installed config hard-code the .so suffix,
+    # which breaks on macOS. Drop at the next ShipSoft/ROOTEGPythia6 tag.
+    - macos-library-suffix.patch
 
 build:
   number: 12
