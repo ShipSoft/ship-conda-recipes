@@ -1,5 +1,5 @@
 context:
-  # Ordinary shared libraries; the MODULE plugins keep .so on macOS.
+  # Shared-library suffix, for the tests.
   shlib_ext: ${{ "dylib" if osx else "so" }}
   version: "3.06.02"
 
@@ -10,6 +10,11 @@ package:
 source:
   url: https://github.com/GENIE-MC/Generator/archive/refs/tags/R-${{ version | replace(".", "_") }}.tar.gz
   sha256: 5770346d888bbac7a80872e7aa01953437ab867e335e39cc7412c9b83a0b4e2a
+  patches:
+    # Make.include compares the macOS major and minor versions separately,
+    # so macOS 11+ fails the ">= 10.9" check and gets -stdlib=libstdc++.
+    # Also stop overriding MACOSX_DEPLOYMENT_TARGET with 10.9.
+    - macos-version-check.patch
 
 build:
   number: 11
