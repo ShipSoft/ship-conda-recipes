@@ -12,6 +12,10 @@ package:
 source:
   url: https://github.com/ShipSoft/pythia6/archive/refs/tags/${{ tag }}.tar.gz
   sha256: caa94bef5dd904cc5dc1c46c10c5731b576936ddc3b639ce86f9dfab82d44079
+  patches:
+    # The macOS block runs a bare "gfortran", which conda-forge's prefixed
+    # compiler doesn't provide. Drop at the next ShipSoft/pythia6 tag.
+    - macos-gfortran-detection.patch
 
 build:
   number: 9
