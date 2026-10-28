@@ -15,6 +15,9 @@ source:
   patches:
     # ROOT 6.42 no longer ships snprintf.h. Drop with the next ShipSoft tag.
     - patches/0001-include-cstdio-instead-of-snprintf.h.patch
+    # FindPythia6.cmake and the installed config hard-code the .so suffix,
+    # which breaks on macOS. Drop at the next ShipSoft/ROOTEGPythia6 tag.
+    - macos-library-suffix.patch
 
 build:
   number: 12
