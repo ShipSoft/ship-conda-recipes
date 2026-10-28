@@ -2,7 +2,7 @@ context:
   version: "0.6.0"
   # 0.6 requires C++23 (CMake refuses anything lower).
   cxx_standard: "23"
-  # Ordinary shared libraries; the MODULE plugins keep .so on macOS.
+  # Shared-library suffix, for the tests.
   shlib_ext: ${{ "dylib" if osx else "so" }}
 
 recipe:

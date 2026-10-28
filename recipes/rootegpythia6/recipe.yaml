@@ -1,5 +1,5 @@
 context:
-  # Ordinary shared libraries; the MODULE plugins keep .so on macOS.
+  # Shared-library suffix, for the tests.
   shlib_ext: ${{ "dylib" if osx else "so" }}
   version: "0.1"
   # ShipSoft fork of luketpickering/ROOTEGPythia6, which has no releases.
