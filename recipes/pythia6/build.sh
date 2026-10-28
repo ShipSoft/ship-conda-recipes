@@ -9,4 +9,4 @@ cmake --build . -j${CPU_COUNT}
 cmake --install .
 
 # Compatibility symlink expected by downstream packages
-ln -s libpythia6.so "${PREFIX}/lib/libPythia6.so"
+ln -s "libpythia6${SHLIB_EXT}" "${PREFIX}/lib/libPythia6${SHLIB_EXT}"

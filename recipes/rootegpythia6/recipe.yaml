@@ -1,4 +1,6 @@
 context:
+  # Ordinary shared libraries; the MODULE plugins keep .so on macOS.
+  shlib_ext: ${{ "dylib" if osx else "so" }}
   version: "0.1"
   # ShipSoft fork of luketpickering/ROOTEGPythia6, which has no releases.
   tag: "v6.28.0-ship1"
@@ -20,6 +22,7 @@ requirements:
     - ${{ compiler('cxx') }}
     - if: linux
       then: sysroot_${{ target_platform }} 2.17.*
+      else: ${{ stdlib('c') }}
     - cmake
     - make
   host:
@@ -33,7 +36,7 @@ requirements:
 
 tests:
   - script:
-      - test -f $PREFIX/lib/libEGPythia6.so
+      - test -f $PREFIX/lib/libEGPythia6.${{ shlib_ext }}
 
 about:
   homepage: https://github.com/ShipSoft/ROOTEGPythia6

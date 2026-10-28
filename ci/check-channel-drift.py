@@ -52,11 +52,11 @@ from recipe_parsing import read_variants, recipe_names
 
 SHIP_REPODATA = "https://prefix.dev/ship-experiment/stable/{subdir}/repodata.json"
 CONDA_FORGE_CHANNELDATA = "https://conda.anaconda.org/conda-forge/channeldata.json"
-SUBDIRS = ("linux-64", "linux-aarch64", "noarch")
+SUBDIRS = ("linux-64", "linux-aarch64", "osx-arm64", "noarch")
 # Subdirs that may not exist on the channel yet. prefix.dev answers 404 for a
 # subdir nobody has uploaded to, and for these that means "no packages", not a
-# failed fetch. linux-aarch64 stays here until its first upload lands.
-OPTIONAL_SUBDIRS = frozenset({"linux-aarch64"})
+# failed fetch. Each subdir stays here until its first upload lands.
+OPTIONAL_SUBDIRS = frozenset({"linux-aarch64", "osx-arm64"})
 RECIPES_DIR = Path("recipes")
 
 # (package, dependency) pairs to ignore, for deliberate pins that lag

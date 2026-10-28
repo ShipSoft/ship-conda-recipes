@@ -33,9 +33,9 @@ jobs:
           channel_url="https://prefix.dev/ship-experiment/stable"
           {
             echo "# prefix.dev/ship-experiment/stable channel snapshot"
-            for subdir in linux-64 linux-aarch64 noarch; do
-              # prefix.dev answers 404 for linux-aarch64 until its first upload.
-              if [ "$subdir" = linux-aarch64 ]; then
+            for subdir in linux-64 linux-aarch64 osx-arm64 noarch; do
+              # prefix.dev answers 404 for a subdir until its first upload.
+              if [ "$subdir" = linux-aarch64 ] || [ "$subdir" = osx-arm64 ]; then
                 status=$(curl -sSL --retry 3 -o /dev/null -w '%{http_code}' \
                   "${channel_url}/${subdir}/repodata.json")
                 [ "$status" = "404" ] && continue

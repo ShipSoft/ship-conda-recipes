@@ -9,7 +9,28 @@
 # newer GCC than their consumers can fail to link: std::format code built
 # with GCC 16 leaves symbols that a GCC 15 link can't resolve. Move these
 # together with conda-forge.
+#
+# On macOS, conda-forge's root_base requires the libc++ headers of the clang
+# cling was built with (libcxx-devel 20), so any environment that combines
+# ROOT and a compiler gets clang 20; build with it too, as root-feedstock and
+# phlex-feedstock do. Move it when root_base does.
 c_compiler_version:
-  - "15"
+  - if: linux
+    then: "15"
+  - if: osx
+    then: "20"
 cxx_compiler_version:
-  - "15"
+  - if: linux
+    then: "15"
+  - if: osx
+    then: "20"
+# macOS only: the recipes request the sysroot explicitly on Linux and
+# ${{ stdlib('c') }} on macOS. 13.3 because std::format of floating-point
+# values needs std::to_chars, which libc++ only provides from macOS 13.3 (see
+# https://conda-forge.org/docs/maintainer/knowledge_base#newer-c-features-with-old-sdk).
+c_stdlib:
+  - if: osx
+    then: macosx_deployment_target
+c_stdlib_version:
+  - if: osx
+    then: "13.3"

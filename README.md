@@ -100,12 +100,12 @@ string changes, so the rebuilds supersede the old builds.
 ### Platforms
 
 Everything is built for linux-64. The Amaru stack is also built for
-linux-aarch64: aegir, aegir-genie, shannon, trout, shipdatamodel,
-shipgeometry, shipgeometryservice, field-service, mp-units, and the GENIE
-chain (genie, pythia6, pythia8, rootegpythia6). osx-arm64 is planned. `build.yml` runs
-one native job per platform (`platforms` in the shared rattler-build
+linux-aarch64 and osx-arm64: aegir, aegir-genie, shannon, trout,
+shipdatamodel, shipgeometry, shipgeometryservice, field-service, mp-units,
+and the GENIE chain (genie, pythia6, pythia8, rootegpythia6). `build.yml`
+runs one native job per platform (`platforms` in the shared rattler-build
 workflow), `nightly-main.yml` does the same for each library, and the aegir
-dev builds run on both runners.
+dev builds run on the Linux runners.
 
 The FairShip stack (fairship, fairroot, evtgen, geant3, genfit, photospp)
 and npdb-client stay linux-64 only. Their recipes skip every other platform
@@ -116,7 +116,21 @@ noarch packages it needs, and only the linux-64 job uploads them.
 Recipes request the sysroot as `if: linux` / `then: sysroot_${{ target_platform
 }} 2.17.*` instead of `${{ stdlib('c') }}`. `stdlib('c')` would add
 `c_stdlib` and `c_stdlib_version` to the hash of every compiled package and
-force a rebuild of the whole channel on linux-64.
+force a rebuild of the whole channel on linux-64. On macOS the same entry
+falls through to `else: ${{ stdlib('c') }}`, which only renders there.
+
+macOS needs two settings, both in `global-variants.yaml` behind `if: osx`:
+
+- clang 20 instead of conda-forge's default 21. conda-forge's `root_base` on
+  macOS requires `libcxx-devel 20.*`, the headers of the clang cling was built
+  with, so any environment that has ROOT and a compiler gets clang 20.
+  root-feedstock and phlex-feedstock build with it for the same reason.
+- deployment target 13.3 (`c_stdlib_version`). `std::format` of floating-point
+  values needs `std::to_chars`, which libc++ only provides from macOS 13.3.
+
+Library tests use a `shlib_ext` context variable (`dylib` on macOS, `so`
+elsewhere) for ordinary shared libraries. The phlex plugins are CMake `MODULE`
+libraries, which keep the `.so` suffix on macOS, so their tests don't change.
 
 ### ROOT C++ standard variants (`root_cxx_standard` / `root_base`)
 

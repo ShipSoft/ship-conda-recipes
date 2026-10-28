@@ -1,4 +1,6 @@
 context:
+  # Ordinary shared libraries; the MODULE plugins keep .so on macOS.
+  shlib_ext: ${{ "dylib" if osx else "so" }}
   version: "0.6.0"
 
 package:
@@ -20,6 +22,7 @@ requirements:
     - ${{ compiler('cxx') }}
     - if: linux
       then: sysroot_${{ target_platform }} 2.17.*
+      else: ${{ stdlib('c') }}
     - cmake
     - make
   host:
@@ -42,7 +45,7 @@ requirements:
 
 tests:
   - script:
-      - test -f $PREFIX/lib/libSHiPGeometryService.so
+      - test -f $PREFIX/lib/libSHiPGeometryService.${{ shlib_ext }}
       - test -f $PREFIX/lib/cmake/SHiPGeometryService/SHiPGeometryServiceConfig.cmake
       - test -f $PREFIX/include/SHiP/GeometryService/GeometryService.h
       - test -f $PREFIX/include/SHiP/GeometryService/IGeometryService.h
