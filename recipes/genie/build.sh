@@ -49,11 +49,18 @@ perl ./configure \
 # Make.include hardwires CXX=g++/LD=g++ and overwrites LDFLAGS, so force the
 # conda toolchain and re-append conda's LDFLAGS (for -rpath $PREFIX/lib) on
 # the make command line; command-line values propagate to all sub-makes.
+# --no-as-needed / --no-undefined are GNU ld options; macOS's ld64 rejects
+# them (GENIE links its dylibs with -undefined dynamic_lookup there).
+GENIE_LDFLAGS="${LDFLAGS} -g"
+# shellcheck disable=SC2154  # target_platform is injected by the build environment
+if [[ "${target_platform}" == linux-* ]]; then
+    GENIE_LDFLAGS+=" -Wl,--no-as-needed -Wl,--no-undefined"
+fi
 MAKE_OVERRIDES=(
     CC="${CC}"
     CXX="${CXX}"
     LD="${CXX}"
-    LDFLAGS="${LDFLAGS} -g -Wl,--no-as-needed -Wl,--no-undefined"
+    LDFLAGS="${GENIE_LDFLAGS}"
 )
 make -j"${CPU_COUNT}" "${MAKE_OVERRIDES[@]}"
 
