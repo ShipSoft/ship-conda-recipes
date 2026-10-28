@@ -8,6 +8,10 @@ package:
 source:
   url: https://github.com/ShipSoft/Trout/archive/refs/tags/v${{ version }}.tar.gz
   sha256: d33721a3cd2bc1691f6a7a60722a5e8cb34f8136cf1b967b619d617701ccde94
+  patches:
+    # Apple's linker rejects -Wl,--no-as-needed; use the macOS counterpart
+    # (drop -dead_strip_dylibs). Drop at the next ShipSoft/Trout release.
+    - macos-link-flags.patch
 
 build:
   number: 2

@@ -8,6 +8,10 @@ package:
 source:
   url: https://github.com/ShipSoft/Shannon/archive/refs/tags/v${{ version }}.tar.gz
   sha256: 883a7a46e43bdf5283cca6d3140226f99d1d25fc99f3a71b1d4693144cb168a7
+  patches:
+    # Apple's linker rejects -Wl,--no-as-needed; use the macOS counterpart
+    # (drop -dead_strip_dylibs). Drop at the next ShipSoft/Shannon release.
+    - macos-link-flags.patch
 
 build:
   number: 1
