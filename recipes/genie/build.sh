@@ -74,6 +74,11 @@ if [[ "${target_platform}" == osx-* ]]; then
         # against an older system libc++, but conda's own libcxx >=20 is used at
         # runtime, so turning them off is safe.
         GOPT_WITH_CXX_USERDEF_FLAGS=-D_LIBCPP_DISABLE_AVAILABILITY
+        # rootcling's cling parses the same headers but doesn't see CXXFLAGS.
+        # LINUX_SYS_INCLUDES is otherwise unset and only feeds the rootcling
+        # and compiler include lists, so it carries the define there without
+        # clobbering ROOT_DICT_GEN_INCLUDES, which package Makefiles append to.
+        LINUX_SYS_INCLUDES=-D_LIBCPP_DISABLE_AVAILABILITY
     )
 fi
 make -j"${CPU_COUNT}" "${MAKE_OVERRIDES[@]}"
