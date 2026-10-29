@@ -1,5 +1,5 @@
 context:
-  version: "26.09"
+  version: "26.10"
 
 package:
   name: fairship
@@ -7,10 +7,10 @@ package:
 
 source:
   url: https://github.com/ShipSoft/FairShip/archive/refs/tags/${{ version }}.tar.gz
-  sha256: 7b0bae60777e426357a42186250594a00afcc80382760d1e5c1d85e1ffc9006c
+  sha256: 736bbd68cbe6a8157c8668c48f875b6da3b2757cfa8095858b4db6a39e86e466
 
 build:
-  number: 14
+  number: 0
   # linux-64 only: not part of the arm64 port (see "Platforms" in the README).
   skip:
     - target_platform != "linux-64"
@@ -31,6 +31,9 @@ requirements:
     - expat
     - zlib
     - freetype
+    # Geant4VMC's CMake config puts VGM targets in its link interface without
+    # looking for VGM itself.
+    - vgm
     - geant4-vmc
     - geant3
     - vmc
@@ -38,6 +41,13 @@ requirements:
     - faircmakemodules
     - fairlogger
     - genfit
+    # ACTS track fitter (ActsTracking/), built only if CMake finds Acts 48.
+    # ActsConfig.cmake calls find_dependency() on Boost and Eigen3, which
+    # acts-core does not depend on. Eigen is header-only (no run_export), and
+    # acts-core 48.2 requires exactly the Eigen it was built against.
+    - acts-core 48.*
+    - libboost-devel
+    - eigen ==5.0.1
     - rootegpythia6
     - pythia6
     - pythia8
@@ -46,12 +56,20 @@ requirements:
     - fmt
     - gsl
     - xerces-c
+  run:
+    # acts-core has no run_exports, so libShipActsTracking.so would ship
+    # without libActsCore.so. ACTS makes no ABI promise across releases, so
+    # pin the exact version built against.
+    - ${{ pin_compatible('acts-core', upper_bound='x.x.x') }}
   run_exports:
     - ${{ pin_subpackage('fairship', upper_bound='x.x') }}
 
 tests:
   - script:
       - test -f $PREFIX/lib/libShipData.so
+      # ACTS is optional at configure time, so check that it was found.
+      - test -f $PREFIX/lib/libShipActsTracking.so
+      - test -f $PREFIX/include/FairShipVersion.h
       - test -d $PREFIX/include
       - test -d $PREFIX/share/FairShip/geometry
       # rattler-build's linking check runs against the host env, so a host dep
