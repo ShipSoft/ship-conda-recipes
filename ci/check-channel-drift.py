@@ -72,6 +72,18 @@ IGNORE: set[tuple[str, str]] = set()
 # SHiP rebuild — so flagging it here is pure noise.
 IGNORE_DEPS: set[str] = {"eigen-abi"}
 
+# Variant keys whose pin names the -devel package while the published build
+# depends on the runtime library that its run_exports adds. Maps key -> the
+# dependency name to treat as held by that pin.
+VARIANT_RUN_NAMES: dict[str, str] = {"libboost-devel": "libboost"}
+
+# Variant keys that follow conda-forge's global pinning and migrations rather
+# than the newest release, so a newer conda-forge build is not variant drift.
+# libboost: conda-forge publishes Boost releases before migrating to them, and
+# acts-core (fairship's ACTS fitter) only moves with the migration. Advancing
+# our pin past it makes fairroot and acts-core disagree on libboost.
+IGNORE_VARIANT_DRIFT: set[str] = {"libboost-devel"}
+
 
 # --- conda version ordering (delegated to rattler) --------------------------
 
@@ -224,7 +236,9 @@ def variant_pinned_deps(recipe: Path) -> frozenset[str]:
     if not variants.is_file():
         return frozenset()
     return frozenset(
-        key for key, vals in read_variants(variants).items() if len(vals) == 1
+        VARIANT_RUN_NAMES.get(key, key)
+        for key, vals in read_variants(variants).items()
+        if len(vals) == 1
     )
 
 
@@ -352,6 +366,8 @@ def detect_variant_drift(
     """Variant pins conda-forge has moved past; these need a lockstep bump."""
     rows = []
     for key, (value, recipes) in sorted(pins.items()):
+        if key in IGNORE_VARIANT_DRIFT:
+            continue
         latest = cf.get(key)
         if not latest:  # not a conda-forge package (e.g. genie_hadronization)
             continue
