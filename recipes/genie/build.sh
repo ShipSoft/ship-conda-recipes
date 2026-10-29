@@ -73,17 +73,6 @@ if [[ "${target_platform}" == osx-* ]]; then
         # empty on macOS and sits in the dylib link rule; make expands
         # $(PACKAGE_LIB) to each package's versioned library name.
         SOMINF='-install_name @rpath/$(PACKAGE_LIB)'
-        # conda-forge's libc++ 20 headers misspell the LLVM 20 availability
-        # attribute (fixed in libcxx-feedstock#265 on main, not on 20.x), which
-        # breaks any C++20 file that pulls in <charconv>. The annotations guard
-        # against an older system libc++, but conda's own libcxx >=20 is used at
-        # runtime, so turning them off is safe.
-        GOPT_WITH_CXX_USERDEF_FLAGS=-D_LIBCPP_DISABLE_AVAILABILITY
-        # rootcling's cling parses the same headers but doesn't see CXXFLAGS.
-        # LINUX_SYS_INCLUDES is otherwise unset and only feeds the rootcling
-        # and compiler include lists, so it carries the define there without
-        # clobbering ROOT_DICT_GEN_INCLUDES, which package Makefiles append to.
-        LINUX_SYS_INCLUDES=-D_LIBCPP_DISABLE_AVAILABILITY
     )
 fi
 make -j"${CPU_COUNT}" "${MAKE_OVERRIDES[@]}"
