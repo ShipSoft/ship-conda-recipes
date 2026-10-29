@@ -191,6 +191,16 @@ it can be dropped.
   ABI lock a SHiP rebuild can't advance, so the drift check skips it.
   *Remove when* conda-forge geomodel-core is rebuilt against the newer
   eigen-abi.
+- **`libboost-devel` pinned in fairroot, outside the variant-drift check**
+  (`recipes/fairroot/variants.yaml`, `IGNORE_VARIANT_DRIFT` in
+  `ci/check-channel-drift.py`): fairship links both fairroot and acts-core, so
+  the two have to use the same libboost. conda-forge acts-core follows
+  conda-forge's libboost migration (1.90), but nothing in fairroot's host
+  limits Boost, so left free it takes the newest libboost on conda-forge
+  instead. The pin follows the migration, so a newer Boost release on
+  conda-forge does not count as drift.
+  *Remove when* fairroot's host has another dependency that pins libboost.
+  Until then, advance the pin when conda-forge's libboost migration moves.
 - **`nlohmann_json` in `host:`** (same five recipes):
   `GeoModelToolsConfig.cmake` does `find_dependency(nlohmann_json 3.12.0)`,
   but conda-forge geomodel-tools keeps nlohmann_json in host only (no run, no

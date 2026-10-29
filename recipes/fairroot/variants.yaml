@@ -5,3 +5,9 @@ root_cxx_standard:
   - "23"
 root_base:
   - "6.40.04"
+# Nothing else in fairroot's host constrains Boost, so without this the solve
+# takes conda-forge's newest libboost, ahead of the migration conda-forge's
+# acts-core follows. fairship links both, so they have to agree. Advance with
+# conda-forge's libboost migration, not with its newest release.
+libboost-devel:
+  - "1.90"

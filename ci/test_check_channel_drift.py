@@ -424,6 +424,20 @@ class VariantPinTest(_TempRecipes):
         self.assertEqual(drift.detect_variant_drift(pins, {"root_base": "6.40.2"}), [])
         self.assertEqual(drift.detect_variant_drift(pins, {}), [])
 
+    def test_devel_pin_holds_the_runtime_dependency(self):
+        # fairroot pins libboost-devel, but its build depends on libboost (the
+        # run_export), so that is the dependency a rebuild would not refresh.
+        recipe = self.simple("fairroot", 'libboost-devel:\n  - "1.90"\n')
+        self.assertIn("libboost", drift.variant_pinned_deps(recipe))
+        stale, pinned = drift.split_rows([self.row("fairroot", "libboost")])
+        self.assertEqual((stale, [r[2] for r in pinned]), ([], ["libboost"]))
+
+    def test_migration_tracked_pin_is_not_variant_drift(self):
+        self.simple("fairroot", 'libboost-devel:\n  - "1.90"\n')
+        pins, _ = drift.variant_pins()
+        self.assertEqual(
+            drift.detect_variant_drift(pins, {"libboost-devel": "1.92.0"}), [])
+
     def test_bump_variants_rewrites_every_recipe_and_keeps_quoting(self):
         a = self.simple("alpha", ROOT_PIN)
         b = self.simple("beta", ROOT_PIN)
