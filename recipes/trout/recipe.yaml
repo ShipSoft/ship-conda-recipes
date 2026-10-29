@@ -10,7 +10,7 @@ source:
   sha256: d33721a3cd2bc1691f6a7a60722a5e8cb34f8136cf1b967b619d617701ccde94
 
 build:
-  number: 2
+  number: 3
   skip:
     - win
   script: build.sh
@@ -61,6 +61,12 @@ requirements:
     # workarounds" in the README for the remove-when conditions.
     - eigen-abi-devel
     - nlohmann_json
+  run:
+    # Three of the libraries link libActsCore.so, but acts-core has no
+    # run_exports, and the unpinned acts-core that field-service-acts pulls in
+    # would accept any release. ACTS makes no ABI promise across releases, so
+    # pin the exact version built against.
+    - ${{ pin_compatible('acts-core', upper_bound='x.x.x') }}
   run_exports:
     - ${{ pin_subpackage('trout', upper_bound='x.x') }}
 
