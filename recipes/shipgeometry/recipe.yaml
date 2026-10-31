@@ -1,4 +1,6 @@
 context:
+  # Shared-library suffix, for the tests.
+  shlib_ext: ${{ "dylib" if osx else "so" }}
   version: "0.3.0"
 
 package:
@@ -8,6 +10,11 @@ package:
 source:
   url: https://github.com/ShipSoft/Geometry/archive/refs/tags/v${{ version }}.tar.gz
   sha256: 35da251ad43852906f663dfcb8802ff8dc9b5a142916d01e1640af2d833d2252
+  patches:
+    # Subsystem libraries and ship_geometry depend on each other, which
+    # Apple's linker rejects; link the subsystems with -undefined
+    # dynamic_lookup on macOS. Drop at the next ShipSoft/Geometry release.
+    - macos-subsystem-link.patch
 
 build:
   number: 0
@@ -20,6 +27,7 @@ requirements:
     - ${{ compiler('cxx') }}
     - if: linux
       then: sysroot_${{ target_platform }} 2.17.*
+      else: ${{ stdlib('c') }}
     - cmake
     - make
   host:
@@ -45,17 +53,17 @@ tests:
       # ship_geometry and the subsystems are ship_geometry_<name>, so that a
       # source build does not put a target called Target or Magnet in the
       # consumer's global namespace.
-      - test -f $PREFIX/lib/libship_geometry.so
-      - test -f $PREFIX/lib/libship_geometry_cavern.so
-      - test -f $PREFIX/lib/libship_geometry_target.so
-      - test -f $PREFIX/lib/libship_geometry_muonshield.so
-      - test -f $PREFIX/lib/libship_geometry_magnet.so
-      - test -f $PREFIX/lib/libship_geometry_decayvolume.so
-      - test -f $PREFIX/lib/libship_geometry_trackers.so
-      - test -f $PREFIX/lib/libship_geometry_calorimeter.so
-      - test -f $PREFIX/lib/libship_geometry_upstreamtagger.so
-      - test -f $PREFIX/lib/libship_geometry_timingdetector.so
-      - test -f $PREFIX/lib/libship_geometry_neutrinodetector.so
+      - test -f $PREFIX/lib/libship_geometry.${{ shlib_ext }}
+      - test -f $PREFIX/lib/libship_geometry_cavern.${{ shlib_ext }}
+      - test -f $PREFIX/lib/libship_geometry_target.${{ shlib_ext }}
+      - test -f $PREFIX/lib/libship_geometry_muonshield.${{ shlib_ext }}
+      - test -f $PREFIX/lib/libship_geometry_magnet.${{ shlib_ext }}
+      - test -f $PREFIX/lib/libship_geometry_decayvolume.${{ shlib_ext }}
+      - test -f $PREFIX/lib/libship_geometry_trackers.${{ shlib_ext }}
+      - test -f $PREFIX/lib/libship_geometry_calorimeter.${{ shlib_ext }}
+      - test -f $PREFIX/lib/libship_geometry_upstreamtagger.${{ shlib_ext }}
+      - test -f $PREFIX/lib/libship_geometry_timingdetector.${{ shlib_ext }}
+      - test -f $PREFIX/lib/libship_geometry_neutrinodetector.${{ shlib_ext }}
       - test -f $PREFIX/bin/build_geometry
       - test -f $PREFIX/bin/validate_geometry
       - test -f $PREFIX/lib/cmake/SHiPGeometry/SHiPGeometryConfig.cmake

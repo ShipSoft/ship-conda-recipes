@@ -102,6 +102,7 @@ class SelectionTest(unittest.TestCase):
                 "foo-b.tar.bz2": pkg("cxx23_h1_0", ["bar <3"]),
             }},
             "linux-aarch64": {"packages": {}},
+            "osx-arm64": {"packages": {}},
             "noarch": {"packages": {}},
         })
         picked, failed = drift.latest_builds()
@@ -125,6 +126,7 @@ class SelectionTest(unittest.TestCase):
                 "c": pkg("1.1", 0, "h0_0"),  # strictly higher wipes the ties
             }},
             "linux-aarch64": {"packages": {}},
+            "osx-arm64": {"packages": {}},
             "noarch": {"packages": {}},
         })
         picked, _ = drift.latest_builds()
@@ -140,6 +142,7 @@ class SelectionTest(unittest.TestCase):
         self._fake_repodata({
             "linux-64": {"packages": {"a": pkg("h0_0", ["bar <3"])}},
             "linux-aarch64": {"packages": {"b": pkg("h1_0", ["bar <2"])}},
+            "osx-arm64": {"packages": {}},
             "noarch": {"packages": {}},
         })
         picked, failed = drift.latest_builds()
@@ -157,6 +160,7 @@ class SelectionTest(unittest.TestCase):
         self._fake_repodata({
             "linux-64": {"packages": {"a": pkg("1.0", ["bar <2"])}},
             "linux-aarch64": {"packages": {"b": pkg("1.1", ["bar <3"])}},
+            "osx-arm64": {"packages": {}},
             "noarch": {"packages": {}},
         })
         picked, _ = drift.latest_builds()
@@ -168,11 +172,12 @@ class SelectionTest(unittest.TestCase):
     def _http_error(code):
         return urllib.error.HTTPError("https://prefix.dev", code, "x", {}, None)
 
-    def test_missing_aarch64_subdir_counts_as_empty(self):
-        # prefix.dev answers 404 until the first linux-aarch64 upload
+    def test_missing_optional_subdirs_count_as_empty(self):
+        # prefix.dev answers 404 for a subdir until its first upload
         self._fake_repodata({
             "linux-64": {"packages": {}},
             "linux-aarch64": self._http_error(404),
+            "osx-arm64": self._http_error(404),
             "noarch": {"packages": {}},
         })
         with contextlib.redirect_stderr(io.StringIO()):
@@ -184,6 +189,7 @@ class SelectionTest(unittest.TestCase):
         self._fake_repodata({
             "linux-64": self._http_error(404),
             "linux-aarch64": self._http_error(503),
+            "osx-arm64": {"packages": {}},
             "noarch": {"packages": {}},
         })
         with contextlib.redirect_stderr(io.StringIO()):
@@ -201,6 +207,7 @@ class SelectionTest(unittest.TestCase):
         self._fake_repodata({
             "linux-64": {"packages": {"a": pkg(1, "h0_1", ["bar <3"])}},
             "linux-aarch64": {"packages": {"b": pkg(0, "h1_0", ["bar <2"])}},
+            "osx-arm64": {"packages": {}},
             "noarch": {"packages": {}},
         })
         picked, _ = drift.latest_builds()
@@ -216,6 +223,7 @@ class SelectionTest(unittest.TestCase):
         self._fake_repodata({
             "linux-64": {"packages": {}},
             "linux-aarch64": {"packages": {}},
+            "osx-arm64": {"packages": {}},
             "noarch": {"packages": {"baz": rec}},
         })
         picked, _ = drift.latest_builds()
@@ -226,6 +234,7 @@ class SelectionTest(unittest.TestCase):
         self._fake_repodata({
             "linux-64": RuntimeError("boom"),
             "linux-aarch64": {"packages": {}},
+            "osx-arm64": {"packages": {}},
             "noarch": {"packages": {}},
         })
         _picked, failed = drift.latest_builds()
@@ -548,11 +557,11 @@ class MainTest(unittest.TestCase):
             return drift.main()
 
     def test_partial_repodata_is_refused(self):
-        with fake_repodata({"linux-64": {}, "linux-aarch64": {}, "noarch": OSError("boom")}):
+        with fake_repodata({"linux-64": {}, "linux-aarch64": {}, "osx-arm64": {}, "noarch": OSError("boom")}):
             self.assertEqual(self.run_main(), 2)
 
     def test_clean_channel_exits_zero(self):
-        with fake_repodata({"linux-64": {}, "linux-aarch64": {}, "noarch": {}}), \
+        with fake_repodata({"linux-64": {}, "linux-aarch64": {}, "osx-arm64": {}, "noarch": {}}), \
                 mock.patch.object(drift, "conda_forge_versions", return_value={}), \
                 mock.patch.object(drift, "variant_pins", return_value=({}, {})):
             self.assertEqual(self.run_main(), 0)
@@ -562,7 +571,7 @@ class MainTest(unittest.TestCase):
             "name": "alpha", "version": "1", "build": "h0", "build_number": 0,
             "depends": ["gsl >=2.7,<2.8.0a0"],
         }}}
-        with fake_repodata({"linux-64": repodata, "linux-aarch64": {}, "noarch": {}}), \
+        with fake_repodata({"linux-64": repodata, "linux-aarch64": {}, "osx-arm64": {}, "noarch": {}}), \
                 mock.patch.object(drift, "conda_forge_versions",
                                   return_value={"gsl": "2.8"}), \
                 mock.patch.object(drift, "variant_pins", return_value=({}, {})), \

@@ -1,4 +1,6 @@
 context:
+  # Shared-library suffix, for the tests.
+  shlib_ext: ${{ "dylib" if osx else "so" }}
   version: "0.5.0"
 
 recipe:
@@ -16,6 +18,10 @@ source:
 
 build:
   number: 0
+  skip:
+    # The cxx20 variant serves the linux-64-only FairShip stack; on macOS
+    # everything that links ROOT (phlex, aegir, Shannon, Trout) is cxx23.
+    - osx and root_cxx_standard == "20"
 
 outputs:
   - staging:
@@ -37,6 +43,7 @@ outputs:
       - ${{ compiler('cxx') }}
       - if: linux
         then: sysroot_${{ target_platform }} 2.17.*
+        else: ${{ stdlib('c') }}
       - cmake
       - make
       host:
@@ -64,7 +71,7 @@ outputs:
     inherit: field-service-build
     build:
       files:
-        - lib/libSHiPFieldService.so*
+        - lib/libSHiPFieldService.*
         - include/SHiP/FieldService/IFieldSource.h
         - include/SHiP/FieldService/CovfieFieldSource.h
         - include/SHiP/FieldService/FieldMap.h
@@ -98,7 +105,7 @@ outputs:
           - root_cxx_standard
     tests:
       - script:
-          - test -f $PREFIX/lib/libSHiPFieldService.so
+          - test -f $PREFIX/lib/libSHiPFieldService.${{ shlib_ext }}
           - test -f $PREFIX/include/SHiP/FieldService/IFieldSource.h
           - test -f $PREFIX/include/SHiP/FieldService/CovfieFieldSource.h
           - test -f $PREFIX/include/SHiP/FieldService/FieldMap.h
@@ -110,7 +117,7 @@ outputs:
     inherit: field-service-build
     build:
       files:
-        - lib/libSHiPFieldServiceMapIO.so*
+        - lib/libSHiPFieldServiceMapIO.*
         - include/SHiP/FieldService/FieldMapIO.h
         - lib/cmake/SHiPFieldService/SHiPFieldServiceMapIOTargets.cmake
         - lib/cmake/SHiPFieldService/SHiPFieldServiceMapIOTargets-*.cmake
@@ -120,7 +127,8 @@ outputs:
         # libSHiPFieldServiceMapIO.so references GLIBCXX_3.4.36, which first
         # ships in libstdcxx 16.2; the compiler's run_exports only ask for
         # >=16 (#190).
-        - libstdcxx >=16.2
+        - if: linux
+          then: libstdcxx >=16.2
       run_exports:
         - ${{ pin_subpackage('field-service-mapio', upper_bound='x.x') }}
       # Links ROOT (kept via root_base's run_exports), not Geant4 or its
@@ -135,7 +143,7 @@ outputs:
           - freetype
     tests:
       - script:
-          - test -f $PREFIX/lib/libSHiPFieldServiceMapIO.so
+          - test -f $PREFIX/lib/libSHiPFieldServiceMapIO.${{ shlib_ext }}
           - test -f $PREFIX/include/SHiP/FieldService/FieldMapIO.h
           - test -f $PREFIX/lib/cmake/SHiPFieldService/SHiPFieldServiceMapIOTargets.cmake
 

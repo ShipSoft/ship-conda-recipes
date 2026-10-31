@@ -1,0 +1,89 @@
+From 74ed8f37c9f478deba6fc74d5570f3ae5da708fa Mon Sep 17 00:00:00 2001
+From: Oliver Lantwin <oliver.lantwin@cern.ch>
+Date: Wed, 28 Oct 2026 18:26:28 +0100
+Subject: [PATCH] fix: fall back to std::function where std::move_only_function
+ is missing
+
+libc++ (20 and 21, used on macOS) doesn't provide
+std::move_only_function, so GeometryThread didn't compile there. Where
+__cpp_lib_move_only_function isn't defined, queue std::function<void()>
+instead and hand it the move-only packaged_task through a shared_ptr.
+libstdc++ keeps std::move_only_function, so the Linux code path is
+unchanged.
+
+Assisted-by: Claude Code:claude-opus-5-5
+---
+ include/SHiP/GeometryService/GeometryThread.h | 19 +++++++++++++++++--
+ src/GeometryThread.cpp                        |  2 +-
+ 2 files changed, 18 insertions(+), 3 deletions(-)
+
+diff --git a/include/SHiP/GeometryService/GeometryThread.h b/include/SHiP/GeometryService/GeometryThread.h
+index a732453..082ebab 100644
+--- a/include/SHiP/GeometryService/GeometryThread.h
++++ b/include/SHiP/GeometryService/GeometryThread.h
+@@ -11,9 +11,11 @@
+ #include <deque>
+ #include <functional>
+ #include <future>
++#include <memory>
+ #include <mutex>
+ #include <stop_token>
+ #include <utility>
++#include <version>
+ 
+ namespace SHiP {
+ 
+@@ -48,22 +50,35 @@ class GeometryThread {
+         using R = std::invoke_result_t<F&>;
+         std::packaged_task<R()> task{std::forward<F>(f)};
+         auto result = task.get_future();
++#if defined(__cpp_lib_move_only_function)
+         post(std::move(task));
++#else
++        // Task is copyable here (see below), so share the move-only
++        // packaged_task instead of moving it in.
++        post([task = std::make_shared<std::packaged_task<R()> >(std::move(task))] { (*task)(); });
++#endif
+         return result.get();
+     }
+ 
+    private:
++#if defined(__cpp_lib_move_only_function)
++    using Task = std::move_only_function<void()>;
++#else
++    // libc++ (macOS) has no std::move_only_function yet.
++    using Task = std::function<void()>;
++#endif
++
+     // Constructible only through geometry_thread(): a second instance would
+     // break the single geometry-creating-thread invariant documented there.
+     GeometryThread();
+     friend GeometryThread& geometry_thread();
+ 
+-    void post(std::move_only_function<void()> task);
++    void post(Task task);
+     void loop(std::stop_token stopToken);
+ 
+     std::mutex m_mutex;
+     std::condition_variable_any m_cv;
+-    std::deque<std::move_only_function<void()>> m_tasks;
++    std::deque<Task> m_tasks;
+     std::jthread m_thread;  ///< last: starts using the members above
+ };
+ 
+diff --git a/src/GeometryThread.cpp b/src/GeometryThread.cpp
+index e838cbe..60ebf23 100644
+--- a/src/GeometryThread.cpp
++++ b/src/GeometryThread.cpp
+@@ -11,7 +11,7 @@ namespace SHiP {
+ GeometryThread::GeometryThread()
+     : m_thread{[this](std::stop_token stopToken) { loop(std::move(stopToken)); }} {}
+ 
+-void GeometryThread::post(std::move_only_function<void()> task) {
++void GeometryThread::post(Task task) {
+     {
+         std::lock_guard lk{m_mutex};
+         m_tasks.push_back(std::move(task));
+-- 
+2.54.0
+

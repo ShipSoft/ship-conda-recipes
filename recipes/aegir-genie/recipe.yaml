@@ -8,6 +8,10 @@ package:
 source:
   url: https://github.com/ShipSoft/aegir-genie/archive/refs/tags/v${{ version }}.tar.gz
   sha256: 3c9b6894a933d4e1297d2493ad81399aca5793e9a2c31eafdeb4f1f5896aaa64
+  patches:
+    # Apple's linker rejects -Wl,--no-as-needed; use the macOS counterpart
+    # (drop -dead_strip_dylibs). Drop at the next ShipSoft/aegir-genie release.
+    - macos-link-flags.patch
 
 build:
   number: 1
@@ -20,6 +24,7 @@ requirements:
     - ${{ compiler('cxx') }}
     - if: linux
       then: sysroot_${{ target_platform }} 2.17.*
+      else: ${{ stdlib('c') }}
     - cmake
     - make
   host:
@@ -60,7 +65,8 @@ requirements:
     # arrives via genie's closure). libnsl: see "Known upstream workarounds"
     # in the README.
     - log4cpp
-    - libnsl
+    - if: linux
+      then: libnsl
     # GeoModel consumers need both in host — see "Known upstream
     # workarounds" in the README for the remove-when conditions.
     - eigen-abi-devel
