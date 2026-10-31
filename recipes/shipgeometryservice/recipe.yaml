@@ -14,9 +14,6 @@ source:
     # libc++ has no std::move_only_function; fall back to std::function on
     # macOS. Drop at the next ShipSoft/geometry_service release.
     - libcxx-move-only-function.patch
-    # GeoModel2G4's VolumeBuilder.h needs GeoMaterial2G4, which it links only
-    # privately; Apple's linker needs it named. Drop with the patch above.
-    - link-geomaterial2g4.patch
 
 build:
   number: 1
