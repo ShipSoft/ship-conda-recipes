@@ -192,7 +192,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Install GENIE from the stable channel
-        uses: prefix-dev/setup-pixi@v0.11.2
+        uses: prefix-dev/setup-pixi@v0.11.3
         with:
           locked: true
           environments: genie
@@ -240,7 +240,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Install GENIE from the stable channel
-        uses: prefix-dev/setup-pixi@v0.11.2
+        uses: prefix-dev/setup-pixi@v0.11.3
         with:
           locked: true
           environments: genie
@@ -300,7 +300,7 @@ jobs:
           # workspace of a job that uploads packages.
           persist-credentials: false
       # default env: rattler-build (build/upload). genie env: gspladd merge.
-      - uses: prefix-dev/setup-pixi@v0.11.2
+      - uses: prefix-dev/setup-pixi@v0.11.3
         with:
           locked: true
           environments: >-
