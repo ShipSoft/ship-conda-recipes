@@ -97,6 +97,18 @@ with a newer GCC than its consumers can fail to link in their environments
 pin when conda-forge does, and bump `build.number` in every recipe whose build
 string changes, so the rebuilds supersede the old builds.
 
+### Geant4 version (`global-variants.yaml`)
+
+`global-variants.yaml` also pins `geant4`, so every recipe that lists `geant4`
+in `host:` is built against the same release, and geant4's `run_exports` pin
+the packages to it at runtime. Without the pin each recipe takes whatever its
+other dependencies allow. That left fairroot and fairship on 11.4.2 (held back
+by geant4-vmc) while aegir, trout and shipgeometryservice moved to 11.4.3, and
+the two halves could not be installed together. Moving the pin is a physics
+change, so do it on purpose: first check that conda-forge has geant4-vmc, vgm
+and geomodel builds for the new version, then bump `build.number` in every
+recipe that lists `geant4` in `host:`.
+
 ### Platforms
 
 Everything is built for linux-64. The Amaru stack is also built for

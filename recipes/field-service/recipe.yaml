@@ -15,7 +15,7 @@ source:
     target_directory: covfie_src
 
 build:
-  number: 0
+  number: 1
 
 outputs:
   - staging:
