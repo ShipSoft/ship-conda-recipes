@@ -13,3 +13,12 @@ c_compiler_version:
   - "15"
 cxx_compiler_version:
   - "15"
+
+# Geant4 is pinned so every package here is built against the same release,
+# and so that a Geant4 upgrade is a decision rather than a side effect of a
+# rebuild. Recipes list geant4 in host: without a version; this variant
+# turns that into 11.4.3.*, and geant4's run_exports carry the pin into each
+# package's run requirements. Before moving it, check that conda-forge has
+# geant4-vmc, vgm and geomodel builds for the new version.
+geant4:
+  - "11.4.3"
