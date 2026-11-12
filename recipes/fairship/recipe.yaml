@@ -10,7 +10,7 @@ source:
   sha256: 736bbd68cbe6a8157c8668c48f875b6da3b2757cfa8095858b4db6a39e86e466
 
 build:
-  number: 1
+  number: 2
   # linux-64 only: not part of the arm64 port (see "Platforms" in the README).
   skip:
     - target_platform != "linux-64"
@@ -61,6 +61,9 @@ requirements:
     # without libActsCore.so. ACTS makes no ABI promise across releases, so
     # pin the exact version built against.
     - ${{ pin_compatible('acts-core', upper_bound='x.x.x') }}
+    # GENIE tools for macro/makeGenieEvents.py; nothing links against it.
+    # shipgen/genie_config uses Pythia8Decayer2023, so take the pythia8 build.
+    - genie 3.06.* pythia8*
   run_exports:
     - ${{ pin_subpackage('fairship', upper_bound='x.x') }}
 
