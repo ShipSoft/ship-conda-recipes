@@ -14,7 +14,7 @@ source:
   sha256: b642700b703190e3304edb98ff464622db5d03c1cfc5d275ba4a628227d7d6d0
 
 build:
-  number: 1
+  number: 2
   # Rebuilt here only so FairShip's evtgen links the ship channel's pythia8
   # (conda-forge's is built against 8.312). FairShip stack: linux-64 only.
   skip:
