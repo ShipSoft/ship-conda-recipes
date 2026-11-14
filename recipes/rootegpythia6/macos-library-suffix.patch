@@ -1,0 +1,79 @@
+From 3377bccd51b8db213689452e06a372dba875c320 Mon Sep 17 00:00:00 2001
+From: Oliver Lantwin <oliver.lantwin@cern.ch>
+Date: Wed, 28 Oct 2026 13:33:44 +0100
+Subject: [PATCH] fix: find libraries with the platform's suffix
+
+FindPythia6.cmake looked for libPythia6.so and imported that path, and
+the installed config looked for libEGPythia6.so. On macOS the libraries
+end in .dylib, so the build failed with "No rule to make target
+libPythia6.so".
+
+Find Pythia6 with find_library, which adds the platform's prefix and
+suffix, trying the Pythia6 compatibility name first and the pythia6
+library itself second; PYTHIA6_LIB_DIR becomes a hint. The config looks
+for libEGPythia6 with CMAKE_SHARED_LIBRARY_SUFFIX, keeping .so as a
+fallback.
+
+Assisted-by: Claude Code:claude-opus-5-5
+---
+ cmake/Modules/FindPythia6.cmake              | 17 +++++++++++------
+ cmake/Templates/ROOTEGPythia6Config.cmake.in |  2 +-
+ 2 files changed, 12 insertions(+), 7 deletions(-)
+
+diff --git a/cmake/Modules/FindPythia6.cmake b/cmake/Modules/FindPythia6.cmake
+index 6ed05d9..1d8a0fc 100644
+--- a/cmake/Modules/FindPythia6.cmake
++++ b/cmake/Modules/FindPythia6.cmake
+@@ -43,25 +43,30 @@ if(NOT TARGET Pythia6::Pythia6)
+   EnsureVarOrEnvSet(PYTHIA6_ENV_LIB_DIR PYTHIA6_LIB_DIR)
+   EnsureVarOrEnvSet(PYTHIA6_LIBRARY PYTHIA6_LIBRARY)
+ 
+-  find_path(PYTHIA6_LIB_DIR
+-  NAMES libPythia6.so
+-  PATHS ${PYTHIA6} ${PYTHIA6_ENV_LIB_DIR} ${PYTHIA6_LIBRARY})
++  # find_library adds the platform's library prefix and suffix (.so, .dylib).
++  # Pythia6 is the compatibility name some packages ship; pythia6 is the
++  # library itself.
++  find_library(PYTHIA6_LIB
++    NAMES Pythia6 pythia6
++    HINTS ${PYTHIA6_LIB_DIR}
++    PATHS ${PYTHIA6} ${PYTHIA6_ENV_LIB_DIR} ${PYTHIA6_LIBRARY})
+ 
+   include(FindPackageHandleStandardArgs)
+   find_package_handle_standard_args(Pythia6
+-      REQUIRED_VARS 
+-        PYTHIA6_LIB_DIR
++      REQUIRED_VARS
++        PYTHIA6_LIB
+   )
+ 
+   if(NOT Pythia6_FOUND)
+     return()
+   endif()
+ 
++  get_filename_component(PYTHIA6_LIB_DIR ${PYTHIA6_LIB} DIRECTORY)
+   message(STATUS "Found Pythia6:")
+   message(STATUS "     PYTHIA6_LIB_DIR: ${PYTHIA6_LIB_DIR}")
+ 
+   add_library(Pythia6::Pythia6 SHARED IMPORTED)
+   set_target_properties(Pythia6::Pythia6 PROPERTIES
+-      IMPORTED_LOCATION ${PYTHIA6_LIB_DIR}/libPythia6.so
++      IMPORTED_LOCATION ${PYTHIA6_LIB}
+     )
+ endif()
+diff --git a/cmake/Templates/ROOTEGPythia6Config.cmake.in b/cmake/Templates/ROOTEGPythia6Config.cmake.in
+index 7a3b406..f73dcde 100644
+--- a/cmake/Templates/ROOTEGPythia6Config.cmake.in
++++ b/cmake/Templates/ROOTEGPythia6Config.cmake.in
+@@ -21,7 +21,7 @@ message(STATUS "Found ROOTEGPythia6 Version: ${ROOTEGPythia6_VERSION} in \"${ROO
+ 
+ 
+ find_path(ROOTEGPythia6_LIB_DIR
+-  NAMES libEGPythia6.so
++  NAMES libEGPythia6${CMAKE_SHARED_LIBRARY_SUFFIX} libEGPythia6.so
+   PATHS ${ROOTEGPythia6_CMAKE_DIR}/../../
+ )
+ 
+-- 
+2.54.0
+

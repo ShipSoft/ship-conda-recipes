@@ -1,4 +1,6 @@
 context:
+  # Shared-library suffix, for the tests.
+  shlib_ext: ${{ "dylib" if osx else "so" }}
   version: "3.06.02"
 
 package:
@@ -8,9 +10,18 @@ package:
 source:
   url: https://github.com/GENIE-MC/Generator/archive/refs/tags/R-${{ version | replace(".", "_") }}.tar.gz
   sha256: 5770346d888bbac7a80872e7aa01953437ab867e335e39cc7412c9b83a0b4e2a
+  patches:
+    # Make.include compares the macOS major and minor versions separately,
+    # so macOS 11+ fails the ">= 10.9" check and gets -stdlib=libstdc++.
+    # Also stop overriding MACOSX_DEPLOYMENT_TARGET with 10.9.
+    - macos-version-check.patch
 
 build:
   number: 11
+  skip:
+    # The cxx20 variant serves the linux-64-only FairShip stack; on macOS
+    # everything that links ROOT (phlex, aegir, Shannon, Trout) is cxx23.
+    - osx and root_cxx_standard == "20"
   string: ${{ genie_hadronization }}_${{ hash }}_${{ build_number }}
   # pythia8 is the default variant the solver picks for a bare `genie`
   # dependency: down-prioritize pythia6. FairShip's shipgen/genie_config
@@ -32,6 +43,7 @@ requirements:
     - ${{ compiler('cxx') }}
     - if: linux
       then: sysroot_${{ target_platform }} 2.17.*
+      else: ${{ stdlib('c') }}
     - make
     # GENIE's configure is a hand-rolled perl script, not autoconf.
     - perl
@@ -57,7 +69,8 @@ requirements:
     - genie-data ==${{ version }}
     # log4cpp's missing libnsl run dependency — see "Known upstream
     # workarounds" in the README.
-    - libnsl
+    - if: linux
+      then: libnsl
   run_exports:
     - ${{ pin_subpackage('genie', upper_bound='x.x') }}
 
@@ -68,8 +81,8 @@ tests:
       - test -f $PREFIX/bin/gevgen_atmo
       - test -f $PREFIX/bin/gmkspl
       - test -f $PREFIX/bin/gntpc
-      - test -f $PREFIX/lib/libGFwEG-${{ version }}.so
-      - test -f $PREFIX/lib/libGTlFlx-${{ version }}.so
+      - test -f $PREFIX/lib/libGFwEG-${{ version }}.${{ shlib_ext }}
+      - test -f $PREFIX/lib/libGTlFlx-${{ version }}.${{ shlib_ext }}
       - test -d $PREFIX/include/GENIE/Framework
       - test -d $PREFIX/share/genie/config
       # Provided by the genie-data run dependency, into the same

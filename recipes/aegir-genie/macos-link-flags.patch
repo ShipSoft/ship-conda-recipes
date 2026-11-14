@@ -1,0 +1,53 @@
+From 9f84125cf2339e521180538b7c84b25afb0be3de Mon Sep 17 00:00:00 2001
+From: Oliver Lantwin <oliver.lantwin@cern.ch>
+Date: Wed, 28 Oct 2026 17:01:19 +0100
+Subject: [PATCH] fix: keep linked libraries on macOS without --no-as-needed
+
+Apple's linker rejects -Wl,--no-as-needed (and --push-state), so the
+macOS build failed when linking the GENIE libraries. Its counterpart of
+--as-needed is -dead_strip_dylibs, which conda-forge passes in LDFLAGS:
+on Apple, drop that from the shared and module linker flags instead,
+so libraries referenced only at run time (such as ROOT dictionaries)
+stay loaded. Linux keeps --no-as-needed.
+
+Assisted-by: Claude Code:claude-opus-5-5
+---
+ CMakeLists.txt | 17 +++++++++++++++--
+ 1 file changed, 15 insertions(+), 2 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 1dbd068..e4d1b2c 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -157,13 +157,26 @@ target_include_directories(
+ # GENIE libraries the consumer does not reference directly — but GENIE's
+ # underlinked libraries resolve their own symbols through whatever the
+ # consumer loaded, so the full set must stay in DT_NEEDED.
++# Apple's linker has no --push-state/--no-as-needed; its counterpart of
++# --as-needed is -dead_strip_dylibs (in conda-forge's LDFLAGS), so drop that
++# from this project's link flags instead.
++if(APPLE)
++    set(_genie_keep_needed_begin "")
++    set(_genie_keep_needed_end "")
++    foreach(flags CMAKE_SHARED_LINKER_FLAGS CMAKE_MODULE_LINKER_FLAGS)
++        string(REPLACE "-Wl,-dead_strip_dylibs" "" ${flags} "${${flags}}")
++    endforeach()
++else()
++    set(_genie_keep_needed_begin -Wl,--push-state,--no-as-needed)
++    set(_genie_keep_needed_end -Wl,--pop-state)
++endif()
+ target_link_libraries(
+     GENIE::GENIE
+     INTERFACE
+-        -Wl,--push-state,--no-as-needed
++        ${_genie_keep_needed_begin}
+         ${GENIE_LIBRARY_FILES}
+         ${GENIE_DEP_LIBRARIES}
+-        -Wl,--pop-state
++        ${_genie_keep_needed_end}
+         ROOT::Core
+         ROOT::RIO
+         ROOT::Tree
+-- 
+2.54.0
+

@@ -1,4 +1,6 @@
 context:
+  # Shared-library suffix, for the tests.
+  shlib_ext: ${{ "dylib" if osx else "so" }}
   version: "6.4.28"
   # ShipSoft fork of SND-LHC/pythia6 with the PDFLIB dummy routines restored.
   tag: "v6.4.28-ship1"
@@ -10,6 +12,10 @@ package:
 source:
   url: https://github.com/ShipSoft/pythia6/archive/refs/tags/${{ tag }}.tar.gz
   sha256: caa94bef5dd904cc5dc1c46c10c5731b576936ddc3b639ce86f9dfab82d44079
+  patches:
+    # The macOS block runs a bare "gfortran", which conda-forge's prefixed
+    # compiler doesn't provide. Drop at the next ShipSoft/pythia6 tag.
+    - macos-gfortran-detection.patch
 
 build:
   number: 9
@@ -22,6 +28,7 @@ requirements:
     - ${{ compiler('fortran') }}
     - if: linux
       then: sysroot_${{ target_platform }} 2.17.*
+      else: ${{ stdlib('c') }}
     - cmake
     - make
   run_exports:
@@ -29,9 +36,12 @@ requirements:
 
 tests:
   - script:
-      - test -f $PREFIX/lib/libpythia6.so
-      - test -L $PREFIX/lib/libPythia6.so
-      - test -f $PREFIX/lib/libPythia6.so
+      - test -f $PREFIX/lib/libpythia6.${{ shlib_ext }}
+      # The libPythia6 compatibility symlink is Linux-only (see build.sh).
+      - if: linux
+        then:
+          - test -L $PREFIX/lib/libPythia6.so
+          - test -f $PREFIX/lib/libPythia6.so
 
 about:
   homepage: https://pythia.org/pythia6/

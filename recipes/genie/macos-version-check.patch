@@ -1,0 +1,28 @@
+--- a/src/make/Make.include
++++ b/src/make/Make.include
+@@ -422,10 +422,10 @@
+ 		str="$(OSX_VERSION)"; split(str, tk, "."); print tk[3]}')
+ # osx version >= 10.6 ?
+ OSX_GE_10_6_0  = $(shell awk 'BEGIN {\
+-		if($(OSXVRS_MAJ)>=10 && $(OSXVRS_MIN)>=6) print "YES"}')
++		if($(OSXVRS_MAJ)>10 || ($(OSXVRS_MAJ)==10 && $(OSXVRS_MIN)>=6)) print "YES"}')
+ # osx version >= 10.9 ?
+ OSX_GE_10_9_0  = $(shell awk 'BEGIN {\
+-		if($(OSXVRS_MAJ)>=10 && $(OSXVRS_MIN)>=9) print "YES"}')
++		if($(OSXVRS_MAJ)>10 || ($(OSXVRS_MAJ)==10 && $(OSXVRS_MIN)>=9)) print "YES"}')
+ ARCH_OK       = YES
+ IS_MACOSX     = YES
+ IS_MACOSX     = YES
+@@ -443,7 +443,11 @@
+ ifeq ($(GCC_GE_4_1_0),YES)
+   ifeq ($(USING_CLANG),YES)
+     ifeq ($(OSX_GE_10_9_0),YES)
+-	CXXFLAGS += -stdlib=libc++ -mmacosx-version-min=10.9
++	CXXFLAGS += -stdlib=libc++
++      # Respect a deployment target set through the environment.
++      ifeq ($(strip $(MACOSX_DEPLOYMENT_TARGET)),)
++	CXXFLAGS += -mmacosx-version-min=10.9
++      endif
+     else
+       ifeq ($(OSX_GE_10_6_0),YES)
+ 	CXXFLAGS += -stdlib=libstdc++ -mmacosx-version-min=10.6

@@ -49,12 +49,32 @@ perl ./configure \
 # Make.include hardwires CXX=g++/LD=g++ and overwrites LDFLAGS, so force the
 # conda toolchain and re-append conda's LDFLAGS (for -rpath $PREFIX/lib) on
 # the make command line; command-line values propagate to all sub-makes.
+# --no-as-needed / --no-undefined are GNU ld options; macOS's ld64 rejects
+# them (GENIE links its dylibs with -undefined dynamic_lookup there).
+GENIE_LDFLAGS="${LDFLAGS} -g"
+# shellcheck disable=SC2154  # target_platform is injected by the build environment
+if [[ "${target_platform}" == linux-* ]]; then
+    GENIE_LDFLAGS+=" -Wl,--no-as-needed -Wl,--no-undefined"
+fi
 MAKE_OVERRIDES=(
     CC="${CC}"
     CXX="${CXX}"
     LD="${CXX}"
-    LDFLAGS="${LDFLAGS} -g -Wl,--no-as-needed -Wl,--no-undefined"
+    LDFLAGS="${GENIE_LDFLAGS}"
 )
+if [[ "${target_platform}" == osx-* ]]; then
+    MAKE_OVERRIDES+=(
+        # On macOS the dylibs are linked with SOFLAGS only, without LDFLAGS,
+        # so ld can't resolve the @rpath install names of dependencies like
+        # log4cpp. Keep GENIE's flags and add conda's library path and rpath.
+        SOFLAGS="-dynamiclib -flat_namespace -single_module -undefined dynamic_lookup -L${PREFIX}/lib -Wl,-rpath,${PREFIX}/lib"
+        # Without an install name, each dylib records its build-tree path and
+        # everything linked against it tries to load from there. SOMINF is
+        # empty on macOS and sits in the dylib link rule; make expands
+        # $(PACKAGE_LIB) to each package's versioned library name.
+        SOMINF='-install_name @rpath/$(PACKAGE_LIB)'
+    )
+fi
 make -j"${CPU_COUNT}" "${MAKE_OVERRIDES[@]}"
 
 # 'make install' is not parallel-safe (per upstream / spack recipe).

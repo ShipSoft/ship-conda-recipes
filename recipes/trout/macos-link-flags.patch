@@ -1,0 +1,47 @@
+From 0b8d9cc7fa858a9b113f01916e52e493880d033d Mon Sep 17 00:00:00 2001
+From: Oliver Lantwin <oliver.lantwin@cern.ch>
+Date: Wed, 28 Oct 2026 17:01:18 +0100
+Subject: [PATCH] fix: keep linked libraries on macOS without --no-as-needed
+
+Apple's linker rejects -Wl,--no-as-needed (and --push-state), so the
+macOS build failed when linking the plugin modules. Its counterpart of
+--as-needed is -dead_strip_dylibs, which conda-forge passes in LDFLAGS:
+on Apple, drop that from the shared and module linker flags instead,
+so libraries referenced only at run time (such as ROOT dictionaries)
+stay loaded. Linux keeps --no-as-needed.
+
+Assisted-by: Claude Code:claude-opus-5-5
+---
+ CMakeLists.txt | 16 ++++++++++++++--
+ 1 file changed, 14 insertions(+), 2 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 3ae0d02..ac6b5da 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -16,8 +16,20 @@ add_compile_options(-Wall -Wextra -Wno-missing-field-initializers)
+ # Ensure plugin modules retain DT_NEEDED entries for all linked libraries,
+ # even if no symbols are directly referenced at link time (e.g. ROOT
+ # dictionary-only dependencies like SHiPDataModel's collection proxies).
+-set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--no-as-needed")
+-set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -Wl,--no-as-needed")
++# Apple's linker has no --no-as-needed; its counterpart of --as-needed is
++# -dead_strip_dylibs (in conda-forge's LDFLAGS), so drop that instead.
++if(APPLE)
++    foreach(flags CMAKE_SHARED_LINKER_FLAGS CMAKE_MODULE_LINKER_FLAGS)
++        string(REPLACE "-Wl,-dead_strip_dylibs" "" ${flags} "${${flags}}")
++    endforeach()
++else()
++    set(CMAKE_SHARED_LINKER_FLAGS
++        "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--no-as-needed"
++    )
++    set(CMAKE_MODULE_LINKER_FLAGS
++        "${CMAKE_MODULE_LINKER_FLAGS} -Wl,--no-as-needed"
++    )
++endif()
+ 
+ # Dependencies
+ find_package(SHiPGeometry CONFIG REQUIRED)
+-- 
+2.54.0
+
