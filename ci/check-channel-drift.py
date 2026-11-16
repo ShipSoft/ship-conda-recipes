@@ -20,6 +20,11 @@ Some pins are ours, not conda-forge's: a dependency named by a recipe's
 same pin and only a lockstep bump of every ``variants.yaml`` advances it.
 Those are reported separately and never trigger a ``build.number`` bump.
 
+Only packages that a recipe under ``recipes/`` still builds are checked.
+Builds of retired recipes (acts-ship) or packages since taken over by
+conda-forge (libjsonnet) stay on the channel for older consumers, but a
+rebuild here cannot refresh them, so reporting them is noise.
+
 Modes:
   (default)         print a report; exit 1 if any drift is found.
   --bump-recipes    additionally bump ``build.number`` once per affected
@@ -221,6 +226,18 @@ def recipe_name_map() -> dict[str, Path]:
         for name in recipe_names(recipe):
             mapping.setdefault(name, recipe)
     return mapping
+
+
+def drop_retired(
+    ship: dict[str, list[dict]], mapping: dict[str, Path]
+) -> tuple[dict[str, list[dict]], list[str]]:
+    """Split channel packages into those a recipe builds and the rest.
+
+    Returns ``(kept, dropped)``; ``dropped`` names channel packages with no
+    recipe in this repo, which a rebuild cannot fix.
+    """
+    kept = {name: recs for name, recs in ship.items() if name in mapping}
+    return kept, sorted(ship.keys() - kept.keys())
 
 
 @functools.lru_cache(maxsize=None)
@@ -496,30 +513,26 @@ def render(
     return "\n".join(lines) + "\n"
 
 
-def group_by_recipe(rows: list[tuple]) -> tuple[dict[Path, dict[str, set[str]]], list[str]]:
-    """Collapse rows onto their owning recipe; return ``(grouped, unknown)``.
+def group_by_recipe(rows: list[tuple]) -> dict[Path, dict[str, set[str]]]:
+    """Collapse rows onto their owning recipe.
 
     Several outputs of one recipe (field-service-core, field-service-tools, …)
     map to the same recipe.yaml. Grouping on the recipe rather than the package
-    name is what keeps a bump at +1 instead of +1 per flagged output.
+    name is what keeps a bump at +1 instead of +1 per flagged output. Rows
+    come from packages ``drop_retired`` kept, so every name has a recipe.
     """
     mapping = recipe_name_map()
     grouped: dict[Path, dict[str, set[str]]] = {}
-    unknown: set[str] = set()
     for name, _rec, dep_name, *_ in rows:
-        recipe = mapping.get(name)
-        if recipe is None:
-            unknown.add(name)
-            continue
-        entry = grouped.setdefault(recipe, {"pkgs": set(), "deps": set()})
+        entry = grouped.setdefault(mapping[name], {"pkgs": set(), "deps": set()})
         entry["pkgs"].add(name)
         entry["deps"].add(dep_name)
-    return grouped, sorted(unknown)
+    return grouped
 
 
 def bump_affected(rows: list[tuple]) -> str:
     """Bump build.number once per affected recipe; return a summary."""
-    grouped, unknown = group_by_recipe(rows)
+    grouped = group_by_recipe(rows)
     bumped, manual, pinned = [], [], []
     for recipe, entry in sorted(grouped.items()):
         pkgs = ", ".join(sorted(entry["pkgs"]))
@@ -551,10 +564,6 @@ def bump_affected(rows: list[tuple]) -> str:
         out += [
             f"- `{r}` ({', '.join(d)}) — {p}" for p, r, d in pinned
         ]
-        out.append("")
-    if unknown:
-        out.append("No recipe in this repo (rebuilt elsewhere / transitive):")
-        out += [f"- `{p}`" for p in unknown]
         out.append("")
     return "\n".join(out)
 
@@ -621,6 +630,11 @@ def main() -> int:
             file=sys.stderr,
         )
         return 2
+
+    ship, dropped = drop_retired(ship, recipe_name_map())
+    if dropped:
+        print(f"note: skipping channel packages with no recipe: {', '.join(dropped)}",
+              file=sys.stderr)
 
     cf = conda_forge_versions()
     rows = detect(ship, cf)

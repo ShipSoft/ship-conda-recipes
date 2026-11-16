@@ -344,9 +344,14 @@ class RecipeBumpTest(_TempRecipes):
         ])
         self.assertIn("build:\n  number: 3\n", recipe.read_text())
 
-    def test_unknown_package_is_listed_not_bumped(self):
-        report = drift.bump_affected([self.row("built-elsewhere", "libboost")])
-        self.assertIn("No recipe in this repo", report)
+    def test_package_without_recipe_is_dropped(self):
+        # Regression: acts-ship builds outlived its recipe and kept being
+        # reported as drift that no rebuild here could fix.
+        self.write("thing", MULTI_OUTPUT)
+        ship = {"thing-core": [{}], "acts-ship": [{}], "libjsonnet": [{}]}
+        kept, dropped = drift.drop_retired(ship, drift.recipe_name_map())
+        self.assertEqual(list(kept), ["thing-core"])
+        self.assertEqual(dropped, ["acts-ship", "libjsonnet"])
 
 
 class VariantPinTest(_TempRecipes):
@@ -551,6 +556,18 @@ class MainTest(unittest.TestCase):
         with fake_repodata({"linux-64": {}, "linux-aarch64": {}, "noarch": OSError("boom")}):
             self.assertEqual(self.run_main(), 2)
 
+    def test_retired_package_is_not_drift(self):
+        repodata = {"packages.conda": {"a.conda": {
+            "name": "retired", "version": "1", "build": "h0", "build_number": 0,
+            "depends": ["gsl >=2.7,<2.8.0a0"],
+        }}}
+        with fake_repodata({"linux-64": repodata, "linux-aarch64": {}, "noarch": {}}), \
+                mock.patch.object(drift, "conda_forge_versions",
+                                  return_value={"gsl": "2.8"}), \
+                mock.patch.object(drift, "variant_pins", return_value=({}, {})), \
+                mock.patch.object(drift, "recipe_name_map", return_value={}):
+            self.assertEqual(self.run_main(), 0)
+
     def test_clean_channel_exits_zero(self):
         with fake_repodata({"linux-64": {}, "linux-aarch64": {}, "noarch": {}}), \
                 mock.patch.object(drift, "conda_forge_versions", return_value={}), \
@@ -566,6 +583,8 @@ class MainTest(unittest.TestCase):
                 mock.patch.object(drift, "conda_forge_versions",
                                   return_value={"gsl": "2.8"}), \
                 mock.patch.object(drift, "variant_pins", return_value=({}, {})), \
+                mock.patch.object(drift, "recipe_name_map",
+                                  return_value={"alpha": Path("recipes/alpha/recipe.yaml")}), \
                 mock.patch.object(drift, "bump_affected", return_value=""):
             self.assertEqual(self.run_main(), 1)
             self.assertEqual(self.run_main(["--bump-recipes"]), 0)
