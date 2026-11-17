@@ -23,7 +23,7 @@ requirements:
     - cmake
     - make
   host:
-    # root_base is pinned by variants.yaml, not constrained here: a variant
+    # root_base is pinned by global-variants.yaml, not constrained here: a variant
     # value only substitutes into a dependency listed without a version.
     - root_base
     - root_cxx_standard

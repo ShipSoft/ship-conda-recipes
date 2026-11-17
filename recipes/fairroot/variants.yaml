@@ -1,10 +1,3 @@
-# ROOT C++-standard variant; root_base is pinned deliberately — see
-# "ROOT C++ standard variants" in the README.
-root_cxx_standard:
-  - "20"
-  - "23"
-root_base:
-  - "6.40.04"
 # Nothing else in fairroot's host constrains Boost, so without this the solve
 # takes conda-forge's newest libboost, ahead of the migration conda-forge's
 # acts-core follows. fairship links both, so they have to agree. Advance with
