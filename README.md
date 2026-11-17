@@ -123,7 +123,9 @@ force a rebuild of the whole channel on linux-64.
 conda-forge splits ROOT builds by C++ standard: consumers put `root_base` and
 the `root_cxx_standard` marker in `host:` and rely on `root_base`'s
 `run_exports`. Most ROOT-linking recipes here build two variants, driven by
-two keys in their `variants.yaml`:
+two keys set once in `global-variants.yaml`. A key only reaches recipes that
+list it bare in `host:` (or read it as `${{ root_cxx_standard }}`), so recipes
+that don't link ROOT are unaffected:
 
 - `root_cxx_standard` (`"20"` / `"23"`) is a variant key: it is folded into
   the package hash, constrains the `root_base` build selected in `host:`, and
@@ -131,31 +133,28 @@ two keys in their `variants.yaml`:
   `build.sh` as `$root_cxx_standard`. cxx20 serves consumers of the default
   ROOT builds (e.g. FairShip); cxx23 serves the phlex/aegir stack (phlex pins
   `root_cxx_standard ==23`).
-- `root_base` must be pinned explicitly as well (currently `6.40.04` in the
-  published recipes under `recipes/`). A bare
+- `root_base` must be pinned explicitly as well (currently `6.40.04`). A bare
   `root_base` host spec resolves, under `root_cxx_standard` 23, to the legacy
-  pre-cxx-split `root_base` 6.36.06 — that build declares no
+  pre-cxx-split `root_base` 6.36.06. That build declares no
   `root_cxx_standard` dependency, so it spuriously satisfies the C++23 marker
   and the solver prefers it. Pinning keeps every recipe on the same ROOT
-  series, as conda-forge's global `root_base` pin does. Bump every
-  `variants.yaml` under `recipes/` in lockstep when conda-forge moves ROOT
-  past 6.40.04. `recipes-dev/phlex` is not part of the lockstep: it keeps its
-  own series pin (`6.40`), matched to the SHiP stack's lock file.
+  series, as conda-forge's global `root_base` pin does. `recipes-dev/phlex`
+  keeps its own series pin (`6.40`), matched to the SHiP stack's lock file.
+
+Every recipe that lists `root_base` bare gets the same pin, and that matters
+for recipes that link each other: fairship and genie put rootegpythia6 in
+`host:`, so a rootegpythia6 built against a different ROOT either makes their
+host env unsolvable or sends the solver back to a pre-`root_base` build from
+the channel.
 
 Because `root_base` is pinned by us rather than tracked to conda-forge, a
-rebuild reproduces the same pin — so the channel-drift check reports it apart
-from genuine stale pins and never bumps `build.number` for it. When conda-forge
-moves past the pin, the check opens a separate `variant-drift` PR advancing it
-across every `variants.yaml` under `recipes/` at once. That PR is a real ROOT upgrade rather than
-a routine refresh, so review it on its own merits. No `build.number` bump
-accompanies it: changing a variant changes the build hash, so the build string
-is new and `--skip-existing` will not skip the rebuild. Every published
-ROOT-linking recipe carries the pin, rootegpythia6 included: fairship and genie list
-rootegpythia6 in `host:` and pin `root_base` themselves, so a rootegpythia6
-left to float to conda-forge's current ROOT either makes their host env
-unsolvable or sends the solver back to a pre-`root_base` build from the
-channel. `ci/check-variant-lockstep.py` enforces that at review time; it runs
-as a prek hook and needs no network access.
+rebuild reproduces the same pin. The channel-drift check therefore reports it
+apart from genuine stale pins and never bumps `build.number` for it. When
+conda-forge moves past the pin, the check opens a separate `variant-drift` PR
+that changes it in `global-variants.yaml`. That PR is a real ROOT upgrade
+rather than a routine refresh, so review it on its own merits. No
+`build.number` bump accompanies it: changing a variant changes the build hash,
+so the build string is new and `--skip-existing` will not skip the rebuild.
 
 For packages whose upstream build system sets no explicit C++ standard
 (photospp's autotools, GENIE's perl configure — both inherit ROOT's standard
@@ -165,9 +164,8 @@ the ROOT build they link against deterministic.
 The C++23-only aegir stack (aegir, aegir-genie, field-service, shannon,
 trout) builds a single variant and constrains ROOT in `host:` instead —
 `root_base >=6.40` plus `root_cxx_standard ==23` — which equally excludes the
-legacy 6.36.06 build.
-rootegpythia6 builds both variants and pins `root_base` in `variants.yaml`, in
-lockstep with fairship and genie, which link against it.
+legacy 6.36.06 build. A constrained spec ignores the variant, so the global
+pin doesn't apply to these recipes.
 
 ### Known upstream workarounds
 

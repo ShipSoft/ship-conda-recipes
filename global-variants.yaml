@@ -13,3 +13,16 @@ c_compiler_version:
   - "15"
 cxx_compiler_version:
   - "15"
+
+# ROOT C++-standard variants, pinned once for every ROOT-linking recipe; see
+# "ROOT C++ standard variants" in the README. Both keys only reach recipes
+# that list them bare in host: (or read ${{ root_cxx_standard }}); the
+# C++23-only aegir stack constrains them in host: instead and is unaffected.
+# Holding root_base here keeps every recipe that links another (fairship and
+# genie link rootegpythia6) on the same ROOT build. The channel-drift job
+# opens a variant-drift PR when conda-forge moves past it.
+root_cxx_standard:
+  - "20"
+  - "23"
+root_base:
+  - "6.40.04"
