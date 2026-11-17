@@ -11,6 +11,11 @@ name: Channel drift
 # Pins we hold ourselves in a recipe's variants.yaml (root_base) are exempt: a
 # rebuild reproduces them unchanged, so they get a separate PR that advances
 # the pin across every recipe in lockstep instead.
+#
+# Channel packages no recipe builds any more (upstreamed to conda-forge) cannot
+# be rebuilt. If conda-forge has a newer build of one, ours shadows it, because
+# the ship channel comes first. The recipes leg fails so that someone deletes
+# the old builds from the channel.
 
 on:
   schedule:
@@ -76,6 +81,7 @@ jobs:
       # pr-body.md stays out of the commit: add-paths below only stages
       # the leg's recipe files.
       - name: Detect drift and apply ${{ matrix.leg }} bumps
+        id: detect
         run: pixi run -e drift check-drift ${{ matrix.flag }} --pr-body pr-body.md
 
       # No-ops when the leg changed nothing, so a quiet week opens no PR.
@@ -91,3 +97,13 @@ jobs:
           labels: drift
           delete-branch: true
           add-paths: ${{ matrix.paths }}
+
+      # Runs after the PR step so a pending rebuild PR still opens. Both legs
+      # see the same packages, so only one of them fails.
+      - name: Fail on packages shadowing conda-forge
+        if: matrix.leg == 'recipes' && steps.detect.outputs.shadowed != '0'
+        env:
+          SHADOWED: ${{ steps.detect.outputs.shadowed }}
+        run: |
+          echo "::error::$SHADOWED ship build(s) shadow a newer conda-forge build; delete them from the channel (see the job summary)"
+          exit 1
