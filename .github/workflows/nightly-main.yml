@@ -165,6 +165,10 @@ jobs:
 
       - name: Build with rattler-build
         if: steps.todo.outputs.build == 'true'
+        env:
+          # Collapsible log groups per build and error annotations.
+          RATTLER_BUILD_ENABLE_GITHUB_INTEGRATION: 'true'
+          RATTLER_BUILD_COLOR: always
         run: |
           # Released dependencies only: the nightly channel is deliberately not a
           # build channel (see header). The recipe tests check the release's
