@@ -378,6 +378,9 @@ jobs:
           } > prebuilt/gxspl-ship.provenance
       - name: Build genie-splines-ship with the merged splines
         env:
+          # Collapsible log groups per build and error annotations.
+          RATTLER_BUILD_ENABLE_GITHUB_INTEGRATION: 'true'
+          RATTLER_BUILD_COLOR: always
           GENIE_SPLINES_PREBUILT: ${{ github.workspace }}/prebuilt/gxspl-ship.xml
           GENIE_SPLINES_PREBUILT_PROVENANCE: ${{ github.workspace }}/prebuilt/gxspl-ship.provenance
           GENIE_SPLINES_BUILD_NUMBER: ${{ inputs.build-number }}
