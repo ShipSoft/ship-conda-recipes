@@ -20,10 +20,17 @@ Some pins are ours, not conda-forge's: a dependency named by a recipe's
 same pin and only a lockstep bump of every ``variants.yaml`` advances it.
 Those are reported separately and never trigger a ``build.number`` bump.
 
-Only packages that a recipe under ``recipes/`` still builds are checked.
-Builds of retired recipes (acts-ship) or packages since taken over by
-conda-forge (libjsonnet) stay on the channel for older consumers, but a
-rebuild here cannot refresh them, so reporting them is noise.
+Only packages that a recipe under ``recipes/`` still builds are checked for
+stale pins. Builds of retired recipes (acts-ship) may stay on the channel for
+older consumers, and a rebuild here cannot refresh them.
+
+Those no-recipe packages get a different check instead. CI lists the ship
+channel before conda-forge with strict priority, so once a name is on our
+channel the solver never sees conda-forge's builds of it. When conda-forge
+has a build that ranks above ours (higher version, or same version and higher
+build number) on the same platform, ours shadows it. That happens to packages
+we upstreamed (libjsonnet). No rebuild fixes it; the old builds have to be
+deleted from the channel.
 
 Modes:
   (default)         print a report; exit 1 if any drift is found.
@@ -37,6 +44,10 @@ Modes:
                     every recipe declaring them, so a lockstep-bump PR can be
                     opened. All-or-nothing per pin. Exits 0.
   --pr-body PATH    write the markdown report (used as the PR body) to PATH.
+
+Shadowed packages fail the default mode. The bump modes still exit 0, but
+write ``shadowed=<count>`` to ``$GITHUB_OUTPUT`` so the workflow can fail
+after opening its PR.
 """
 
 from __future__ import annotations
@@ -57,6 +68,10 @@ from recipe_parsing import read_variants, recipe_names
 
 SHIP_REPODATA = "https://prefix.dev/ship-experiment/stable/{subdir}/repodata.json"
 CONDA_FORGE_CHANNELDATA = "https://conda.anaconda.org/conda-forge/channeldata.json"
+# Per-package file listing with build numbers. channeldata only carries the
+# latest version, which misses a same-version rebuild (libjsonnet 0.22.0 _2),
+# and the full per-subdir repodata is far too large to fetch for a few names.
+CONDA_FORGE_FILES = "https://api.anaconda.org/package/conda-forge/{name}"
 SUBDIRS = ("linux-64", "linux-aarch64", "noarch")
 # Subdirs that may not exist on the channel yet. prefix.dev answers 404 for a
 # subdir nobody has uploaded to, and for these that means "no packages", not a
@@ -165,16 +180,15 @@ def _retain(variants: list[dict], rec: dict) -> None:
         variants.append(rec)
 
 
-def latest_builds() -> tuple[dict[str, list[dict]], list[str]]:
-    """name -> the records the solver could pick (all tied at max version/build).
+def solver_views() -> tuple[dict[str, dict[str, list[dict]]], list[str]]:
+    """platform subdir -> name -> the records the solver could pick there.
 
     Selection runs once per solver view, i.e. each platform subdir plus
     noarch, because a solver only ever sees one platform. Ranking all subdirs
     together would let a newer linux-64 build hide a lagging linux-aarch64
-    one. The per-view picks are merged, keeping a noarch record that several
-    views share only once.
+    one. All records kept for a name tie at its max version/build_number.
 
-    Returns ``(picked, failed)`` where ``failed`` lists any subdir whose
+    Returns ``(views, failed)`` where ``failed`` lists any subdir whose
     repodata could not be fetched; callers must not report a clean no-drift
     result while sources are missing. A 404 for a subdir in
     ``OPTIONAL_SUBDIRS`` counts as an empty subdir, not a failure.
@@ -199,22 +213,59 @@ def latest_builds() -> tuple[dict[str, list[dict]], list[str]]:
         fetched[subdir] = list(records.values())
 
     noarch = fetched.get("noarch", [])
-    picked: dict[str, list[dict]] = {}
+    views: dict[str, dict[str, list[dict]]] = {}
     for subdir, records in fetched.items():
         if subdir == "noarch":
             continue
-        view: dict[str, list[dict]] = {}
+        view = views[subdir] = {}
         for rec in records + noarch:
             _retain(view.setdefault(rec["name"], []), rec)
+    return views, failed
+
+
+def merge_views(views: dict[str, dict[str, list[dict]]]) -> dict[str, list[dict]]:
+    """Merge per-view picks, keeping a noarch record several views share once."""
+    picked: dict[str, list[dict]] = {}
+    for view in views.values():
         for name, variants in view.items():
             merged = picked.setdefault(name, [])
             merged += [r for r in variants if all(r is not m for m in merged)]
-    return picked, failed
+    return picked
+
+
+def latest_builds() -> tuple[dict[str, list[dict]], list[str]]:
+    """name -> the records the solver could pick, on any platform."""
+    views, failed = solver_views()
+    return merge_views(views), failed
 
 
 def conda_forge_versions() -> dict[str, str]:
     data = fetch_json(CONDA_FORGE_CHANNELDATA)
     return {name: meta.get("version") for name, meta in data.get("packages", {}).items()}
+
+
+def conda_forge_files(name: str) -> list[dict] | None:
+    """conda-forge's builds of ``name`` as repodata-like records.
+
+    Returns None when conda-forge has no such package (anaconda.org answers
+    404); other errors propagate.
+    """
+    try:
+        data = fetch_json(CONDA_FORGE_FILES.format(name=name))
+    except urllib.error.HTTPError as exc:
+        if exc.code == 404:
+            return None
+        raise
+    return [
+        {
+            "name": name,
+            "version": f["version"],
+            "build": f["attrs"]["build"],
+            "build_number": f["attrs"].get("build_number", 0),
+            "subdir": f["attrs"]["subdir"],
+        }
+        for f in data.get("files", [])
+    ]
 
 
 # --- recipe mapping / build-number bump -------------------------------------
@@ -393,6 +444,41 @@ def detect_variant_drift(
     return rows
 
 
+def detect_shadowed(
+    views: dict[str, dict[str, list[dict]]],
+    names: list[str],
+    files_for=None,
+) -> tuple[list[tuple], list[str]]:
+    """No-recipe channel packages hiding a newer conda-forge build.
+
+    Compares, per solver view, our pick for each name against conda-forge's
+    best build on the same platform (or noarch). Returns ``(rows, failed)``:
+    rows are ``(name, subdir, ship_record, conda_forge_record)`` and
+    ``failed`` names packages whose conda-forge listing could not be fetched.
+    """
+    files_for = files_for or conda_forge_files
+    rows, failed = [], []
+    for name in names:
+        try:
+            files = files_for(name)
+        except Exception as exc:  # noqa: BLE001 - network / 403 / bad JSON
+            print(f"error: could not list conda-forge builds of {name}: {exc}",
+                  file=sys.stderr)
+            failed.append(name)
+            continue
+        if not files:  # not on conda-forge (e.g. acts-ship)
+            continue
+        for subdir, view in sorted(views.items()):
+            ours = view.get(name)
+            theirs = [f for f in files if f["subdir"] in (subdir, "noarch")]
+            if not ours or not theirs:
+                continue
+            best = max(theirs, key=functools.cmp_to_key(_rank_cmp))
+            if _rank_cmp(best, ours[0]) > 0:
+                rows.append((name, subdir, ours[0], best))
+    return rows, failed
+
+
 def split_rows(rows: list[tuple]) -> tuple[list[tuple], list[tuple]]:
     """Partition rows into (rebuild refreshes these, held by our variants.yaml)."""
     mapping = recipe_name_map()
@@ -443,9 +529,10 @@ def render(
     variant_rows: list[tuple],
     inconsistent: dict[str, dict[str, list[Path]]],
     scope: str | None = None,
+    shadowed: list[tuple] = (),
 ) -> str:
     lines = ["# Channel drift check", ""]
-    if not rows and not variant_rows and not inconsistent:
+    if not rows and not variant_rows and not inconsistent and not shadowed:
         lines.append("No stale conda-forge pins found in the ship channel. ✅")
         return "\n".join(lines) + "\n"
     if scope:
@@ -508,6 +595,28 @@ def render(
             for value, recipes in sorted(by_value.items()):
                 names = ", ".join(sorted(r.parent.name for r in recipes))
                 lines.append(f"- `{key}` = {value}: {names}")
+        lines.append("")
+
+    if shadowed:
+        lines += [
+            "## Shadowing conda-forge",
+            "",
+            "No recipe here builds these any more, but their old builds are "
+            "still on the ship channel. The channel comes first with strict "
+            "priority, so the solver never sees the newer conda-forge build. "
+            "Neither PR fixes this: delete every build of the package in that "
+            "subdir from the channel with `DELETE /api/v1/delete/"
+            "ship-experiment/stable/<subdir>/<file>`. A yank in the prefix.dev "
+            "web UI leaves the build in the repodata.",
+            "",
+            "| Package | Platform | Ship build | conda-forge build |",
+            "|---------|----------|------------|-------------------|",
+        ]
+        for name, subdir, ours, theirs in shadowed:
+            lines.append(
+                f"| {name} | {subdir} | {ours['version']} `{ours.get('build', '')}` "
+                f"| {theirs['version']} `{theirs['build']}` |"
+            )
         lines.append("")
 
     return "\n".join(lines) + "\n"
@@ -622,7 +731,7 @@ def build_parser() -> argparse.ArgumentParser:
 def main() -> int:
     args = build_parser().parse_args()
 
-    ship, failed = latest_builds()
+    views, failed = solver_views()
     if failed:
         print(
             f"error: could not fetch ship repodata for: {', '.join(failed)}; "
@@ -631,10 +740,18 @@ def main() -> int:
         )
         return 2
 
-    ship, dropped = drop_retired(ship, recipe_name_map())
+    ship, dropped = drop_retired(merge_views(views), recipe_name_map())
     if dropped:
-        print(f"note: skipping channel packages with no recipe: {', '.join(dropped)}",
-              file=sys.stderr)
+        print(f"note: no recipe builds {', '.join(dropped)}; checking only "
+              "whether they shadow conda-forge", file=sys.stderr)
+    shadowed, failed = detect_shadowed(views, dropped)
+    if failed:
+        print(
+            f"error: could not list conda-forge builds of: {', '.join(failed)}; "
+            "refusing to certify no-drift on partial data",
+            file=sys.stderr,
+        )
+        return 2
 
     cf = conda_forge_versions()
     rows = detect(ship, cf)
@@ -642,7 +759,7 @@ def main() -> int:
     variant_rows = detect_variant_drift(pins, cf)
 
     scope = "recipes" if args.bump_recipes else "variants" if args.bump_variants else None
-    report = render(rows, variant_rows, inconsistent, scope)
+    report = render(rows, variant_rows, inconsistent, scope, shadowed)
     if rows and args.bump_recipes:
         report += bump_affected(rows)
     if args.bump_variants:
@@ -654,10 +771,14 @@ def main() -> int:
         Path(summary).write_text(report, encoding="utf-8")
     if args.pr_body:
         args.pr_body.write_text(report, encoding="utf-8")
+    output = os.environ.get("GITHUB_OUTPUT")
+    if output:
+        with open(output, "a", encoding="utf-8") as fh:
+            fh.write(f"shadowed={len(shadowed)}\n")
 
     if args.bump_recipes or args.bump_variants:
         return 0
-    return 1 if (rows or variant_rows or inconsistent) else 0
+    return 1 if (rows or variant_rows or inconsistent or shadowed) else 0
 
 
 if __name__ == "__main__":
