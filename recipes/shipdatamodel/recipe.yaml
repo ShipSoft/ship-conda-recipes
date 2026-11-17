@@ -10,6 +10,11 @@ package:
 source:
   url: https://github.com/ShipSoft/data-model/archive/refs/tags/v${{ version }}.tar.gz
   sha256: 2c5a6af1efc291ec48ace3f262bd20225a7c056941b7723911649b500354113d
+  patches:
+    # Apple's linker rejects -Wl,--no-as-needed in the I/O tests; keep the
+    # dictionary linked with -needed_library instead. Drop at the next
+    # ShipSoft/data-model release.
+    - macos-test-dictionary-link.patch
 
 build:
   number: 1

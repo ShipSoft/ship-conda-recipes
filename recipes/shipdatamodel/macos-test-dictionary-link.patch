@@ -1,0 +1,20 @@
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 9acd397..521cd39 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -3,7 +3,14 @@ find_package(ROOT REQUIRED COMPONENTS Core RIO Tree ROOTNTuple)
+ # The data classes are header-only, so the test executables reference no
+ # symbols from libSHiPDataModel. Disable --as-needed for it to keep the
+ # DT_NEEDED entry that loads the ROOT dictionary at startup.
+-set(link_dictionary -Wl,--no-as-needed SHiPDataModel -Wl,--as-needed)
++# Apple's linker has no --as-needed; its counterpart is -dead_strip_dylibs (in
++# conda-forge's LDFLAGS), which spares libraries linked with -needed_library.
++# CMake's NEEDED_LIBRARY feature passes that, but only exists on Apple.
++if(APPLE)
++    set(link_dictionary "$<LINK_LIBRARY:NEEDED_LIBRARY,SHiPDataModel>")
++else()
++    set(link_dictionary -Wl,--no-as-needed SHiPDataModel -Wl,--as-needed)
++endif()
+ 
+ add_executable(test_ttree_io test_ttree_io.cpp)
+ target_link_libraries(
