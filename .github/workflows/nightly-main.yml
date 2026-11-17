@@ -179,30 +179,6 @@ jobs:
             --channel https://prefix.dev/ship-experiment/stable --channel conda-forge \
             --test skip
 
-      - name: Build summary
-        if: always() && steps.todo.outputs.build == 'true'
-        run: |
-          {
-            echo
-            shopt -s nullglob
-            files=("output/$SUBDIR"/*.conda output/noarch/*.conda)
-            if [ "${#files[@]}" -eq 0 ]; then
-              echo "_No \`.conda\` artifacts produced._"
-            else
-              echo "| File | Size |"
-              echo "|------|------|"
-              for f in "${files[@]}"; do
-                size=$(wc -c < "$f" | tr -d ' ')
-                if [ "$size" -ge 1048576 ]; then
-                  hsize="$(awk -v s="$size" 'BEGIN{printf "%.1f MiB", s/1048576}')"
-                else
-                  hsize="$(awk -v s="$size" 'BEGIN{printf "%.0f KiB", s/1024}')"
-                fi
-                echo "| \`$(basename "$f")\` | $hsize |"
-              done
-            fi
-          } >> "$GITHUB_STEP_SUMMARY"
-
       - name: Upload to prefix.dev/ship-experiment/nightly
         if: github.event_name != 'pull_request' && steps.todo.outputs.build == 'true'
         # Trusted publishing: prefix.dev accepts this workflow's OIDC token
