@@ -332,15 +332,48 @@ class ShadowTest(unittest.TestCase):
         )
         report = drift.render([], [], {}, shadowed=rows)
         self.assertIn("## Shadowing conda-forge", report)
-        self.assertIn("| libjsonnet | linux-64 | 0.22.0 `hship_1` | 0.22.0 `hcf_2` |",
-                      report)
+        self.assertIn("| libjsonnet | linux-64 | 0.22.0 `hship_1` (linux-64) "
+                      "| 0.22.0 `hcf_2` |", report)
+
+    def test_report_names_noarch_storage_for_noarch_builds(self):
+        # A noarch ship build shadows per platform, but lives in noarch.
+        ours = {**ship_rec("foo", "1.0", 0), "subdir": "noarch"}
+        rows, _ = self.shadowed(
+            {"linux-64": {"foo": [ours]}},
+            {"foo": [cf_file("foo", "1.1", 0, "linux-64")]},
+        )
+        report = drift.render([], [], {}, shadowed=rows)
+        self.assertIn("| foo | linux-64 | 1.0 `hship_0` (noarch) |", report)
+
+    def test_solver_views_tag_records_with_their_subdir(self):
+        rec = lambda: {"name": "foo", "version": "1.0",  # noqa: E731
+                       "build_number": 0, "build": "h0"}
+        with fake_repodata({
+            "linux-64": {"packages": {}},
+            "linux-aarch64": urllib.error.HTTPError("u", 404, "nf", {}, None),
+            "noarch": {"packages": {"foo.tar.bz2": rec()}},
+        }), contextlib.redirect_stderr(io.StringIO()):
+            views, failed = drift.solver_views()
+        self.assertEqual(failed, [])
+        # The missing aarch64 subdir still gets a view holding noarch packages.
+        self.assertEqual(sorted(views), ["linux-64", "linux-aarch64"])
+        self.assertEqual(views["linux-aarch64"]["foo"][0]["subdir"], "noarch")
 
     def test_conda_forge_files_maps_404_to_none(self):
         err = urllib.error.HTTPError("u", 404, "nf", {}, None)
         with mock.patch.object(drift, "fetch_json", side_effect=err):
             self.assertIsNone(drift.conda_forge_files("acts-ship"))
-        payload = {"files": [{"version": "0.22.0", "attrs": {
-            "subdir": "linux-64", "build": "h4dbf13b_2", "build_number": 2}}]}
+
+    def test_conda_forge_files_keeps_only_served_builds(self):
+        def entry(build, labels):
+            return {"version": "0.22.0", "labels": labels, "attrs": {
+                "subdir": "linux-64", "build": build, "build_number": 2}}
+
+        payload = {"files": [
+            entry("h4dbf13b_2", ["main"]),
+            entry("hbroken_2", ["main", "broken"]),
+            entry("hdev_2", ["dev"]),
+        ]}
         with mock.patch.object(drift, "fetch_json", return_value=payload):
             self.assertEqual(drift.conda_forge_files("libjsonnet"), [{
                 "name": "libjsonnet", "version": "0.22.0", "build": "h4dbf13b_2",
