@@ -205,11 +205,17 @@ def solver_views() -> tuple[dict[str, dict[str, list[dict]]], list[str]]:
                 and exc.code == 404
             ):
                 print(f"note: no {subdir} repodata on the channel yet", file=sys.stderr)
+                # Still a solver view: noarch packages install there.
+                fetched[subdir] = []
                 continue
             print(f"error: could not fetch {subdir} repodata: {exc}", file=sys.stderr)
             failed.append(subdir)
             continue
         records = {**repodata.get("packages", {}), **repodata.get("packages.conda", {})}
+        # Remember where each file is stored: a noarch record shows up in
+        # every platform view, but deleting it means deleting from noarch.
+        for rec in records.values():
+            rec.setdefault("subdir", subdir)
         fetched[subdir] = list(records.values())
 
     noarch = fetched.get("noarch", [])
@@ -247,6 +253,10 @@ def conda_forge_versions() -> dict[str, str]:
 def conda_forge_files(name: str) -> list[dict] | None:
     """conda-forge's builds of ``name`` as repodata-like records.
 
+    Only builds the default channel serves count: those labelled ``main``
+    and not also ``broken``. Anything else is invisible to the solver, so it
+    cannot be shadowed.
+
     Returns None when conda-forge has no such package (anaconda.org answers
     404); other errors propagate.
     """
@@ -265,6 +275,7 @@ def conda_forge_files(name: str) -> list[dict] | None:
             "subdir": f["attrs"]["subdir"],
         }
         for f in data.get("files", [])
+        if "main" in f.get("labels", []) and "broken" not in f.get("labels", [])
     ]
 
 
@@ -604,18 +615,20 @@ def render(
             "No recipe here builds these any more, but their old builds are "
             "still on the ship channel. The channel comes first with strict "
             "priority, so the solver never sees the newer conda-forge build. "
-            "Neither PR fixes this: delete every build of the package in that "
-            "subdir from the channel with `DELETE /api/v1/delete/"
-            "ship-experiment/stable/<subdir>/<file>`. A yank in the prefix.dev "
-            "web UI leaves the build in the repodata.",
+            "Neither PR fixes this: delete every build of the package in the "
+            "subdir it is stored in with `DELETE /api/v1/delete/"
+            "ship-experiment/stable/<subdir>/<file>`. When we yanked builds in "
+            "the prefix.dev web UI, they stayed in `repodata.json` and the "
+            "solver kept picking them.",
             "",
-            "| Package | Platform | Ship build | conda-forge build |",
-            "|---------|----------|------------|-------------------|",
+            "| Package | Solver platform | Ship build (stored in) | conda-forge build |",
+            "|---------|-----------------|------------------------|-------------------|",
         ]
-        for name, subdir, ours, theirs in shadowed:
+        for name, platform, ours, theirs in shadowed:
+            stored = ours.get("subdir", platform)
             lines.append(
-                f"| {name} | {subdir} | {ours['version']} `{ours.get('build', '')}` "
-                f"| {theirs['version']} `{theirs['build']}` |"
+                f"| {name} | {platform} | {ours['version']} `{ours.get('build', '')}` "
+                f"({stored}) | {theirs['version']} `{theirs['build']}` |"
             )
         lines.append("")
 

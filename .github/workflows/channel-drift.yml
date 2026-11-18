@@ -105,5 +105,6 @@ jobs:
         env:
           SHADOWED: ${{ steps.detect.outputs.shadowed }}
         run: |
-          echo "::error::$SHADOWED ship build(s) shadow a newer conda-forge build; delete them from the channel (see the job summary)"
+          echo "::error::$SHADOWED ship build(s) shadow a newer conda-forge build;" \
+            "delete them from the channel (see the job summary)"
           exit 1
