@@ -53,10 +53,32 @@ jobs:
     if: always()
     runs-on: ubuntu-latest
     needs: [build]
+    # To list this run's jobs.
+    permissions:
+      actions: read
     steps:
       - name: Check status of all jobs
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
+          set -euo pipefail
           if [[ "${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}" == "true" ]]; then
             echo "One or more jobs failed or were cancelled"
+            exit 1
+          fi
+
+          # needs.build.result rolls up the reusable workflow's per-platform
+          # jobs, and a cancelled one (e.g. no runner picked it up) still
+          # reports success there. Check each of them in this attempt.
+          jobs=$(gh api --paginate \
+            "repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/attempts/$GITHUB_RUN_ATTEMPT/jobs" \
+            --jq '.jobs[] | select(.name | startswith("build / ")) | "\(.conclusion)\t\(.name)"')
+          if [[ -z "$jobs" ]]; then
+            echo "::error::No build jobs found in this run"
+            exit 1
+          fi
+          echo "$jobs"
+          if awk -F'\t' '$1 != "success" && $1 != "skipped" { bad = 1 } END { exit !bad }' <<< "$jobs"; then
+            echo "::error::One or more build jobs did not succeed"
             exit 1
           fi
