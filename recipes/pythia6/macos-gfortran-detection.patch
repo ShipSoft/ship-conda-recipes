@@ -1,0 +1,48 @@
+From c6db6d8afdcde70fc4f230e14973832be4deab75 Mon Sep 17 00:00:00 2001
+From: Oliver Lantwin <oliver.lantwin@cern.ch>
+Date: Wed, 28 Oct 2026 12:55:30 +0100
+Subject: [PATCH] fix: detect gfortran through CMake on macOS
+
+The macOS block ran a bare "gfortran -dumpversion". conda-forge names
+the compiler with a target prefix (arm64-apple-darwin20.0.0-gfortran),
+so the command found nothing, the version came back empty and
+configure failed in string(SUBSTRING). The block also took only the
+first character of the version, so gfortran 10 and later compared as
+"1" and skipped linking libgfortran.
+
+Use CMAKE_Fortran_COMPILER_ID and CMAKE_Fortran_COMPILER_VERSION, run
+CMAKE_Fortran_COMPILER for the library path, and strip the trailing
+newline from its output.
+
+Assisted-by: Claude Code:claude-opus-5-5
+---
+ CMakeLists.txt | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 99726ad..6139231 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -37,12 +37,14 @@ Add_Library(pythia6 SHARED ${Pythia_FSRCS} ${Pythia_CSRCS})
+ If(CMAKE_SYSTEM_NAME MATCHES Darwin)
+   SET(CMAKE_SHARED_LIBRARY_CREATE_Fortran_FLAGS "${CMAKE_SHARED_LIBRARY_CREATE_Fortran_FLAGS} -flat_namespace -single_module -undefined dynamic_lookup")
+ 
+-  Execute_Process(COMMAND gfortran -dumpversion
+-                  OUTPUT_VARIABLE _gfortran_version)
+-  String(SUBSTRING ${_gfortran_version} 0 1 _gfortran_major_version)
+-  If(${_gfortran_major_version} GREATER 5)
+-    Execute_Process(COMMAND gfortran -print-file-name=libgfortran.dylib
++  # Use the Fortran compiler CMake found rather than whatever "gfortran" is on
++  # PATH (toolchains such as conda-forge's name it with a target prefix), and
++  # compare the whole version: gfortran 10 and later have two-digit majors.
++  If(CMAKE_Fortran_COMPILER_ID STREQUAL "GNU"
++     AND CMAKE_Fortran_COMPILER_VERSION VERSION_GREATER_EQUAL 6)
++    Execute_Process(COMMAND ${CMAKE_Fortran_COMPILER} -print-file-name=libgfortran.dylib
+                     OUTPUT_VARIABLE _gfortran_path
++                    OUTPUT_STRIP_TRAILING_WHITESPACE
+                    )
+     Get_Filename_COMPONENT(_gfortran_libdir ${_gfortran_path} DIRECTORY)
+     Message("${_gfortran_libdir}")
+-- 
+2.54.0
+
