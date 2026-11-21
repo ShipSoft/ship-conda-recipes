@@ -8,9 +8,9 @@ name: Channel drift
 # affected recipes' build.number and opens/updates a rebuild PR; merging it
 # rebuilds and re-uploads via build.yml.
 #
-# Pins we hold ourselves in a recipe's variants.yaml (root_base) are exempt: a
-# rebuild reproduces them unchanged, so they get a separate PR that advances
-# the pin across every recipe in lockstep instead.
+# Pins we hold ourselves in global-variants.yaml (root_base) or a recipe's
+# variants.yaml are exempt: a rebuild reproduces them unchanged, so they get a
+# separate PR that advances the pin instead.
 
 on:
   schedule:
@@ -49,7 +49,7 @@ jobs:
           - leg: variants
             flag: '--bump-variants'
             branch: variant-drift
-            paths: recipes/**/variants.yaml
+            paths: global-variants.yaml,recipes/**/variants.yaml
             commit: 'chore: bump variant pins behind conda-forge'
     steps:
       # An app token, unlike GITHUB_TOKEN, lets the PR trigger the

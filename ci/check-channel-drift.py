@@ -15,10 +15,11 @@ This catches drift that the binary dev-build signal misses: a free ``*``
 solve simply co-selects the older, mutually-compatible builds and stays
 green, hiding the fact that the channel has fallen behind conda-forge.
 
-Some pins are ours, not conda-forge's: a dependency named by a recipe's
-``variants.yaml`` is held at a value we choose, so a rebuild reproduces the
-same pin and only a lockstep bump of every ``variants.yaml`` advances it.
-Those are reported separately and never trigger a ``build.number`` bump.
+Some pins are ours, not conda-forge's: a dependency named by a single-valued
+key in ``global-variants.yaml`` (for the recipes that use the key) or in a
+recipe's own ``variants.yaml`` is held at a value we choose, so a rebuild
+reproduces the same pin and only bumping the variant advances it. Those are
+reported separately and never trigger a ``build.number`` bump.
 
 Only packages that a recipe under ``recipes/`` still builds are checked.
 Builds of retired recipes (acts-ship) or packages since taken over by
@@ -34,8 +35,8 @@ Modes:
                     (e.g. it is templated) is listed for manual handling.
                     Exits 0 so the caller can open the PR.
   --bump-variants   rewrite variant pins that conda-forge has moved past, in
-                    every recipe declaring them, so a lockstep-bump PR can be
-                    opened. All-or-nothing per pin. Exits 0.
+                    every variant file declaring them, so a variant-bump PR can
+                    be opened. All-or-nothing per pin. Exits 0.
   --pr-body PATH    write the markdown report (used as the PR body) to PATH.
 """
 
@@ -63,6 +64,9 @@ SUBDIRS = ("linux-64", "linux-aarch64", "noarch")
 # failed fetch. linux-aarch64 stays here until its first upload lands.
 OPTIONAL_SUBDIRS = frozenset({"linux-aarch64"})
 RECIPES_DIR = Path("recipes")
+# Passed to every build with --variant-config; its keys win over a recipe's
+# own variants.yaml.
+GLOBAL_VARIANTS = Path("global-variants.yaml")
 
 # (package, dependency) pairs to ignore, for deliberate pins that lag
 # conda-forge on purpose. Keep this small and documented.
@@ -240,48 +244,76 @@ def drop_retired(
     return kept, sorted(ship.keys() - kept.keys())
 
 
+def _global_variants() -> dict[str, list[str]]:
+    return read_variants(GLOBAL_VARIANTS) if GLOBAL_VARIANTS.is_file() else {}
+
+
+def uses_variant_key(recipe: Path, key: str) -> bool:
+    """Whether rattler-build applies the variant ``key`` to this recipe.
+
+    A variant only reaches a dependency listed bare (``- root_base``); a
+    constrained spec such as ``root_base >=6.40`` ignores it. A key can also be
+    read as a template variable (``${{ root_cxx_standard }}``).
+    """
+    text = recipe.read_text()
+    k = re.escape(key)
+    return bool(
+        re.search(rf"^\s*-\s*{k}\s*(?:#.*)?$", text, re.MULTILINE)
+        or re.search(rf"\$\{{\{{\s*{k}\s*\}}\}}", text)
+    )
+
+
 @functools.lru_cache(maxsize=None)
 def variant_pinned_deps(recipe: Path) -> frozenset[str]:
-    """Dependency names this recipe pins in its own variants.yaml.
+    """Dependency names held by a variant pin for this recipe.
 
+    That is every single-valued key in the recipe's own variants.yaml, plus
+    every single-valued key in global-variants.yaml that the recipe uses.
     conda-forge moving past such a pin does not make the published build
     stale in a way a rebuild fixes: the rebuild reproduces the same pin. A
     key with several values is a build matrix, not a pin, so it is left out:
     a matrix over a real dependency (e.g. ``python``) must still flag drift.
     """
+    keys = {
+        key for key, vals in _global_variants().items()
+        if len(vals) == 1 and uses_variant_key(recipe, key)
+    }
     variants = recipe.parent / "variants.yaml"
-    if not variants.is_file():
-        return frozenset()
-    return frozenset(
-        VARIANT_RUN_NAMES.get(key, key)
-        for key, vals in read_variants(variants).items()
-        if len(vals) == 1
-    )
+    if variants.is_file():
+        keys |= {key for key, vals in read_variants(variants).items() if len(vals) == 1}
+    return frozenset(VARIANT_RUN_NAMES.get(key, key) for key in keys)
 
 
 def variant_pins() -> tuple[dict[str, tuple[str, list[Path]]], dict[str, dict[str, list[Path]]]]:
-    """Return ``(pins, inconsistent)`` across every recipe's variants.yaml.
+    """Return ``(pins, inconsistent)`` across the variant files.
 
-    ``pins`` maps a variant key that carries exactly one value in every recipe
-    declaring it to ``(value, recipes)`` — a deliberate pin we can advance.
-    A key with more than one value anywhere is a build matrix (root_cxx_standard,
-    genie_hadronization), not a pin, and is excluded everywhere.
+    ``pins`` maps a variant key that carries exactly one value in every file
+    declaring it to ``(value, files)``, a deliberate pin we can advance. The
+    files are global-variants.yaml and the recipes' own variants.yaml. A key
+    set in global-variants.yaml is only read from there, since that file wins.
+    A key with more than one value anywhere is a build matrix
+    (root_cxx_standard, genie_hadronization), not a pin, and is excluded.
 
-    ``inconsistent`` maps a single-valued key whose recipes disagree on the
-    value to ``{value: recipes}``. That is a half-finished lockstep bump, not
-    something to bump again, so it is reported rather than acted on.
+    ``inconsistent`` maps a single-valued key whose files disagree on the
+    value to ``{value: files}``. That is a half-finished bump, not something
+    to bump again, so it is reported rather than acted on.
     """
-    values: dict[str, dict[str, list[Path]]] = {}
-    matrix: set[str] = set()
+    glob = _global_variants()
+    sources = [(GLOBAL_VARIANTS, glob)] if glob else []
     for recipe in sorted(RECIPES_DIR.glob("*/recipe.yaml")):
         variants = recipe.parent / "variants.yaml"
-        if not variants.is_file():
-            continue
-        for key, vals in read_variants(variants).items():
+        if variants.is_file():
+            local = {k: v for k, v in read_variants(variants).items() if k not in glob}
+            sources.append((variants, local))
+
+    values: dict[str, dict[str, list[Path]]] = {}
+    matrix: set[str] = set()
+    for path, keys in sources:
+        for key, vals in keys.items():
             if len(vals) != 1:
                 matrix.add(key)
                 continue
-            values.setdefault(key, {}).setdefault(vals[0], []).append(recipe)
+            values.setdefault(key, {}).setdefault(vals[0], []).append(path)
 
     pins: dict[str, tuple[str, list[Path]]] = {}
     inconsistent: dict[str, dict[str, list[Path]]] = {}
@@ -289,18 +321,23 @@ def variant_pins() -> tuple[dict[str, tuple[str, list[Path]]], dict[str, dict[st
         if key in matrix:
             continue
         if len(by_value) == 1:
-            value, recipes = next(iter(by_value.items()))
-            pins[key] = (value, recipes)
+            value, files = next(iter(by_value.items()))
+            pins[key] = (value, files)
         else:
             inconsistent[key] = by_value
     return pins, inconsistent
+
+
+def variant_file_label(path: Path) -> str:
+    """``global-variants.yaml`` for the global file, else the recipe name."""
+    return path.name if path == GLOBAL_VARIANTS else path.parent.name
 
 
 def rewrite_variant_pin(path: Path, key: str, old: str, new: str) -> str | None:
     """Return variants.yaml text with ``key``'s value ``old`` -> ``new``.
 
     Returns None when the pin is not present as expected, so callers can treat
-    a lockstep rewrite as all-or-nothing. Accepts the same trailing comments
+    a multi-file rewrite as all-or-nothing. Accepts the same trailing comments
     as ``read_variants`` and keeps them, along with the value's quoting.
     """
     lines = path.read_text().splitlines(keepends=True)
@@ -380,21 +417,21 @@ def detect(ship: dict[str, list[dict]], cf: dict[str, str]) -> list[tuple]:
 def detect_variant_drift(
     pins: dict[str, tuple[str, list[Path]]], cf: dict[str, str]
 ) -> list[tuple]:
-    """Variant pins conda-forge has moved past; these need a lockstep bump."""
+    """Variant pins conda-forge has moved past; these need a variant bump."""
     rows = []
-    for key, (value, recipes) in sorted(pins.items()):
+    for key, (value, files) in sorted(pins.items()):
         if key in IGNORE_VARIANT_DRIFT:
             continue
         latest = cf.get(key)
         if not latest:  # not a conda-forge package (e.g. genie_hadronization)
             continue
         if vcmp(latest, value) > 0:
-            rows.append((key, value, latest, recipes))
+            rows.append((key, value, latest, files))
     return rows
 
 
 def split_rows(rows: list[tuple]) -> tuple[list[tuple], list[tuple]]:
-    """Partition rows into (rebuild refreshes these, held by our variants.yaml)."""
+    """Partition rows into (rebuild refreshes these, held by our variant pins)."""
     mapping = recipe_name_map()
     stale, pinned = [], []
     for row in rows:
@@ -427,7 +464,7 @@ def _dep_table(rows: list[tuple]) -> list[str]:
 SCOPE_NOTES = {
     "recipes": (
         "**This PR bumps `build.number` only.** Pins held by our own "
-        "`variants.yaml` are listed below for context but advanced separately, "
+        "variant files are listed below for context but advanced separately, "
         "on the `variant-drift` branch."
     ),
     "variants": (
@@ -468,12 +505,13 @@ def render(
     if pinned:
         pkgs = sorted({name for name, *_ in pinned})
         lines += [
-            "## Pins held by our own `variants.yaml`",
+            "## Pins held by our own variant files",
             "",
             f"**{len(pinned)}** pin(s) across **{len(pkgs)}** package(s) are held "
-            "at a value this repo chooses, not tracked to conda-forge. A rebuild "
-            "reproduces them unchanged, so these do **not** justify a "
-            "`build.number` bump — advance them by bumping the pin in lockstep.",
+            "at a value this repo chooses (`global-variants.yaml` or a recipe's "
+            "`variants.yaml`), not tracked to conda-forge. A rebuild reproduces "
+            "them unchanged, so these do **not** justify a `build.number` bump. "
+            "Advance them by bumping the variant pin.",
             "",
             *_dep_table(pinned),
             "",
@@ -483,30 +521,30 @@ def render(
         lines += [
             "## Variant pins behind conda-forge",
             "",
-            "Bump these in lockstep across every `variants.yaml` that declares "
-            "them. No `build.number` bump is needed: the variant hash changes "
-            "the build string, so the rebuild is not skipped.",
+            "Bump these in every variant file that declares them. No "
+            "`build.number` bump is needed: the variant hash changes the build "
+            "string, so the rebuild is not skipped.",
             "",
-            "| Variant | Pinned | conda-forge latest | Recipes |",
-            "|---------|--------|--------------------|---------|",
+            "| Variant | Pinned | conda-forge latest | Declared in |",
+            "|---------|--------|--------------------|-------------|",
         ]
-        for key, value, latest, recipes in variant_rows:
-            names = ", ".join(sorted(r.parent.name for r in recipes))
-            lines.append(f"| `{key}` | {value} | {latest} | {names} ({len(recipes)}) |")
+        for key, value, latest, files in variant_rows:
+            names = ", ".join(sorted(variant_file_label(f) for f in files))
+            lines.append(f"| `{key}` | {value} | {latest} | {names} |")
         lines.append("")
 
     if inconsistent:
         lines += [
             "## Inconsistent variant pins",
             "",
-            "These keys are pinned to different values in different recipes — "
-            "usually a lockstep bump that stopped half-way. Reconcile them by "
+            "These keys are pinned to different values in different variant "
+            "files, usually a bump that stopped half-way. Reconcile them by "
             "hand; they are not bumped automatically.",
             "",
         ]
         for key, by_value in sorted(inconsistent.items()):
-            for value, recipes in sorted(by_value.items()):
-                names = ", ".join(sorted(r.parent.name for r in recipes))
+            for value, files in sorted(by_value.items()):
+                names = ", ".join(sorted(variant_file_label(f) for f in files))
                 lines.append(f"- `{key}` = {value}: {names}")
         lines.append("")
 
@@ -557,9 +595,9 @@ def bump_affected(rows: list[tuple]) -> str:
         out.append("")
     if pinned:
         out.append(
-            "Not bumped — flagged only for pins held by the recipe's own "
-            "`variants.yaml`, which a rebuild reproduces unchanged. Advance "
-            "these by bumping the pin in lockstep instead:"
+            "Not bumped: flagged only for pins held by our variant files, "
+            "which a rebuild reproduces unchanged. Advance these by bumping "
+            "the variant pin instead:"
         )
         out += [
             f"- `{r}` ({', '.join(d)}) — {p}" for p, r, d in pinned
@@ -569,32 +607,31 @@ def bump_affected(rows: list[tuple]) -> str:
 
 
 def bump_affected_variants(variant_rows: list[tuple]) -> str:
-    """Rewrite each behind variant pin in every recipe declaring it."""
+    """Rewrite each behind variant pin in every variant file declaring it."""
     out = ["", "## Variant actions", ""]
     if not variant_rows:
         out.append("No variant pins behind conda-forge.")
         return "\n".join(out) + "\n"
-    for key, value, latest, recipes in variant_rows:
+    for key, value, latest, files in variant_rows:
         # Stage every rewrite before touching disk: a pin advanced in some
-        # recipes but not others is worse than one left alone.
+        # files but not others is worse than one left alone.
         staged = {}
-        for recipe in recipes:
-            variants = recipe.parent / "variants.yaml"
-            text = rewrite_variant_pin(variants, key, value, latest)
+        for path in files:
+            text = rewrite_variant_pin(path, key, value, latest)
             if text is None:
                 break
-            staged[variants] = text
-        if len(staged) != len(recipes):
+            staged[path] = text
+        if len(staged) != len(files):
             out.append(
-                f"- `{key}`: **not rewritten** — could only update "
-                f"{len(staged)}/{len(recipes)} recipes, and a partial lockstep "
+                f"- `{key}`: **not rewritten**: could only update "
+                f"{len(staged)}/{len(files)} variant files, and a partial "
                 "bump would split the stack. Needs a look by hand."
             )
             continue
         for path, text in staged.items():
             path.write_text(text)
-        names = ", ".join(sorted(r.parent.name for r in recipes))
-        out.append(f"- `{key}` {value} → {latest} in {len(recipes)} recipe(s): {names}")
+        names = ", ".join(sorted(variant_file_label(f) for f in files))
+        out.append(f"- `{key}` {value} → {latest} in {names}")
     out += [
         "",
         "No `build.number` bump accompanies these: changing a variant changes "
@@ -614,7 +651,7 @@ def build_parser() -> argparse.ArgumentParser:
     bump.add_argument("--bump-recipes", action="store_true",
                       help="bump build.number once per affected recipe")
     bump.add_argument("--bump-variants", action="store_true",
-                      help="rewrite variant pins conda-forge has moved past, in lockstep")
+                      help="rewrite variant pins conda-forge has moved past")
     ap.add_argument("--pr-body", type=Path, help="write the markdown report to this path")
     return ap
 

@@ -50,20 +50,6 @@ repos:
         pass_filenames: false
         always_run: true
 
-      - id: variant-lockstep
-        name: root_base variant lockstep
-        language: system
-        entry: python ci/check-variant-lockstep.py
-        pass_filenames: false
-        files: ^recipes/[^/]+/(recipe|variants)\.yaml$
-
-      - id: test-lockstep
-        name: variant lockstep checker tests
-        language: system
-        entry: python ci/test_check_variant_lockstep.py
-        pass_filenames: false
-        files: ^ci/(check-variant-lockstep|test_check_variant_lockstep|recipe_parsing)\.py$
-
       # Needs py-rattler, so it runs in the drift environment.
       - id: test-drift
         name: channel-drift checker tests

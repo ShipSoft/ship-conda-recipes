@@ -256,14 +256,23 @@ class _TempRecipes(unittest.TestCase):
         self._tmp = tempfile.TemporaryDirectory()
         self.recipes = Path(self._tmp.name)
         self._orig_dir = drift.RECIPES_DIR
+        self._orig_global = drift.GLOBAL_VARIANTS
         drift.RECIPES_DIR = self.recipes
+        # Absent unless a test writes it, so the real file never leaks in.
+        drift.GLOBAL_VARIANTS = self.recipes.parent / f"{self.recipes.name}-global.yaml"
         drift.variant_pinned_deps.cache_clear()
         self.addCleanup(self._restore)
 
     def _restore(self):
+        drift.GLOBAL_VARIANTS.unlink(missing_ok=True)
         drift.RECIPES_DIR = self._orig_dir
+        drift.GLOBAL_VARIANTS = self._orig_global
         drift.variant_pinned_deps.cache_clear()
         self._tmp.cleanup()
+
+    def write_global(self, variants: str) -> Path:
+        drift.GLOBAL_VARIANTS.write_text(textwrap.dedent(variants).lstrip())
+        return drift.GLOBAL_VARIANTS
 
     def write(self, dirname, recipe: str, variants: str | None = None) -> Path:
         d = self.recipes / dirname
@@ -383,7 +392,7 @@ class VariantPinTest(_TempRecipes):
         recipe = self.simple("alpha", ROOT_PIN)
         report = drift.bump_affected([self.row("alpha", "root_base")])
         self.assertIn("  number: 2\n", recipe.read_text())
-        self.assertIn("variants.yaml", report)
+        self.assertIn("variant pin", report)
         self.assertIn("root_base", report)
 
     def test_unpinned_dep_still_triggers_a_bump(self):
@@ -396,8 +405,8 @@ class VariantPinTest(_TempRecipes):
         self.assertIn("  number: 3\n", recipe.read_text())
 
     def test_recipe_pinning_only_a_matrix_key_is_bumpable(self):
-        # rootegpythia6 pins only root_cxx_standard, so its root_base pin does
-        # refresh on a rebuild and the bump is worth making.
+        # A recipe pinning only root_cxx_standard gets its root_base pin
+        # refreshed by a rebuild, so the bump is worth making.
         recipe = self.simple("gamma", 'root_cxx_standard:\n  - "20"\n  - "23"\n')
         drift.bump_affected([self.row("gamma", "root_base")])
         self.assertIn("  number: 3\n", recipe.read_text())
@@ -483,7 +492,7 @@ class VariantPinTest(_TempRecipes):
             text, 'root_base:  # the ROOT series\n  - "6.40.04"  # lockstep\n'
         )
 
-    def test_partial_lockstep_is_refused(self):
+    def test_partial_variant_bump_is_refused(self):
         self.simple("alpha", ROOT_PIN)
         stray = self.simple("beta", ROOT_PIN)
         pins, _ = drift.variant_pins()
@@ -494,6 +503,56 @@ class VariantPinTest(_TempRecipes):
         self.assertIn("not rewritten", report)
         alpha = (self.recipes / "alpha" / "variants.yaml").read_text()
         self.assertIn('  - "6.40.2"\n', alpha)
+
+
+class GlobalVariantPinTest(_TempRecipes):
+    """Pins held once in global-variants.yaml."""
+
+    BARE = "package:\n  name: {0}\n\nbuild:\n  number: 2\n\nrequirements:\n  host:\n    - root_base\n"
+    CONSTRAINED = (
+        "package:\n  name: {0}\n\nbuild:\n  number: 2\n\n"
+        "requirements:\n  host:\n    - root_base >=6.40\n"
+    )
+
+    def test_global_pin_holds_only_recipes_using_the_key(self):
+        self.write_global(ROOT_PIN)
+        bare = self.write("alpha", self.BARE.format("alpha"))
+        constrained = self.write("aegir", self.CONSTRAINED.format("aegir"))
+        self.assertIn("root_base", drift.variant_pinned_deps(bare))
+        # A constrained spec ignores the variant, so a rebuild does refresh it.
+        self.assertNotIn("root_base", drift.variant_pinned_deps(constrained))
+        drift.bump_affected([self.row("alpha", "root_base"), self.row("aegir", "root_base")])
+        self.assertIn("  number: 2\n", bare.read_text())
+        self.assertIn("  number: 3\n", constrained.read_text())
+
+    def test_template_use_counts_as_using_the_key(self):
+        recipe = self.write(
+            "beta", "package:\n  name: beta\n\nbuild:\n  script: echo ${{ root_base }}\n"
+        )
+        self.assertTrue(drift.uses_variant_key(recipe, "root_base"))
+        self.assertFalse(drift.uses_variant_key(recipe, "root_cxx_standard"))
+
+    def test_global_pin_is_reported_and_bumped_once(self):
+        path = self.write_global(ROOT_PIN)
+        self.write("alpha", self.BARE.format("alpha"))
+        pins, inconsistent = drift.variant_pins()
+        self.assertEqual(pins["root_base"], ("6.40.2", [path]))
+        self.assertEqual(inconsistent, {})
+        rows = drift.detect_variant_drift(pins, {"root_base": "6.40.04"})
+        report = drift.bump_affected_variants(rows)
+        self.assertIn(path.name, report)
+        text = path.read_text()
+        self.assertIn('root_base:\n  - "6.40.04"\n', text)
+        self.assertIn('  - "20"\n  - "23"\n', text)  # matrix untouched
+
+    def test_global_key_overrides_recipe_files(self):
+        # global-variants.yaml wins in rattler-build, so a stale per-recipe copy
+        # is dead and must not make the pin look inconsistent.
+        path = self.write_global('root_base:\n  - "6.40.04"\n')
+        self.write("alpha", self.BARE.format("alpha"), 'root_base:\n  - "6.38.0"\n')
+        pins, inconsistent = drift.variant_pins()
+        self.assertEqual(pins["root_base"], ("6.40.04", [path]))
+        self.assertEqual(inconsistent, {})
 
 
 class FetchRetryTest(unittest.TestCase):
@@ -583,6 +642,7 @@ class MainTest(unittest.TestCase):
                 mock.patch.object(drift, "conda_forge_versions",
                                   return_value={"gsl": "2.8"}), \
                 mock.patch.object(drift, "variant_pins", return_value=({}, {})), \
+                mock.patch.object(drift, "variant_pinned_deps", return_value=frozenset()), \
                 mock.patch.object(drift, "recipe_name_map",
                                   return_value={"alpha": Path("recipes/alpha/recipe.yaml")}), \
                 mock.patch.object(drift, "bump_affected", return_value=""):
