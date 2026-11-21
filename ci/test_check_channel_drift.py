@@ -249,6 +249,137 @@ class SelectionTest(unittest.TestCase):
         self.assertIn("libboost", flagged)
 
 
+def cf_file(name, version, build_number, subdir):
+    return {"name": name, "version": version, "build_number": build_number,
+            "build": f"hcf_{build_number}", "subdir": subdir}
+
+
+def ship_rec(name, version, build_number):
+    return {"name": name, "version": version, "build_number": build_number,
+            "build": f"hship_{build_number}"}
+
+
+class ShadowTest(unittest.TestCase):
+    """No-recipe channel packages that hide a newer conda-forge build."""
+
+    def shadowed(self, views, files):
+        with contextlib.redirect_stderr(io.StringIO()):
+            return drift.detect_shadowed(views, sorted(files), files.get)
+
+    def test_same_version_rebuild_is_shadowed(self):
+        # Regression: libjsonnet 0.22.0 _1 on the ship channel hid
+        # conda-forge's 0.22.0 _2 on linux-64.
+        rows, failed = self.shadowed(
+            {"linux-64": {"libjsonnet": [ship_rec("libjsonnet", "0.22.0", 1)]}},
+            {"libjsonnet": [cf_file("libjsonnet", "0.22.0", 1, "linux-64"),
+                            cf_file("libjsonnet", "0.22.0", 2, "linux-64")]},
+        )
+        self.assertEqual(failed, [])
+        self.assertEqual([(r[0], r[1], r[3]["build"]) for r in rows],
+                         [("libjsonnet", "linux-64", "hcf_2")])
+
+    def test_newer_version_is_shadowed(self):
+        rows, _ = self.shadowed(
+            {"linux-64": {"foo": [ship_rec("foo", "1.0", 5)]}},
+            {"foo": [cf_file("foo", "1.1", 0, "linux-64")]},
+        )
+        self.assertEqual(len(rows), 1)
+
+    def test_equal_or_older_conda_forge_build_is_not_shadowed(self):
+        rows, _ = self.shadowed(
+            {"linux-64": {"foo": [ship_rec("foo", "1.0", 1)]}},
+            {"foo": [cf_file("foo", "1.0", 1, "linux-64"),
+                     cf_file("foo", "0.9", 7, "linux-64")]},
+        )
+        self.assertEqual(rows, [])
+
+    def test_only_the_same_platform_counts(self):
+        # A newer linux-64 build says nothing about our aarch64 one.
+        rows, _ = self.shadowed(
+            {"linux-aarch64": {"foo": [ship_rec("foo", "1.0", 0)]}},
+            {"foo": [cf_file("foo", "2.0", 0, "linux-64")]},
+        )
+        self.assertEqual(rows, [])
+
+    def test_noarch_conda_forge_build_counts_for_every_platform(self):
+        rows, _ = self.shadowed(
+            {"linux-64": {"foo": [ship_rec("foo", "1.0", 0)]},
+             "linux-aarch64": {"foo": [ship_rec("foo", "1.0", 0)]}},
+            {"foo": [cf_file("foo", "1.1", 0, "noarch")]},
+        )
+        self.assertEqual(sorted(r[1] for r in rows), ["linux-64", "linux-aarch64"])
+
+    def test_package_missing_from_conda_forge_is_skipped(self):
+        rows, failed = self.shadowed(
+            {"linux-64": {"acts-ship": [ship_rec("acts-ship", "1.0", 0)]}},
+            {"acts-ship": None},
+        )
+        self.assertEqual((rows, failed), ([], []))
+
+    def test_listing_failure_is_reported(self):
+        def boom(_name):
+            raise OSError("boom")
+
+        with contextlib.redirect_stderr(io.StringIO()):
+            rows, failed = drift.detect_shadowed(
+                {"linux-64": {"foo": [ship_rec("foo", "1.0", 0)]}}, ["foo"], boom)
+        self.assertEqual((rows, failed), ([], ["foo"]))
+
+    def test_report_lists_shadowed_package(self):
+        rows, _ = self.shadowed(
+            {"linux-64": {"libjsonnet": [ship_rec("libjsonnet", "0.22.0", 1)]}},
+            {"libjsonnet": [cf_file("libjsonnet", "0.22.0", 2, "linux-64")]},
+        )
+        report = drift.render([], [], {}, shadowed=rows)
+        self.assertIn("## Shadowing conda-forge", report)
+        self.assertIn("| libjsonnet | linux-64 | 0.22.0 `hship_1` (linux-64) "
+                      "| 0.22.0 `hcf_2` |", report)
+
+    def test_report_names_noarch_storage_for_noarch_builds(self):
+        # A noarch ship build shadows per platform, but lives in noarch.
+        ours = {**ship_rec("foo", "1.0", 0), "subdir": "noarch"}
+        rows, _ = self.shadowed(
+            {"linux-64": {"foo": [ours]}},
+            {"foo": [cf_file("foo", "1.1", 0, "linux-64")]},
+        )
+        report = drift.render([], [], {}, shadowed=rows)
+        self.assertIn("| foo | linux-64 | 1.0 `hship_0` (noarch) |", report)
+
+    def test_solver_views_tag_records_with_their_subdir(self):
+        rec = lambda: {"name": "foo", "version": "1.0",  # noqa: E731
+                       "build_number": 0, "build": "h0"}
+        with fake_repodata({
+            "linux-64": {"packages": {}},
+            "linux-aarch64": urllib.error.HTTPError("u", 404, "nf", {}, None),
+            "noarch": {"packages": {"foo.tar.bz2": rec()}},
+        }), contextlib.redirect_stderr(io.StringIO()):
+            views, failed = drift.solver_views()
+        self.assertEqual(failed, [])
+        # The missing aarch64 subdir still gets a view holding noarch packages.
+        self.assertEqual(sorted(views), ["linux-64", "linux-aarch64"])
+        self.assertEqual(views["linux-aarch64"]["foo"][0]["subdir"], "noarch")
+
+    def test_conda_forge_files_maps_404_to_none(self):
+        err = urllib.error.HTTPError("u", 404, "nf", {}, None)
+        with mock.patch.object(drift, "fetch_json", side_effect=err):
+            self.assertIsNone(drift.conda_forge_files("acts-ship"))
+
+    def test_conda_forge_files_keeps_only_served_builds(self):
+        def entry(build, labels):
+            return {"version": "0.22.0", "labels": labels, "attrs": {
+                "subdir": "linux-64", "build": build, "build_number": 2}}
+
+        payload = {"files": [
+            entry("h4dbf13b_2", ["main"]),
+            entry("hbroken_2", ["main", "broken"]),
+            entry("hdev_2", ["dev"]),
+        ]}
+        with mock.patch.object(drift, "fetch_json", return_value=payload):
+            self.assertEqual(drift.conda_forge_files("libjsonnet"), [{
+                "name": "libjsonnet", "version": "0.22.0", "build": "h4dbf13b_2",
+                "build_number": 2, "subdir": "linux-64"}])
+
+
 class _TempRecipes(unittest.TestCase):
     """Base: point RECIPES_DIR at a throwaway tree of recipes."""
 
@@ -545,28 +676,53 @@ class FetchRetryTest(unittest.TestCase):
 class MainTest(unittest.TestCase):
     """Exit codes: 2 on partial data, 1 on drift (check mode), else 0."""
 
-    def run_main(self, argv=()):
+    def run_main(self, argv=(), env=None):
+        env = {"GITHUB_STEP_SUMMARY": "", "GITHUB_OUTPUT": "", **(env or {})}
         with mock.patch.object(drift.sys, "argv", ["check-channel-drift", *argv]), \
                 contextlib.redirect_stdout(io.StringIO()), \
                 contextlib.redirect_stderr(io.StringIO()), \
-                mock.patch.dict(drift.os.environ, {"GITHUB_STEP_SUMMARY": ""}):
+                mock.patch.dict(drift.os.environ, env):
             return drift.main()
 
     def test_partial_repodata_is_refused(self):
         with fake_repodata({"linux-64": {}, "linux-aarch64": {}, "noarch": OSError("boom")}):
             self.assertEqual(self.run_main(), 2)
 
-    def test_retired_package_is_not_drift(self):
+    def _retired(self, conda_forge_files):
+        """Patch a channel holding one no-recipe build of ``retired``."""
         repodata = {"packages.conda": {"a.conda": {
-            "name": "retired", "version": "1", "build": "h0", "build_number": 0,
+            "name": "retired", "version": "1", "build": "h0_1", "build_number": 1,
             "depends": ["gsl >=2.7,<2.8.0a0"],
         }}}
-        with fake_repodata({"linux-64": repodata, "linux-aarch64": {}, "noarch": {}}), \
-                mock.patch.object(drift, "conda_forge_versions",
-                                  return_value={"gsl": "2.8"}), \
-                mock.patch.object(drift, "variant_pins", return_value=({}, {})), \
-                mock.patch.object(drift, "recipe_name_map", return_value={}):
-            self.assertEqual(self.run_main(), 0)
+        stack = contextlib.ExitStack()
+        stack.enter_context(fake_repodata(
+            {"linux-64": repodata, "linux-aarch64": {}, "noarch": {}}))
+        stack.enter_context(mock.patch.object(
+            drift, "conda_forge_versions", return_value={"gsl": "2.8"}))
+        stack.enter_context(mock.patch.object(
+            drift, "variant_pins", return_value=({}, {})))
+        stack.enter_context(mock.patch.object(
+            drift, "recipe_name_map", return_value={}))
+        stack.enter_context(mock.patch.object(
+            drift, "conda_forge_files", **conda_forge_files))
+        self.enterContext(stack)
+
+    def test_retired_package_is_not_drift(self):
+        self._retired({"return_value": None})
+        self.assertEqual(self.run_main(), 0)
+
+    def test_shadowed_package_fails_check_mode_and_sets_output(self):
+        self._retired({"return_value": [cf_file("retired", "1", 2, "linux-64")]})
+        self.assertEqual(self.run_main(), 1)
+        with tempfile.TemporaryDirectory() as tmp:
+            out = Path(tmp, "out")
+            self.assertEqual(
+                self.run_main(["--bump-recipes"], {"GITHUB_OUTPUT": str(out)}), 0)
+            self.assertEqual(out.read_text(), "shadowed=1\n")
+
+    def test_conda_forge_listing_failure_is_refused(self):
+        self._retired({"side_effect": OSError("boom")})
+        self.assertEqual(self.run_main(), 2)
 
     def test_clean_channel_exits_zero(self):
         with fake_repodata({"linux-64": {}, "linux-aarch64": {}, "noarch": {}}), \
