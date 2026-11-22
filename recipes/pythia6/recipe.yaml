@@ -1,7 +1,8 @@
 context:
   version: "6.4.28"
-  # ShipSoft fork of SND-LHC/pythia6 with the PDFLIB dummy routines restored.
-  tag: "v6.4.28-ship1"
+  # ShipSoft fork of SND-LHC/pythia6 with the PDFLIB dummy routines restored
+  # and a fix for DIS (process 99) being switched off at initialisation.
+  tag: "v6.4.28-ship2"
 
 package:
   name: pythia6
@@ -9,10 +10,10 @@ package:
 
 source:
   url: https://github.com/ShipSoft/pythia6/archive/refs/tags/${{ tag }}.tar.gz
-  sha256: caa94bef5dd904cc5dc1c46c10c5731b576936ddc3b639ce86f9dfab82d44079
+  sha256: 88d8b9b318c0d55c0d14fb85e22d6e396e1f3a6e7b9a18cc7f986282100234e6
 
 build:
-  number: 9
+  number: 10
   script: build.sh
 
 requirements:
