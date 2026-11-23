@@ -227,6 +227,9 @@ it can be dropped.
   its closure and only trip over `expat`; shipgeometryservice, which has no
   ROOT, trips over all three. The feedstock's own CMake test does not catch
   this because its test environment lists all three explicitly.
+  shipgeometryservice also lists the three in `run:`, because its own CMake
+  config finds Geant4: packages and pixi environments that get Geant4 only
+  through it would otherwise have to know about the workaround.
   The dev-build workflows resolve the upstream pixi manifests instead of these
   recipes, so FairShip's and geometry_service's `pixi.toml` carry the same
   three (and field_service's carries `expat`); drop those alongside the recipe
