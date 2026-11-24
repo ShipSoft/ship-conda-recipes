@@ -26,6 +26,12 @@ build-aegir = "rattler-build build --recipe recipes/aegir --variant-config globa
 # environments. Usage: pixi run build-phlex-pr <pr-number|branch|tag|sha>
 build-phlex-pr = "scripts/build-phlex-pr.sh"
 
+# Patch an upstream package in place inside a consumer's environment: build a
+# source checkout incrementally and install it over the released package,
+# with `restore` to undo. Usage: pixi run overlay <configure|build|install|
+# restore|status> ../<consumer> ...; run it without arguments for details.
+overlay = "scripts/overlay.sh"
+
 # Linting / formatting toolchain. prek orchestrates the hooks; the tools come
 # from this environment so versions are tracked in pixi.lock and run identically
 # everywhere (including NixOS). See .pre-commit-config.yaml.
