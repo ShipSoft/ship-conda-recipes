@@ -1,5 +1,7 @@
 context:
-  version: "0.5.0"
+  version: "0.6.0"
+  # 0.6 requires C++23 (CMake refuses anything lower).
+  cxx_standard: "23"
 
 recipe:
   name: field-service
@@ -7,7 +9,7 @@ recipe:
 
 source:
   - url: https://github.com/ShipSoft/field_service/archive/refs/tags/v${{ version }}.tar.gz
-    sha256: 0e9745f266bf15e88740cffd1fb8bb510eb6433a3d6645228666e92b49fa7066
+    sha256: 91a90e0bb37b3170b3e22de5c7a3792b63111efeb8f21a3dc99558bcc95b1388
   # covfie is FetchContent'd by upstream CMake; vendor it so the build
   # stays offline. Pinned to the same tag the CMakeLists.txt uses.
   - url: https://github.com/acts-project/covfie/archive/refs/tags/v0.16.0.tar.gz
@@ -23,7 +25,7 @@ outputs:
     build:
       script: |
         cmake ${CMAKE_ARGS} -S ${SRC_DIR} -B build \
-            -DCMAKE_CXX_STANDARD=${{ root_cxx_standard }} \
+            -DCMAKE_CXX_STANDARD=${{ cxx_standard }} \
             -DCMAKE_INSTALL_LIBDIR=lib \
             -DBUILD_G4_ADAPTER=ON \
             -DBUILD_ACTS_ADAPTER=ON \
@@ -41,6 +43,8 @@ outputs:
       - make
       host:
       - mp-units
+      # Kokkos mdspan (header-only), included by the public FieldMap.h.
+      - mdspan
       # SHiP/Units.hpp (SHiP::SHiPUnits); >=0.6.0 for SHiP::Length.
       - shipdatamodel >=0.6.0
       - geant4
@@ -54,10 +58,12 @@ outputs:
       - acts-core
       - libboost-devel
       - eigen
-      - root_base
+      - root_base >=6.40
       # Placement manifests (MapIO, header-only, private).
       - nlohmann_json
-      - root_cxx_standard
+      # C++23 only: pin the matching ROOT variant, as the rest of the aegir
+      # stack does (an unconstrained solve drifts down to the C++20 build).
+      - root_cxx_standard ==${{ cxx_standard }}
 
   - package:
       name: field-service-core
@@ -66,7 +72,6 @@ outputs:
       files:
         - lib/libSHiPFieldService.so*
         - include/SHiP/FieldService/IFieldSource.h
-        - include/SHiP/FieldService/CovfieFieldSource.h
         - include/SHiP/FieldService/FieldMap.h
         - lib/cmake/SHiPFieldService/SHiPFieldServiceConfig.cmake
         - lib/cmake/SHiPFieldService/SHiPFieldServiceConfigVersion.cmake
@@ -74,11 +79,12 @@ outputs:
         - lib/cmake/SHiPFieldService/SHiPFieldServiceTargets-*.cmake
     requirements:
       run:
-        # find_dependency(mp-units) and find_dependency(SHiPDataModel) in
-        # SHiPFieldServiceConfig.cmake — needed in consumers' host env at
-        # configure time, which requires listing them here rather than
-        # relying on their run_exports alone.
+        # find_dependency(mp-units), find_dependency(mdspan) and
+        # find_dependency(SHiPDataModel) in SHiPFieldServiceConfig.cmake —
+        # needed in consumers' host env at configure time, which requires
+        # listing them here rather than relying on their run_exports alone.
         - mp-units
+        - mdspan
         - shipdatamodel >=0.6.0
       run_exports:
         - ${{ pin_subpackage('field-service-core', upper_bound='x.x') }}
@@ -100,7 +106,6 @@ outputs:
       - script:
           - test -f $PREFIX/lib/libSHiPFieldService.so
           - test -f $PREFIX/include/SHiP/FieldService/IFieldSource.h
-          - test -f $PREFIX/include/SHiP/FieldService/CovfieFieldSource.h
           - test -f $PREFIX/include/SHiP/FieldService/FieldMap.h
           - test -f $PREFIX/lib/cmake/SHiPFieldService/SHiPFieldServiceConfig.cmake
           - test -f $PREFIX/lib/cmake/SHiPFieldService/SHiPFieldServiceTargets.cmake
@@ -258,7 +263,7 @@ about:
   repository: https://github.com/ShipSoft/field_service
   summary: SHiP magnetic field service (framework-agnostic, covfie-backed)
   description: |
-    SHiPFieldService is a framework-agnostic C++20 library exposing the
+    SHiPFieldService is a framework-agnostic C++23 library exposing the
     SHiP magnetic field maps to simulation (aegir) and reconstruction.
     Maps are stored in the SHiP field-map format, a versioned ROOT
     RNTuple layout, and evaluated with the covfie library. The core

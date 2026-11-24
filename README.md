@@ -162,10 +162,10 @@ For packages whose upstream build system sets no explicit C++ standard
 via `root-config`), there is no compile flag to drive; the variant only makes
 the ROOT build they link against deterministic.
 
-The C++23-only aegir stack (aegir, aegir-genie, shannon, trout) builds a
-single variant and constrains ROOT in `host:` instead — `root_base >=6.40`
-plus `root_cxx_standard ==23` — which equally excludes the legacy 6.36.06
-build.
+The C++23-only aegir stack (aegir, aegir-genie, field-service, shannon,
+trout) builds a single variant and constrains ROOT in `host:` instead —
+`root_base >=6.40` plus `root_cxx_standard ==23` — which equally excludes the
+legacy 6.36.06 build.
 rootegpythia6 builds both variants and pins `root_base` in `variants.yaml`, in
 lockstep with fairship and genie, which link against it.
 
