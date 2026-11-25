@@ -1,0 +1,45 @@
+From 4a0fae036f03052f1e4935659ac00e06b37f09fc Mon Sep 17 00:00:00 2001
+From: Chris Burr <christopher.burr@cern.ch>
+Date: Sun, 12 Jul 2026 06:29:09 +0000
+Subject: [PATCH] [cmake] Quote list-valued cache variable in root-config
+ generation
+
+The loop that builds the `root-config --config` argument list guards each
+cache variable with
+
+    if((var MATCHES "_(LIBRARIES|LIBRARY|INCLUDE|VERSION)") AND
+       (NOT ${${var}} STREQUAL "") AND
+       (NOT ${var} MATCHES "NOTFOUND"))
+
+When the variable holds a list (e.g.
+CLING_LIBRARIES=clingInterpreter;clingMetaProcessor;clingUtils) the
+unquoted ${${var}} expands to several tokens, so the parenthesised
+sub-expression `(NOT a b c STREQUAL "")` is malformed. CMake silently
+accepted this until 4.4, which now propagates errors from parenthesised
+if() sub-expressions (kitware/cmake@240481490c, kitware/cmake#26424) and
+fails configuration with "Unknown arguments specified".
+
+Quote the expansion so the value is compared as a single string. Besides
+fixing configuration with CMake >= 4.4, this restores the intended
+behaviour: list-valued variables were previously dropped from
+`root-config --config` (the malformed guard evaluated to false) and are
+now included.
+
+Signed-off-by: Chris Burr <christopher.burr@cern.ch>
+---
+ CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 40c88e00050b3..feb1dcaad6d3b 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -603,7 +603,7 @@ add_custom_target(dist COMMAND cpack --config CPackConfig.cmake)
+ get_cmake_property(variables CACHE_VARIABLES)
+ foreach(var ${variables})
+   if((var MATCHES "_(LIBRARIES|LIBRARY|INCLUDE|VERSION)") AND
+-     (NOT ${${var}} STREQUAL "") AND
++     (NOT "${${var}}" STREQUAL "") AND
+      (NOT ${var} MATCHES "NOTFOUND"))
+     if (var MATCHES "^QT_")
+       # filter out the very long list of Qt libraries and include dirs
