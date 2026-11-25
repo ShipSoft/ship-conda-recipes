@@ -18,7 +18,7 @@ set -euo pipefail
 # Usage:
 #   overlay.sh configure <consumer> <src> [-e ENV] [-t "TOOL ..."] [-- CMAKE_ARGS...]
 #   overlay.sh build     <consumer> <src> [-e ENV]
-#   overlay.sh install   <consumer> <src> <package> [-e ENV]
+#   overlay.sh install   <consumer> <src> <package> [-e ENV] [-f]
 #   overlay.sh restore   <consumer> <package> [-e ENV]
 #   overlay.sh status    <consumer> [-e ENV]
 #
@@ -27,14 +27,16 @@ set -euo pipefail
 # -t names build-only tools the consumer environment lacks (e.g. "cetmodules
 # pkg-config"); they come from a cached `pixi exec` environment and are added
 # to PATH and CMAKE_PREFIX_PATH. CMAKE_ARGS should mirror the feedstock's
-# build script.
+# build script. -f lets install go ahead when <src> is not on the tag of the
+# installed version (e.g. a fix on top of upstream main), with a warning
+# instead of an error.
 
 die() {
     echo "error: $*" >&2
     exit 1
 }
 usage() {
-    sed -n '/^# Usage:/,/^# build script\./p' "$0" | sed 's/^# \{0,1\}//' >&2
+    sed -n '/^# Usage:/,/^# instead of an error\./p' "$0" | sed 's/^# \{0,1\}//' >&2
     exit 2
 }
 
@@ -69,6 +71,7 @@ esac
 
 env=default
 tools=
+force=
 cmake_args=()
 while [[ $# -gt 0 ]]; do
     case $1 in
@@ -79,6 +82,10 @@ while [[ $# -gt 0 ]]; do
     -t)
         tools=$2
         shift 2
+        ;;
+    -f)
+        force=1
+        shift
         ;;
     --)
         shift
@@ -184,9 +191,12 @@ install)
     [[ -n "$installed" ]] || die "$pkg is not installed in the '$env' environment of $consumer"
     described=$(git -C "$src" describe --tags --always --dirty 2>/dev/null || echo unknown)
     tag=$(git -C "$src" describe --tags --abbrev=0 2>/dev/null || true)
-    tag_matches "$tag" "$installed" ||
-        die "$src is at '$described' but the environment has $pkg $installed;
+    if ! tag_matches "$tag" "$installed"; then
+        msg="$src is at '$described' but the environment has $pkg $installed;
        patch on top of the matching tag, or ABI mismatches may crash at run time"
+        [[ -n "$force" ]] || die "$msg (or pass -f to install anyway)"
+        echo "warning: $msg" >&2
+    fi
     # Record the overlay before touching the prefix: cmake --install doesn't
     # roll back, so a failed install still leaves something to restore.
     mkdir -p "$marker_dir/$pkg"
