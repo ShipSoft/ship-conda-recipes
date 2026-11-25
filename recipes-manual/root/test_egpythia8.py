@@ -10,7 +10,9 @@ import ROOT
 
 assert ROOT.gSystem.Load("libEGPythia8") >= 0, "cannot load libEGPythia8"
 
-pythia = ROOT.TPythia8().Pythia8()
+# Keep the TPythia8 alive: it owns the Pythia instance.
+tpythia8 = ROOT.TPythia8()
+pythia = tpythia8.Pythia8()
 library = round(pythia.settings.parm("Pythia:versionNumber") * 1000)
 headers = int(ROOT.gInterpreter.ProcessLine("PYTHIA_VERSION_INTEGER;"))
 print(f"libpythia8 {library}, cling headers {headers}")
