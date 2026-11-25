@@ -4,7 +4,7 @@ set -euo pipefail
 # Patch an upstream (conda-forge) package in place inside a consumer's pixi
 # environment: build a source checkout of it incrementally with the
 # environment's own compilers and dependencies, install it over the released
-# package, and put the released package back afterwards. See the Developer
+# package, and put the released package back on `restore`. See the Developer
 # Guide (SHiP Documentation site), "Patching an upstream package".
 #
 # conda-forge links with DT_RPATH, which the dynamic loader searches before
@@ -99,15 +99,33 @@ prefix=$(in_env bash -c 'echo "$CONDA_PREFIX"')
 marker_dir="$prefix/.ship-overlay"
 build_dir="${src:+$src-overlay-build}"
 
+configured_prefix() {
+    sed -n 's/^CMAKE_INSTALL_PREFIX:[A-Z]*=//p' "$build_dir/CMakeCache.txt"
+}
+
 # Check that the build directory is configured for this environment, so that
 # a build configured for one consumer is never installed (and recorded) as
 # an overlay of another.
 check_configured() {
     [[ -f "$build_dir/CMakeCache.txt" ]] || die "$build_dir is not configured; run 'configure' first"
     local configured
-    configured=$(sed -n 's/^CMAKE_INSTALL_PREFIX:[A-Z]*=//p' "$build_dir/CMakeCache.txt")
+    configured=$(configured_prefix)
     [[ "$configured" == "$prefix" ]] ||
         die "$build_dir is configured for $configured, not $prefix; run 'configure' again for this environment"
+}
+
+# Succeed if the version numbers of tag $1 end with those of version $2,
+# compared as integers: v0.4.2 and v6-36-04 match 0.4.2 and 6.36.4, but
+# v0.4.20 doesn't match 0.4.2.
+tag_matches() {
+    local -a t v
+    read -ra t <<<"$(grep -oE '[0-9]+' <<<"$1" | tr '\n' ' ')"
+    read -ra v <<<"$(grep -oE '[0-9]+' <<<"$2" | tr '\n' ' ')"
+    local n=${#v[@]} off=$((${#t[@]} - ${#v[@]})) i
+    ((n > 0 && off >= 0)) || return 1
+    for ((i = 0; i < n; i++)); do
+        ((10#${t[off + i]} == 10#${v[i]})) || return 1
+    done
 }
 
 # Run a command in the consumer environment with the -t tools of the
@@ -121,6 +139,12 @@ in_build_env() {
 
 case $cmd in
 configure)
+    # A cache from another environment keeps that environment's compiler and
+    # dependency paths, so start from a fresh one (what cmake --fresh does).
+    if [[ -f "$build_dir/CMakeCache.txt" ]] && [[ "$(configured_prefix)" != "$prefix" ]]; then
+        echo "$build_dir was configured for $(configured_prefix); starting from a fresh CMake cache" >&2
+        rm -rf "${build_dir:?}/CMakeCache.txt" "${build_dir:?}/CMakeFiles"
+    fi
     aux=
     if [[ -n "$tools" ]]; then
         specs=()
@@ -159,10 +183,10 @@ install)
         awk -v p="$pkg" '$1 == p {print $2; exit}')
     [[ -n "$installed" ]] || die "$pkg is not installed in the '$env' environment of $consumer"
     described=$(git -C "$src" describe --tags --always --dirty 2>/dev/null || echo unknown)
-    if [[ "$described" != *"$installed"* ]]; then
-        echo "warning: $src is at '$described' but the environment has $pkg $installed;" >&2
-        echo "         check out the matching tag, or ABI mismatches may crash at run time" >&2
-    fi
+    tag=$(git -C "$src" describe --tags --abbrev=0 2>/dev/null || true)
+    tag_matches "$tag" "$installed" ||
+        die "$src is at '$described' but the environment has $pkg $installed;
+       patch on top of the matching tag, or ABI mismatches may crash at run time"
     # Record the overlay before touching the prefix: cmake --install doesn't
     # roll back, so a failed install still leaves something to restore.
     mkdir -p "$marker_dir/$pkg"
@@ -190,6 +214,7 @@ install)
     ;;
 restore)
     [[ -f "$marker_dir/$pkg/info" ]] || die "no overlay of $pkg recorded in $prefix"
+    state=$(sed -n 's/^state=//p' "$marker_dir/$pkg/info")
     # Remove everything the source build installed (it may have added files
     # the package doesn't ship), then let pixi re-link the released package.
     if [[ -f "$marker_dir/$pkg/install_manifest.txt" ]]; then
@@ -200,8 +225,9 @@ restore)
             *) echo "warning: skipping $f (outside $prefix)" >&2 ;;
             esac
         done <"$marker_dir/$pkg/install_manifest.txt"
-    else
-        echo "warning: the first install of $pkg failed, so there is no list of the files it added;" >&2
+    fi
+    if [[ "$state" == installing ]]; then
+        echo "warning: the last install of $pkg failed, so the files it added aren't listed;" >&2
         echo "         files the released package doesn't ship may remain in $prefix" >&2
     fi
     pixi reinstall --manifest-path "$consumer/pixi.toml" -e "$env" "$pkg"
