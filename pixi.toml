@@ -21,6 +21,10 @@ build-all = "rattler-build build --recipe-dir recipes/ --variant-config global-v
 # --channel https://prefix.dev/ship-experiment/stable --channel conda-forge
 build-aegir = "rattler-build build --recipe recipes/aegir --variant-config global-variants.yaml --channel https://prefix.dev/ship-experiment/stable --channel conda-forge"
 
+# ROOT rebuilt against the ship channel's pythia8 (recipes-manual/root).
+# Too big for GitHub runners: run on a large build machine.
+build-root = "scripts/build-root.sh"
+
 # Build the phlex package from an upstream PR (or any git ref) into the local
 # dev channel ../ship-local-channel for consumption by downstream dev
 # environments. Usage: pixi run build-phlex-pr <pr-number|branch|tag|sha>

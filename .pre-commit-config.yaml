@@ -27,6 +27,8 @@ repos:
         entry: yamllint
         args: [-c, .yamllint.yml]
         types: [yaml]
+        # root-feedstock's recipe, kept verbatim to stay diffable.
+        exclude: ^recipes-manual/root/
 
       - id: shellcheck
         name: shellcheck
@@ -34,8 +36,9 @@ repos:
         entry: shellcheck
         args: [--severity=warning]
         types: [shell]
-        # The csh activation scripts copied from conda-forge feedstocks.
-        exclude: \.csh$
+        # The csh activation scripts copied from conda-forge feedstocks, and
+        # root-feedstock's build scripts, kept verbatim to stay diffable.
+        exclude: \.csh$|^recipes-manual/root/
 
       - id: actionlint
         name: actionlint

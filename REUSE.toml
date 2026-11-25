@@ -14,3 +14,9 @@ path = ["recipes/pythia8/**", "recipes/evtgen/**"]
 precedence = "aggregate"
 SPDX-FileCopyrightText = "conda-forge contributors"
 SPDX-License-Identifier = "BSD-3-Clause"
+
+[[annotations]]
+path = "recipes-manual/root/**"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "conda-forge contributors"
+SPDX-License-Identifier = "BSD-3-Clause"

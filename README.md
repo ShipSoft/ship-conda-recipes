@@ -28,6 +28,7 @@ The old `prefix.dev/ship` channel no longer receives uploads.
 | pythia6 | No (ShipSoft fork) |
 | pythia8 | Temporary (conda-forge is behind, see below) |
 | random123 | Yes (conda-forge feedstock) |
+| root | Temporary (conda-forge's links pythia8 8.312, see below) |
 | rootegpythia6 | No (niche) |
 | shannon | No (SHiP-specific) |
 | ship-ci-metrics | No (SHiP-specific) |
@@ -69,20 +70,43 @@ conda-forge catches up.
   pythia8. conda-forge's build links 8.312 and accepts any 8.3 release at
   runtime, but Pythia doesn't keep ABI between releases. linux-64 only, like
   the rest of the FairShip stack.
+- **root 6.40.04** (`recipes-manual/root`, linux-64): the root-feedstock
+  recipe at `fedfe95`, built against our pythia8. conda-forge's `root_base`
+  links 8.312, and its `EGPythia8` C++ module embeds the 8.312 headers. With
+  our 8.318 in the environment, `libEGPythia8` fails to load (missing
+  `Pythia8::HadronLevel::moreDecays`). Worse, cling takes the Pythia8
+  declarations from that module, so PyROOT reads Pythia8 members at 8.312
+  offsets: `particleData.m0(211)` returns 0.0. `variants/` holds the
+  feedstock's `.ci_support` files with `pythia8` changed (and the smithy-only
+  `channel_sources`/`channel_targets` dropped, which clash with `--channel`); the recipe
+  adds `test_egpythia8.py`, which checks that cling's Pythia8 view matches
+  the library. The build is too big for GitHub runners. Run `pixi run
+  build-root` on a large build machine and upload `output/linux-64` by hand.
+  It isn't under `recipes/`, so `build-all` and CI skip it.
+  Upload `root_base` and `root` for every Python and C++ standard the
+  feedstock builds. Strict channel priority hides all of conda-forge's builds
+  of these names on linux-64, so a missing variant would make it unsolvable,
+  not fall back. Don't upload the noarch `root_cxx_standard` marker: it is
+  identical to conda-forge's and would shadow it on every platform. That also means a ROOT
+  upgrade (`variant-drift` PR) needs this rebuilt at the new version first.
+  linux-aarch64 and osx-arm64 still use conda-forge's ROOT, whose PyROOT
+  Pythia8 view is wrong there too. Nothing in the Amaru stack uses it.
 
 The ship channel comes first and solves use strict channel priority, so while
 our pythia8 is on the channel, no solve sees conda-forge's. Once conda-forge
-ships pythia8 ≥ 8.318 (and an evtgen built against it):
+ships pythia8 ≥ 8.318 (and evtgen and root built against it):
 
-1. Delete `recipes/pythia8` and `recipes/evtgen` and their table rows.
+1. Delete `recipes/pythia8`, `recipes/evtgen` and `recipes-manual/root`
+   and their table rows.
 2. Refresh the downstream lockfiles (FairShip, aegir) so they no longer point
    at the ship-channel builds.
-3. Delete the ship-channel pythia8 and evtgen builds with the prefix.dev
-   delete API. A UI yank isn't enough: the builds stay in the repodata and keep
+3. Delete the ship-channel pythia8, evtgen, root_base and root builds
+   with the prefix.dev delete API. A UI yank isn't enough: the builds stay in the repodata and keep
    shadowing conda-forge.
 
 Consumers need no rebuild: their `pythia8 >=8.318,<8.400.0a0` pin accepts
-conda-forge's build.
+conda-forge's build, and their `root_base` pin accepts conda-forge's
+6.40.04.
 
 ## Recipe conventions
 
