@@ -10,7 +10,7 @@ source:
   sha256: 3c9b6894a933d4e1297d2493ad81399aca5793e9a2c31eafdeb4f1f5896aaa64
 
 build:
-  number: 5
+  number: 4
   skip:
     - win
   script: build.sh
@@ -35,7 +35,7 @@ requirements:
     - aegir >=0.5,<0.6
     # SHiP::random::PhiloxRng, the per-event reseeding RNG.
     - ship-random >=0.4,<0.5
-    - root_base >=6.42
+    - root_base >=6.40
     # phlex/shipdatamodel are C++23; pin the matching ROOT variant so genie
     # and phlex stay co-installable (an unconstrained solve drifts down to
     # the C++20 ROOT build).
