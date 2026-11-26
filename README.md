@@ -70,8 +70,9 @@ conda-forge catches up.
   pythia8. conda-forge's build links 8.312 and accepts any 8.3 release at
   runtime, but Pythia doesn't keep ABI between releases. linux-64 only, like
   the rest of the FairShip stack.
-- **root 6.40.04** (`recipes-manual/root`, linux-64 and linux-aarch64): the
-  root-feedstock recipe at `fedfe95`, built against our pythia8. conda-forge's
+- **root 6.42.00** (`recipes-manual/root`, linux-64 and linux-aarch64; 6.40.04
+  also on the channel): root-feedstock's recipe at `fedfe95`, moved to 6.42.00
+  ahead of conda-forge and built against our pythia8. conda-forge's
   `root_base` links 8.312, and its `EGPythia8` C++ module embeds the 8.312
   headers. With our 8.318 in the environment, `libEGPythia8` fails to load
   (missing `Pythia8::HadronLevel::moreDecays`). Worse, cling takes the Pythia8
@@ -89,16 +90,45 @@ conda-forge catches up.
   `NO_TEST=1`. The recipe isn't under `recipes/`, so `build-all` and CI skip
   it.
 
+  6.42 moves cling to LLVM 22, and conda-forge has no `clangdev` with ROOT's
+  patches for it yet (`root_64200`, in draft
+  [clangdev-feedstock#517](https://github.com/conda-forge/clangdev-feedstock/pull/517)).
+  Build that PR's `linux_64_variantroot_64200` and, cross-compiled,
+  `linux_aarch64_variantroot_64200` into a local channel and pass it as
+  `EXTRA_CHANNEL=file://...`. The PR (at `eb62367`) needs one fix first: its
+  `build.sh` lost the 20.x branch's `root*`-variant sed that sets
+  `LLVM_LINK_LLVM_DYLIB no` in `LLVMConfig.cmake` before clang is configured.
+  Without it the static clang targets link the LLVM dylib, so rootcling links
+  LLVM twice and aborts with "Option 'W' registered more than once". Only the
+  build needs clangdev: `root_base` links clang statically and depends on
+  conda-forge's unpatched `libllvm22` at runtime. Don't upload the clangdev
+  builds. On the ship channel they would hide every conda-forge clangdev.
+
+  Of the feedstock's patches, 0005, 0006, 0014, 0015 and 0017 are upstream in
+  6.42 and have been dropped; 0003, 0004, 0007 and 0011 have been rebased.
+  `build_root.sh` gains three 6.42 changes. civetweb, JSROOT and MathJax are
+  no longer bundled, so it enables their builtins (civetweb isn't on
+  conda-forge, and without JSROOT the web GUI loads it from root.cern at
+  runtime). When cross-compiling, it first builds a native `cppinterop-tblgen`
+  and passes it as `CPPINTEROP_TABLEGEN_EXE`, because CppInterOp otherwise
+  calls the tool by bare name in builds that count as cross-compiling. Both
+  versions also set `check_connection=OFF`: the configure-time probe fetches a
+  file from root.cern that now answers 403, while the downloads themselves come
+  from lcgpackages.
+
   Strict channel priority hides all of conda-forge's builds of `root_base`
   and `root` on every platform where we upload one, so a missing variant
-  makes a solve fail instead of falling back. Upload every variant under
-  `variants/` for each version a consumer pins: all Pythons and both C++
-  standards on linux-64, and Python 3.14 with both C++ standards on
-  linux-aarch64. The aarch64 consumers (the aegir stack, genie and
-  rootegpythia6) use Python 3.14 and build both C++ standards in CI. Don't
-  upload the noarch `root_cxx_standard` marker: it is identical to
-  conda-forge's and would shadow it on every platform. That also means a ROOT
-  upgrade (`variant-drift` PR) needs this rebuilt at the new version first.
+  makes a solve fail instead of falling back. `variants/` holds only the
+  variants SHiP uses: Python 3.13 with both C++ standards (FairShip) and
+  Python 3.14 with C++23 (the aegir stack) on linux-64, and Python 3.14 with
+  both C++ standards on linux-aarch64 (the aegir stack, plus genie and
+  rootegpythia6, which CI builds in both standards). Add a variant file
+  before a consumer moves to another Python. The 6.40.04 builds stay on the
+  channel for the consumers that still pin it: all eight feedstock variants
+  on linux-64, and the two aarch64 ones. Don't upload the noarch
+  `root_cxx_standard` marker: it is identical to conda-forge's and would
+  shadow it on every platform. That also means a ROOT upgrade
+  (`variant-drift` PR) needs this rebuilt at the new version first.
   osx-arm64 still uses conda-forge's ROOT, whose PyROOT Pythia8 view is wrong
   there too.
 

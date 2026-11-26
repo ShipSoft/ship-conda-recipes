@@ -6,9 +6,8 @@ Subject: [PATCH] Avoid linking TPython against libPython
 ---
  bindings/tpython/CMakeLists.txt | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
-
 diff --git a/bindings/tpython/CMakeLists.txt b/bindings/tpython/CMakeLists.txt
-index cfb9f4e65e..fddb8c09fa 100644
+index fafae367..ab17b2bb 100644
 --- a/bindings/tpython/CMakeLists.txt
 +++ b/bindings/tpython/CMakeLists.txt
 @@ -27,7 +27,7 @@ ROOT_STANDARD_LIBRARY_PACKAGE(ROOTTPython
@@ -19,7 +18,7 @@ index cfb9f4e65e..fddb8c09fa 100644
 +    Python3::Module
  )
  
- # Disables warnings originating from deprecated register keyword in Python
+ # On Windows we can't use the stable ABI yet: it requires linking against a
 -- 
-2.45.0
+2.47.1
 

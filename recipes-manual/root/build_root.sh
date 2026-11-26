@@ -85,6 +85,12 @@ CMAKE_PLATFORM_FLAGS+=("-Dbuiltin_nlohmannjson=OFF")
 CMAKE_PLATFORM_FLAGS+=("-Dbuiltin_openssl=OFF")
 # TODO: Make external?
 CMAKE_PLATFORM_FLAGS+=("-Dbuiltin_openui5=ON")
+# SHiP: 6.42 stopped bundling civetweb (not on conda-forge) and JSROOT/MathJax
+# (downloaded at build time from lcgpackages, hash-pinned). Without the builtins
+# THttpServer and the web GUI would load JSROOT from root.cern at runtime.
+CMAKE_PLATFORM_FLAGS+=("-Dbuiltin_civetweb=ON")
+CMAKE_PLATFORM_FLAGS+=("-Dbuiltin_jsroot=ON")
+CMAKE_PLATFORM_FLAGS+=("-Dbuiltin_mathjax=ON")
 CMAKE_PLATFORM_FLAGS+=("-Dbuiltin_pcre=OFF")
 CMAKE_PLATFORM_FLAGS+=("-Dbuiltin_tbb=OFF")
 CMAKE_PLATFORM_FLAGS+=("-Dbuiltin_unuran=OFF")
@@ -177,6 +183,23 @@ if [[ "${target_platform}" != "${build_platform}" ]]; then
     fi
 
     CMAKE_ARGS_BUILD=$(echo $CMAKE_ARGS | sed s@$PREFIX@$BUILD_PREFIX@g | sed s@${host_alias}@${build_alias}@g)
+
+    # SHiP: ROOT 6.42's CppInterOp generates headers with its own
+    # cppinterop-tblgen. While cross-compiling (and CMAKE_ARGS makes the
+    # helper builds below count as cross-compiling too) CMake calls it by bare
+    # name instead of its path, so build a native one first, with
+    # CppInterOp's tablegen-only mode, and hand it to every configure.
+    CONDA_BUILD_SYSROOT="${CONDA_BUILD_SYSROOT_BUILD}" CMAKE_PREFIX_PATH="${BUILD_PREFIX}" \
+        cmake "${SRC_DIR}/root-source/interpreter/CppInterOp" \
+                -B "${SRC_DIR}/build-cppinterop-tblgen" \
+                -DCPPINTEROP_BUILD_TABLEGEN_ONLY=ON \
+                -DLLVM_DIR="${Clang_DIR_BUILD}/lib/cmake/llvm" \
+                "${CMAKE_PLATFORM_FLAGS_BUILD[@]}" \
+                ${CMAKE_ARGS_BUILD}
+    CONDA_BUILD_SYSROOT="${CONDA_BUILD_SYSROOT_BUILD}" \
+        cmake --build "${SRC_DIR}/build-cppinterop-tblgen" --target cppinterop-tblgen -- "-j${CPU_COUNT}"
+    CMAKE_PLATFORM_FLAGS_BUILD+=("-DCPPINTEROP_TABLEGEN_EXE=${SRC_DIR}/build-cppinterop-tblgen/utils/TableGen/cppinterop-tblgen")
+    CMAKE_PLATFORM_FLAGS+=("-DCPPINTEROP_TABLEGEN_EXE=${SRC_DIR}/build-cppinterop-tblgen/utils/TableGen/cppinterop-tblgen")
 
     CONDA_BUILD_SYSROOT="${CONDA_BUILD_SYSROOT_BUILD}" CMAKE_PREFIX_PATH="${BUILD_PREFIX}" \
         cmake "${SRC_DIR}/root-source" \
