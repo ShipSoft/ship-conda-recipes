@@ -70,27 +70,37 @@ conda-forge catches up.
   pythia8. conda-forge's build links 8.312 and accepts any 8.3 release at
   runtime, but Pythia doesn't keep ABI between releases. linux-64 only, like
   the rest of the FairShip stack.
-- **root 6.40.04** (`recipes-manual/root`, linux-64): the root-feedstock
-  recipe at `fedfe95`, built against our pythia8. conda-forge's `root_base`
-  links 8.312, and its `EGPythia8` C++ module embeds the 8.312 headers. With
-  our 8.318 in the environment, `libEGPythia8` fails to load (missing
-  `Pythia8::HadronLevel::moreDecays`). Worse, cling takes the Pythia8
+- **root 6.40.04** (`recipes-manual/root`, linux-64 and linux-aarch64): the
+  root-feedstock recipe at `fedfe95`, built against our pythia8. conda-forge's
+  `root_base` links 8.312, and its `EGPythia8` C++ module embeds the 8.312
+  headers. With our 8.318 in the environment, `libEGPythia8` fails to load
+  (missing `Pythia8::HadronLevel::moreDecays`). Worse, cling takes the Pythia8
   declarations from that module, so PyROOT reads Pythia8 members at 8.312
   offsets: `particleData.m0(211)` returns 0.0. `variants/` holds the
   feedstock's `.ci_support` files with `pythia8` changed (and the smithy-only
   `channel_sources`/`channel_targets` dropped, which clash with `--channel`); the recipe
   adds `test_egpythia8.py`, which checks that cling's Pythia8 view matches
   the library. The build is too big for GitHub runners. Run `pixi run
-  build-root` on a large build machine and upload `output/linux-64` by hand.
-  It isn't under `recipes/`, so `build-all` and CI skip it.
-  Upload `root_base` and `root` for every Python and C++ standard the
-  feedstock builds. Strict channel priority hides all of conda-forge's builds
-  of these names on linux-64, so a missing variant would make it unsolvable,
-  not fall back. Don't upload the noarch `root_cxx_standard` marker: it is
-  identical to conda-forge's and would shadow it on every platform. That also means a ROOT
+  build-root` on a large linux-64 build machine and upload `output/` by hand.
+  linux-aarch64 is cross-compiled there, through the feedstock's own
+  cross-compilation path (the one conda-forge uses for ppc64le). Its tests
+  need qemu-user registered with binfmt_misc and `QEMU_LD_PREFIX` set to an
+  aarch64 glibc sysroot (from `sysroot_linux-aarch64`). Without them, set
+  `NO_TEST=1`. The recipe isn't under `recipes/`, so `build-all` and CI skip
+  it.
+
+  Strict channel priority hides all of conda-forge's builds of `root_base`
+  and `root` on every platform where we upload one, so a missing variant
+  makes a solve fail instead of falling back. Upload every variant under
+  `variants/` for each version a consumer pins: all Pythons and both C++
+  standards on linux-64, and Python 3.14 with both C++ standards on
+  linux-aarch64. The aarch64 consumers (the aegir stack, genie and
+  rootegpythia6) use Python 3.14 and build both C++ standards in CI. Don't
+  upload the noarch `root_cxx_standard` marker: it is identical to
+  conda-forge's and would shadow it on every platform. That also means a ROOT
   upgrade (`variant-drift` PR) needs this rebuilt at the new version first.
-  linux-aarch64 and osx-arm64 still use conda-forge's ROOT, whose PyROOT
-  Pythia8 view is wrong there too. Nothing in the Amaru stack uses it.
+  osx-arm64 still uses conda-forge's ROOT, whose PyROOT Pythia8 view is wrong
+  there too.
 
 The ship channel comes first and solves use strict channel priority, so while
 our pythia8 is on the channel, no solve sees conda-forge's. Once conda-forge

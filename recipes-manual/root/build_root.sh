@@ -110,6 +110,9 @@ fi
 CMAKE_PLATFORM_FLAGS+=("-Dbuiltin_cling=ON")
 CMAKE_PLATFORM_FLAGS+=("-DCLING_BUILD_PLUGINS=ON")
 CMAKE_PLATFORM_FLAGS+=("-Dclad=ON")
+# SHiP: the connectivity probe fetches https://root.cern/files/cmake_connectivity_test.txt,
+# which answers 403 (2026-11-26). clad itself comes from lcgpackages.web.cern.ch.
+CMAKE_PLATFORM_FLAGS+=("-Dcheck_connection=OFF")
 
 # Cling needs some minor patches to the LLVM sources, hackily apply them rather than rebuilding LLVM
 # The following lines are used to avoid linking against LLVM during the build of ROOT, which is not supported.
