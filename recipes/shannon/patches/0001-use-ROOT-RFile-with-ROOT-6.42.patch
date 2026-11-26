@@ -1,0 +1,28 @@
+From: SHiP <noreply@ship.invalid>
+Subject: [PATCH] Use ROOT::RFile with ROOT 6.42
+
+ROOT 6.42 moved RFile out of ROOT::Experimental. Pick the namespace by
+ROOT version so the code builds with 6.40 and 6.42.
+---
+--- a/src/digitised_output_module.cpp
++++ b/src/digitised_output_module.cpp
+@@ -16,6 +16,7 @@
+ 
+ #include <ROOT/Hist/ConvertToTH1.hxx>
+ #include <ROOT/RFile.hxx>
++#include <ROOT/RVersion.hxx>
+ #include <ROOT/RHist.hxx>
+ #include <ROOT/RHistConcurrentFiller.hxx>
+ #include <ROOT/RHistFillContext.hxx>
+@@ -51,7 +52,11 @@
+ using ROOT::REntry;
+ using ROOT::RNTupleModel;
+ using ROOT::RNTupleParallelWriter;
++#if ROOT_VERSION_CODE >= ROOT_VERSION(6, 42, 0)
++using ROOT::RFile;
++#else
+ using ROOT::Experimental::RFile;
++#endif
+ using ROOT::Experimental::RHist;
+ using ROOT::Experimental::RHistConcurrentFiller;
+ using ROOT::Experimental::RHistFillContext;
