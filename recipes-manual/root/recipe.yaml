@@ -1,9 +1,9 @@
 context:
   name: root
-  tag_name: 6-40-04
-  build_number: 2
-  clang_version: 20.1.8
-  clang_patches_version: root_64004
+  tag_name: 6-42-00
+  build_number: 0
+  clang_version: 22.1.8
+  clang_patches_version: root_64200
   builtin_clang: false
   run_gtests: false
   # When new Python versions are released numba tends to be slow to support them
@@ -18,7 +18,7 @@ recipe:
 
 source:
   url: https://github.com/root-project/root/archive/refs/tags/v${{ tag_name }}.tar.gz
-  sha256: 02b994fd645dbb7b89f5ab9342278d3c53bf2ed46d50aebd1aecccfa040711c4
+  sha256: 4eb3b685b606c8b33b9524af1f46d3291a6ab925162e148adc10833d109924cb
   target_directory: root-source
   patches:
     - patches/0001-disable-cling-sysroot-at-runtime.patch
@@ -29,8 +29,6 @@ source:
     - if: osx
       then:
         - patches/0004-avoid-linking-TPython-against-libPython.patch
-        - patches/0005-root-x.xx.xx-osx-remove-hardcoded-sysroot.patch
-        - patches/0006-Remove-bad-check-on-SDK-for-std_darwin.MacOSX14.2.sd.patch
         - patches/0007-Disable-libcxx-availability-in-rootcling.patch
         - patches/0008-Disable-libcxx-availability-in-makepch.patch
     - patches/0009-Try-relative-libstdc-include-directories.patch
@@ -38,10 +36,7 @@ source:
     - patches/0011-feat-use-ROOT-s-own-libc.modulemap-on-macOS-instead-.patch
     - patches/0012-fix-Set-default-visibility-on-dictionary-targets-for.patch
     - patches/0013-fix-Set-CXX_VISIBILITY_PRESET-hidden-for-ClingUtils.patch
-    - patches/0014-build-Use-correct-CMake-syntax-to-check-for-variable.patch
-    - patches/0015-Avoid-try_run-when-cross-compiling.patch
     - patches/0016-cling-Anchor-the-interpreter-s-clang-driver-on-ROOTS.patch
-    - patches/0017-cmake-Quote-list-valued-cache-variable-in-root-conf.patch
 build:
   number: ${{ build_number }}
   skip:

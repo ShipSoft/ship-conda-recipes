@@ -6,14 +6,13 @@ Subject: [PATCH 2/2] HACK: Support overriding triplet used by cling
 ---
  interpreter/cling/lib/Interpreter/CIFactory.cpp | 12 +++++++++---
  1 file changed, 9 insertions(+), 3 deletions(-)
-
 diff --git a/interpreter/cling/lib/Interpreter/CIFactory.cpp b/interpreter/cling/lib/Interpreter/CIFactory.cpp
-index 1c099ad3f5..8311b7edc3 100644
+index fecd1c74..2a3ad1f5 100644
 --- a/interpreter/cling/lib/Interpreter/CIFactory.cpp
 +++ b/interpreter/cling/lib/Interpreter/CIFactory.cpp
-@@ -1266,9 +1266,8 @@ namespace {
-     bool profilingEnabled =
-         cling::utils::ConvertEnvValueToBool(std::getenv("CLING_PROFILE"));
+@@ -1360,9 +1360,8 @@ namespace {
+     // https://github.com/llvm/llvm-project/issues/225385
+     argvCompile.push_back("--driver-mode=g++");
  
 -#if __APPLE__ && __arm64__
 -    argvCompile.push_back("--target=arm64-apple-darwin20.3.0");
@@ -23,8 +22,8 @@ index 1c099ad3f5..8311b7edc3 100644
  #if __aarch64__
      // Disable outline-atomics on AArch64; the routines __aarch64_* are defined
      // in the static library libgcc.a and not necessarily included in libCling
-@@ -1417,6 +1416,13 @@ namespace {
-     clang::driver::Driver Drvr(argv[0], TheTriple.getTriple(), *Diags);
+@@ -1523,6 +1522,13 @@ namespace {
+     clang::driver::Driver Drvr(ClingBin, TheTriple.getTriple(), *Diags);
      //Drvr.setWarnMissingInput(false);
      Drvr.setCheckInputsExist(false); // think foo.C(12)
 +    if (COpts.Verbose) {
