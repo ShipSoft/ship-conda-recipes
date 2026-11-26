@@ -10,6 +10,9 @@ package:
 source:
   url: https://github.com/ShipSoft/ROOTEGPythia6/archive/refs/tags/${{ tag }}.tar.gz
   sha256: 14b02629c503539ec6f60bd8f48cacc2161264ac0e4520c51932ada6b1dc9f04
+  patches:
+    # ROOT 6.42 no longer ships snprintf.h. Drop with the next ShipSoft tag.
+    - patches/0001-include-cstdio-instead-of-snprintf.h.patch
 
 build:
   number: 12
