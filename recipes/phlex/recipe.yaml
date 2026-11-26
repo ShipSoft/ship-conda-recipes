@@ -8,6 +8,10 @@ package:
 source:
   url: https://github.com/Framework-R-D/phlex/archive/refs/tags/v${{ version }}.tar.gz
   sha256: 2dd95ed463971221c3f8d58893729ebdcd79d1da12d891038237b0eab872a864
+  patches:
+    # SHiP: ROOT 6.42 deprecates RVersion.h with a #warning (fatal under
+    # -Werror). phlex main no longer has the file, so nothing to upstream.
+    - patches/0001-include-ROOT-RVersion.hxx.patch
 
 build:
   number: 1
