@@ -7,5 +7,8 @@ root_cxx_standard:
 # root_base is pinned deliberately — see "ROOT C++ standard variants" in the
 # README. fairship and genie put rootegpythia6 in host: and pin root_base
 # themselves, so this has to move in lockstep with theirs.
+# 6.40.04 for the FairShip stack, which conda-forge's vmc, vgm and
+# geant4-vmc hold there; 6.42.00 for the Amaru stack (aegir-genie).
 root_base:
   - "6.40.04"
+  - "6.42.00"

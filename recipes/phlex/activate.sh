@@ -1,0 +1,7 @@
+#!/bin/sh
+if [ -n "${PHLEX_PLUGIN_PATH:-}" ]; then
+  export PHLEX_PLUGIN_PATH_CONDA_BACKUP="${PHLEX_PLUGIN_PATH}"
+  export PHLEX_PLUGIN_PATH="${CONDA_PREFIX}/lib:${PHLEX_PLUGIN_PATH}"
+else
+  export PHLEX_PLUGIN_PATH="${CONDA_PREFIX}/lib"
+fi

@@ -107,6 +107,31 @@ class LockstepTest(unittest.TestCase):
         self.assertEqual(len(problems), 1, problems)
         self.assertIn("bump them in lockstep", problems[0])
 
+    def test_producer_building_both_series_serves_a_single_pin(self):
+        # genie and rootegpythia6 build 6.40.04 for fairship and 6.42.00 for
+        # the Amaru stack.
+        both = PIN_6402 + '      - "6.42.00"\n'
+        self.assertEqual(
+            self.check(
+                {
+                    "rootegpythia6": (PRODUCER, both),
+                    "fairship": (CONSUMER, PIN_6402),
+                }
+            ),
+            [],
+        )
+
+    def test_consumer_series_missing_from_producer_is_reported(self):
+        both = PIN_6402 + '      - "6.42.00"\n'
+        problems = self.check(
+            {
+                "rootegpythia6": (PRODUCER, PIN_6402),
+                "fairship": (CONSUMER, both),
+            }
+        )
+        self.assertEqual(len(problems), 1, problems)
+        self.assertIn("pins root_base 6.42.00; bump them in lockstep", problems[0])
+
     def test_producer_that_does_not_link_root_is_ignored(self):
         pythia6 = """
             package:

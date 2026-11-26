@@ -1,0 +1,21 @@
+# Temporary override of conda-forge's phlex (see "Temporary overrides" in the
+# README): the feedstock's recipe at 4dcb2a1, built only for what the Amaru
+# stack uses, the latest phlex against our ROOT 6.42.00 with C++23 and
+# Python 3.14. conda-forge has no ROOT 6.42 yet, so it can't build this.
+root_base:
+  - "6.42.00"
+root_cxx_standard:
+  - "23"
+python:
+  - 3.14.* *_cp314
+numpy:
+  - "2"
+# Without conda-forge's global pinning the free solve picks incompatible
+# combinations (spdlog 1.10 next to fmt 12). Pin the ABI-relevant packages to
+# what the Amaru stack's lock files use, as recipes-dev/phlex does.
+spdlog:
+  - "1.17"
+fmt:
+  - "12"
+libboost-devel:
+  - "1.90"

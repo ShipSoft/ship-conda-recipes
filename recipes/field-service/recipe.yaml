@@ -17,7 +17,7 @@ source:
     target_directory: covfie_src
 
 build:
-  number: 0
+  number: 1
 
 outputs:
   - staging:
@@ -58,7 +58,7 @@ outputs:
       - acts-core
       - libboost-devel
       - eigen
-      - root_base >=6.40
+      - root_base >=6.42
       # Placement manifests (MapIO, header-only, private).
       - nlohmann_json
       # C++23 only: pin the matching ROOT variant, as the rest of the aegir

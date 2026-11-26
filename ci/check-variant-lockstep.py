@@ -42,17 +42,18 @@ from recipe_parsing import read_variants, recipe_names
 LOCKSTEP_KEYS = ("root_base",)
 
 
-def pinned(recipe: Path, key: str) -> str | None:
-    """The single value ``recipe`` holds ``key`` at, or None if it is free.
+def pinned(recipe: Path, key: str) -> list[str]:
+    """The values ``recipe`` builds ``key`` at, or [] if it leaves it free.
 
-    A key carrying several values is a build matrix (root_cxx_standard), not a
-    pin, so it does not participate in the lockstep.
+    Usually that is a single pin. A producer that serves consumers on two
+    series (6.40.04 for the FairShip stack, 6.42.00 for the Amaru stack) lists
+    both and builds each; a consumer then needs every value it pins to be
+    among its producers' values.
     """
     variants = recipe.parent / "variants.yaml"
     if not variants.is_file():
-        return None
-    values = read_variants(variants).get(key, [])
-    return values[0] if len(values) == 1 else None
+        return []
+    return list(read_variants(variants).get(key, []))
 
 
 def output_names(recipe: Path) -> set[str]:
@@ -101,26 +102,30 @@ def check(recipes_dir: Path) -> list[str]:
     problems: list[str] = []
     for key in LOCKSTEP_KEYS:
         for recipe in recipes:
-            value = pinned(recipe, key)
-            if value is None:
+            values = pinned(recipe, key)
+            if not values:
                 continue
+            shown = ", ".join(values)
             for dep in sorted(hosts[recipe]):
                 target = provider.get(dep)
                 if target is None or target == recipe:
                     continue
                 if key not in hosts[target]:
                     continue
-                dep_value = pinned(target, key)
-                if dep_value is None:
+                dep_values = pinned(target, key)
+                if not dep_values:
                     problems.append(
                         f"{target.parent.name}: links {key} and is a host dependency of "
-                        f"{recipe.parent.name} (which pins {key} {value}), so it must pin "
+                        f"{recipe.parent.name} (which pins {key} {shown}), so it must pin "
                         f"{key} in its own variants.yaml"
                     )
-                elif dep_value != value:
+                    continue
+                missing = [v for v in values if v not in dep_values]
+                if missing:
                     problems.append(
-                        f"{target.parent.name}: pins {key} {dep_value} but its consumer "
-                        f"{recipe.parent.name} pins {key} {value}; bump them in lockstep"
+                        f"{target.parent.name}: pins {key} {', '.join(dep_values)} but its "
+                        f"consumer {recipe.parent.name} pins {key} {', '.join(missing)}; "
+                        f"bump them in lockstep"
                     )
     return sorted(set(problems))
 

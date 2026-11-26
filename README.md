@@ -25,6 +25,7 @@ The old `prefix.dev/ship` channel no longer receives uploads.
 | mp-units | Yes (conda-forge feedstock) |
 | npdb-client | No (SHiP-specific, split recipe with `python-npdb-client`) |
 | photospp | Yes |
+| phlex | Temporary (conda-forge has no ROOT 6.42, see below) |
 | pythia6 | No (ShipSoft fork) |
 | pythia8 | Temporary (conda-forge is behind, see below) |
 | random123 | Yes (conda-forge feedstock) |
@@ -59,6 +60,16 @@ conda-forge ships these, but too old for SHiP. The recipes are copies of the
 conda-forge feedstocks with as few changes as possible, and they go away once
 conda-forge catches up.
 
+- **phlex 0.4.3** (`recipes/phlex`, linux-64 and linux-aarch64): the
+  feedstock's recipe at `4dcb2a1`, with `stdlib('c')` replaced by the sysroot
+  convention below, built against our ROOT 6.42.00 (cxx23, Python 3.14) so
+  the Amaru stack can move to 6.42. conda-forge can't build that until it has
+  ROOT 6.42. `variants.yaml` pins spdlog, fmt and libboost-devel to the Amaru
+  lock files' versions, because the free solve picks incompatible ones without
+  conda-forge's global pinning. Only the latest phlex is built: with strict
+  channel priority this hides conda-forge's phlex on both platforms, so an
+  environment still on ROOT 6.40 can no longer solve a phlex. Drop it once
+  conda-forge has phlex built against ROOT 6.42.
 - **pythia8 8.318**: conda-forge has 8.312, and SHiP productions see physics
   differences from 8.316 onward. The 8.316 bump is
   [pythia8-feedstock#74](https://github.com/conda-forge/pythia8-feedstock/pull/74).
@@ -195,16 +206,18 @@ two keys in their `variants.yaml`:
   `build.sh` as `$root_cxx_standard`. cxx20 serves consumers of the default
   ROOT builds (e.g. FairShip); cxx23 serves the phlex/aegir stack (phlex pins
   `root_cxx_standard ==23`).
-- `root_base` must be pinned explicitly as well (currently `6.40.04` in the
-  published recipes under `recipes/`). A bare
+- `root_base` must be pinned explicitly as well. A bare
   `root_base` host spec resolves, under `root_cxx_standard` 23, to the legacy
   pre-cxx-split `root_base` 6.36.06 — that build declares no
   `root_cxx_standard` dependency, so it spuriously satisfies the C++23 marker
   and the solver prefers it. Pinning keeps every recipe on the same ROOT
-  series, as conda-forge's global `root_base` pin does. Bump every
-  `variants.yaml` under `recipes/` in lockstep when conda-forge moves ROOT
-  past 6.40.04. `recipes-dev/phlex` is not part of the lockstep: it keeps its
-  own series pin (`6.40`), matched to the SHiP stack's lock file.
+  series, as conda-forge's global `root_base` pin does. Two series are
+  current. The FairShip stack (fairroot, fairship, geant3, genfit, photospp)
+  pins `6.40.04`, because conda-forge's vmc, vgm and geant4-vmc are only built
+  against 6.40. The Amaru stack is on our `6.42.00` (shipdatamodel and phlex
+  pin it). genie and rootegpythia6 serve both and list both values, so each
+  is built against each. `recipes-dev/phlex` is not part of the lockstep: it
+  keeps its own series pin (`6.42`), matched to the Amaru stack's lock files.
 
 Because `root_base` is pinned by us rather than tracked to conda-forge, a
 rebuild reproduces the same pin — so the channel-drift check reports it apart
@@ -218,8 +231,12 @@ ROOT-linking recipe carries the pin, rootegpythia6 included: fairship and genie 
 rootegpythia6 in `host:` and pin `root_base` themselves, so a rootegpythia6
 left to float to conda-forge's current ROOT either makes their host env
 unsolvable or sends the solver back to a pre-`root_base` build from the
-channel. `ci/check-variant-lockstep.py` enforces that at review time; it runs
-as a prek hook and needs no network access.
+channel. `ci/check-variant-lockstep.py` enforces that at review time: every
+`root_base` value a recipe pins must be among the values of each ROOT-linking
+recipe in its `host:`. It runs as a prek hook and needs no network access.
+While genie and rootegpythia6 list two values, the channel-drift check treats
+`root_base` as a build matrix and opens no `variant-drift` PR for it; ROOT
+upgrades go through `recipes-manual/root` first anyway.
 
 For packages whose upstream build system sets no explicit C++ standard
 (photospp's autotools, GENIE's perl configure — both inherit ROOT's standard
@@ -228,10 +245,11 @@ the ROOT build they link against deterministic.
 
 The C++23-only aegir stack (aegir, aegir-genie, field-service, shannon,
 trout) builds a single variant and constrains ROOT in `host:` instead —
-`root_base >=6.40` plus `root_cxx_standard ==23` — which equally excludes the
+`root_base >=6.42` plus `root_cxx_standard ==23` — which equally excludes the
 legacy 6.36.06 build.
-rootegpythia6 builds both variants and pins `root_base` in `variants.yaml`, in
-lockstep with fairship and genie, which link against it.
+rootegpythia6 builds both C++ standards and both ROOT series in
+`variants.yaml`, covering fairship (6.40.04) and genie (both), which link
+against it.
 
 ### Known upstream workarounds
 
