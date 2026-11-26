@@ -1,0 +1,22 @@
+From: SHiP <noreply@ship.invalid>
+Subject: [PATCH] form: include ROOT/RVersion.hxx instead of RVersion.h
+
+ROOT 6.42 deprecates RVersion.h with a #warning, which -Werror turns
+into a build failure. ROOT/RVersion.hxx defines the same macros and also
+exists in older releases. phlex main no longer has this file.
+---
+ form/root_storage/root_rntuple_write_container.hpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/form/root_storage/root_rntuple_write_container.hpp b/form/root_storage/root_rntuple_write_container.hpp
+--- a/form/root_storage/root_rntuple_write_container.hpp
++++ b/form/root_storage/root_rntuple_write_container.hpp
+@@ -5,7 +5,7 @@
+ 
+ #include "storage/storage_write_association.hpp"
+ 
+-#include <RVersion.h>
++#include <ROOT/RVersion.hxx>
+ 
+ #include <memory>
+ #include <string>

@@ -62,7 +62,8 @@ conda-forge catches up.
 
 - **phlex 0.4.3** (`recipes/phlex`, linux-64 and linux-aarch64): the
   feedstock's recipe at `4dcb2a1`, with `stdlib('c')` replaced by the sysroot
-  convention below, built against our ROOT 6.42.00 (cxx23, Python 3.14) so
+  convention below and a one-line patch for ROOT 6.42's deprecated
+  `RVersion.h` (fatal under phlex's `-Werror`), built against our ROOT 6.42.00 (cxx23, Python 3.14) so
   the Amaru stack can move to 6.42. conda-forge can't build that until it has
   ROOT 6.42. `variants.yaml` pins spdlog, fmt and libboost-devel to the Amaru
   lock files' versions, because the free solve picks incompatible ones without
