@@ -1,0 +1,116 @@
+context:
+  version: "0.4.3"
+
+package:
+  name: phlex
+  version: ${{ version }}
+
+source:
+  url: https://github.com/Framework-R-D/phlex/archive/refs/tags/v${{ version }}.tar.gz
+  sha256: 2dd95ed463971221c3f8d58893729ebdcd79d1da12d891038237b0eab872a864
+
+build:
+  number: 1
+  skip:
+    # phlex needs GCC 15 / libc++ 21 (std::vector(from_range, ...),
+    # std::jthread), which global pinning provides. On macOS, only
+    # Apple silicon is built.
+    - win
+    - osx and x86_64
+    - match(root_cxx_standard, "<23")
+    # the python/numba plugin requires find_package(Python 3.12 ...)
+    - match(python, "<3.12")
+  script: build.sh
+
+requirements:
+  build:
+    - ${{ compiler('cxx') }}
+    - if: linux
+      then: sysroot_${{ target_platform }} 2.17.*
+    - cmake
+    - make
+    - pkgconf
+    - if: build_platform != target_platform
+      then:
+        - python
+        - cross-python_${{ target_platform }}
+        - numpy
+        # Findjsonnet.cmake only looks for the headers and libraries once it
+        # has found and run the jsonnet CLI, which must be a build-machine
+        # binary when cross-compiling.
+        - libjsonnet
+        # cetmodules pulls a target bash into host; give `#!/usr/bin/env bash`
+        # scripts such as the pkg-config wrapper a build-machine one.
+        - bash
+  host:
+    - cetmodules
+    - libboost-devel
+    - fmt
+    - tbb-devel
+    - ms-gsl
+    - spdlog
+    - libjsonnet
+    # required by the python/numba plugin (plugins/python)
+    - libffi
+    - python
+    - numpy
+    - root_base
+    - root_cxx_standard
+  run:
+    - python
+    # headers and CMake configs of dependencies exported by phlexConfig.cmake
+    - libboost-devel
+    - fmt
+    - tbb-devel
+    - ms-gsl
+    - spdlog
+  run_constraints:
+    # phlex's public headers need GCC 15's libstdc++ (std::vector(from_range,
+    # ...) in core/registration_api.hpp), so plugins built against phlex do
+    # too. This keeps an environment that has phlex from resolving to an
+    # older libstdc++ for its compiler.
+    - if: linux
+      then:
+        - libstdcxx-devel_${{ target_platform }} >=15
+  run_exports:
+    - ${{ pin_subpackage('phlex', upper_bound='x.x') }}
+
+tests:
+  - package_contents:
+      lib:
+        - phlex_core
+      files:
+        - etc/conda/activate.d/phlex_activate.sh
+  # build a plugin against the installed package via find_package(phlex);
+  # needs to run the target's cmake and compiler, so native builds only
+  - if: build_platform == target_platform
+    then:
+      - files:
+          recipe:
+            - test/
+        requirements:
+          run:
+            - ${{ compiler('cxx') }}
+            - cmake
+            - make
+        script:
+          - cmake -S test -B build -DCMAKE_PREFIX_PATH=${PREFIX}
+          - cmake --build build
+
+about:
+  homepage: https://github.com/Framework-R-D/phlex
+  repository: https://github.com/Framework-R-D/phlex
+  summary: Parallel, Hierarchical, and Layered Execution of data-processing algorithms
+  description: |
+    Phlex is a framework for the Parallel, Hierarchical, and Layered
+    Execution of data-processing algorithms. It lets users implement
+    algorithms and organise them into multi-threaded workflows
+    structured around hierarchical event/data tiers, building on
+    Intel TBB for task parallelism and on the patterns established by
+    Fermilab's art framework.
+  license: Apache-2.0
+  license_file: LICENSE
+
+extra:
+  recipe-maintainers:
+    - olantwin

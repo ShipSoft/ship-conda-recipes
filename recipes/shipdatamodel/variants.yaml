@@ -1,7 +1,8 @@
 # ROOT C++-standard variant; root_base is pinned deliberately — see
-# "ROOT C++ standard variants" in the README.
+# "ROOT C++ standard variants" in the README. Only the Amaru stack links
+# shipdatamodel, and it moves to ROOT 6.42 as a whole, so no 6.40.04 build.
 root_cxx_standard:
   - "20"
   - "23"
 root_base:
-  - "6.40.04"
+  - "6.42.00"

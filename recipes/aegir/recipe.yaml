@@ -10,7 +10,7 @@ source:
   sha256: f744cc528a209be7147fbc6281104db731416fa3f0869fe4f03491d6fc58f2c8
 
 build:
-  number: 4
+  number: 5
   skip:
     - win
   script: build.sh
@@ -32,7 +32,7 @@ requirements:
     - field-service-g4 >=0.4,<0.5
     # SHiP::FieldServiceMapIO, used by field_map_provider.
     - field-service-mapio >=0.4,<0.5
-    - root_base >=6.40
+    - root_base >=6.42
     # phlex/shipdatamodel are C++23; pin the matching ROOT variant so aegir
     # and phlex stay co-installable (an unconstrained solve drifts down to
     # the C++20 ROOT build).

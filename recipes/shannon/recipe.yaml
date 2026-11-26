@@ -10,7 +10,7 @@ source:
   sha256: 883a7a46e43bdf5283cca6d3140226f99d1d25fc99f3a71b1d4693144cb168a7
 
 build:
-  number: 4
+  number: 5
   skip:
     - win
   script: build.sh
@@ -29,7 +29,7 @@ requirements:
     - phlex >=0.4.1
     # SHiP::random::PhiloxRng, the per-event reseeding RNG.
     - ship-random >=0.4,<0.5
-    - root_base >=6.40
+    - root_base >=6.42
     # phlex/shipdatamodel are C++23; pin the matching ROOT variant.
     - root_cxx_standard ==23
     - random123
