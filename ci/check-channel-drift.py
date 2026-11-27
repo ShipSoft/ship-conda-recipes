@@ -72,11 +72,11 @@ CONDA_FORGE_CHANNELDATA = "https://conda.anaconda.org/conda-forge/channeldata.js
 # latest version, which misses a same-version rebuild (libjsonnet 0.22.0 _2),
 # and the full per-subdir repodata is far too large to fetch for a few names.
 CONDA_FORGE_FILES = "https://api.anaconda.org/package/conda-forge/{name}"
-SUBDIRS = ("linux-64", "linux-aarch64", "noarch")
+SUBDIRS = ("linux-64", "linux-aarch64", "osx-arm64", "noarch")
 # Subdirs that may not exist on the channel yet. prefix.dev answers 404 for a
 # subdir nobody has uploaded to, and for these that means "no packages", not a
-# failed fetch. linux-aarch64 stays here until its first upload lands.
-OPTIONAL_SUBDIRS = frozenset({"linux-aarch64"})
+# failed fetch. Each subdir stays here until its first upload lands.
+OPTIONAL_SUBDIRS = frozenset({"linux-aarch64", "osx-arm64"})
 RECIPES_DIR = Path("recipes")
 
 # (package, dependency) pairs to ignore, for deliberate pins that lag
