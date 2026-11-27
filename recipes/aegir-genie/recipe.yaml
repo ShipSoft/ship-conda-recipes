@@ -10,7 +10,7 @@ source:
   sha256: 3c9b6894a933d4e1297d2493ad81399aca5793e9a2c31eafdeb4f1f5896aaa64
 
 build:
-  number: 4
+  number: 5
   skip:
     - win
   script: build.sh
@@ -32,10 +32,10 @@ requirements:
     - shipgeometryservice >=0.6,<0.7
     # genie_source builds on aegir's installed generator-source helper
     # (aegir::source_helper), declared in SHiP::aegir since 0.5.
-    - aegir >=0.5,<0.6
+    - aegir >=0.6,<0.7
     # SHiP::random::PhiloxRng, the per-event reseeding RNG.
     - ship-random >=0.4,<0.5
-    - root_base >=6.40
+    - root_base >=6.42
     # phlex/shipdatamodel are C++23; pin the matching ROOT variant so genie
     # and phlex stay co-installable (an unconstrained solve drifts down to
     # the C++20 ROOT build).
@@ -68,7 +68,7 @@ requirements:
   run:
     # aegir has no run_exports. The genie workflows load aegir's plugins,
     # and aegir 0.x only promises a stable source helper within a minor.
-    - aegir >=0.5,<0.6
+    - aegir >=0.6,<0.7
 
 tests:
   - script:

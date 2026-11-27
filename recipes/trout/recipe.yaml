@@ -1,5 +1,5 @@
 context:
-  version: "0.3.1"
+  version: "0.4.0"
 
 package:
   name: trout
@@ -7,10 +7,10 @@ package:
 
 source:
   url: https://github.com/ShipSoft/Trout/archive/refs/tags/v${{ version }}.tar.gz
-  sha256: d33721a3cd2bc1691f6a7a60722a5e8cb34f8136cf1b967b619d617701ccde94
+  sha256: 093683d3d70ceed62f3977e27402f8599fc646abbf59cb4f98cc9e5a81da3d7f
 
 build:
-  number: 5
+  number: 0
   skip:
     - win
   script: build.sh
@@ -29,16 +29,16 @@ requirements:
     # 0.3.1 takes the world from geant4WorldLogical() as a reference (0.6).
     - shipgeometryservice >=0.6,<0.7
     # 0.4 moved into the SHiP namespace, and a 0.x minor may break the API.
-    - field-service-core >=0.4,<0.5
-    - field-service-mapio >=0.4,<0.5
-    - field-service-acts >=0.4,<0.5
+    - field-service-core >=0.6,<0.7
+    - field-service-mapio >=0.6,<0.7
+    - field-service-acts >=0.6,<0.7
     - phlex >=0.4.1
     # SHiP::random::PhiloxRng, for make_test_input.
     # find_package(SHiPRandom 0.4) accepts only 0.4.x (SameMinorVersion).
     - ship-random >=0.4,<0.5
     # Upstream ACTS from conda-forge, not the acts-ship fork snapshot.
     - acts-core
-    - root_base >=6.40
+    - root_base >=6.42
     # phlex/shipdatamodel are C++23; pin the matching ROOT variant so trout
     # and phlex stay co-installable (an unconstrained solve drifts down to
     # the C++20 ROOT build).
