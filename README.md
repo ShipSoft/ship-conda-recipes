@@ -260,10 +260,7 @@ the ROOT build they link against deterministic.
 The C++23-only aegir stack (aegir, aegir-genie, field-service, shannon,
 trout) builds a single variant and constrains ROOT in `host:` instead —
 `root_base` plus `root_cxx_standard ==23` — which equally excludes the
-legacy 6.36.06 build. field-service and shannon require `>=6.42`. aegir and
-trout stay at `>=6.40` until releases on field-service 0.6 exist (their
-current releases need field-service 0.4, which only exists built against
-6.40), and aegir-genie follows aegir.
+legacy 6.36.06 build. All of them require `>=6.42`.
 rootegpythia6 builds both C++ standards and both ROOT series in
 `variants.yaml`, covering fairship (6.40.04) and genie (both), which link
 against it.
