@@ -37,7 +37,8 @@ requirements:
     # find_package(SHiPRandom 0.4) accepts only 0.4.x (SameMinorVersion).
     - ship-random >=0.4,<0.5
     # Upstream ACTS from conda-forge, not the acts-ship fork snapshot.
-    - acts-core
+    # find_package(Acts 48) accepts only 48.x (SameMajorVersion).
+    - acts-core >=48,<49
     - root_base >=6.42
     # phlex/shipdatamodel are C++23; pin the matching ROOT variant so trout
     # and phlex stay co-installable (an unconstrained solve drifts down to
