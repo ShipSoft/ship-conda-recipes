@@ -146,19 +146,27 @@ conda-forge catches up.
 
 The ship channel comes first and solves use strict channel priority, so while
 our pythia8 is on the channel, no solve sees conda-forge's. Once conda-forge
-ships pythia8 ≥ 8.318 (and evtgen and root built against it):
+ships pythia8 ≥ 8.318 (and evtgen built against it):
 
-1. Delete `recipes/pythia8`, `recipes/evtgen` and `recipes-manual/root`
-   and their table rows.
+1. Delete `recipes/pythia8` and `recipes/evtgen` and their table rows.
 2. Refresh the downstream lockfiles (FairShip, aegir) so they no longer point
    at the ship-channel builds.
-3. Delete the ship-channel pythia8, evtgen, root_base and root builds
-   with the prefix.dev delete API. A UI yank isn't enough: the builds stay in the repodata and keep
-   shadowing conda-forge.
+3. Delete the ship-channel pythia8 and evtgen builds with the prefix.dev
+   delete API. A UI yank isn't enough: the builds stay in the repodata and
+   keep shadowing conda-forge.
 
 Consumers need no rebuild: their `pythia8 >=8.318,<8.400.0a0` pin accepts
-conda-forge's build, and their `root_base` pin accepts conda-forge's
-6.40.04.
+conda-forge's build.
+
+ROOT has to wait until conda-forge ships 6.42 as well, with its 6.40.04 and
+6.42 builds linking that pythia8. phlex, shipdatamodel, field-service and
+shannon need 6.42, which only the ship channel has today, and while any of
+our `root_base` builds is on the channel, strict priority hides all of
+conda-forge's. So the 6.40.04 and 6.42.00 builds go together: delete
+`recipes-manual/root` and its table row, refresh the lockfiles, then delete
+the ship-channel root_base and root builds the same way. Consumers need no
+rebuild then either, since their `root_base` pins accept conda-forge's
+6.40.04 and 6.42.00.
 
 ## Recipe conventions
 
