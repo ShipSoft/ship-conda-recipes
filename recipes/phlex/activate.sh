@@ -1,7 +1,10 @@
 #!/bin/sh
-if [ -n "${PHLEX_PLUGIN_PATH:-}" ]; then
-  export PHLEX_PLUGIN_PATH_CONDA_BACKUP="${PHLEX_PLUGIN_PATH}"
-  export PHLEX_PLUGIN_PATH="${CONDA_PREFIX}/lib:${PHLEX_PLUGIN_PATH}"
-else
-  export PHLEX_PLUGIN_PATH="${CONDA_PREFIX}/lib"
-fi
+# Prepend this environment's lib directory to PHLEX_PLUGIN_PATH unless it is
+# already listed. conda re-runs this script when a stacked environment is
+# deactivated, so it must be idempotent.
+_phlex_dir="${CONDA_PREFIX}/lib"
+case ":${PHLEX_PLUGIN_PATH-}:" in
+  *":${_phlex_dir}:"*) ;;
+  *) export PHLEX_PLUGIN_PATH="${_phlex_dir}${PHLEX_PLUGIN_PATH:+:${PHLEX_PLUGIN_PATH}}" ;;
+esac
+unset _phlex_dir
