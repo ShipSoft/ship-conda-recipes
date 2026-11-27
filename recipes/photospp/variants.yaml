@@ -1,9 +1,0 @@
-# ROOT C++-standard variant; root_base is pinned deliberately — see
-# "ROOT C++ standard variants" in the README. photospp's autotools build sets
-# no explicit C++ standard, so there is no compile flag to drive here — this
-# only makes the ROOT build it links against deterministic.
-root_cxx_standard:
-  - "20"
-  - "23"
-root_base:
-  - "6.40.04"

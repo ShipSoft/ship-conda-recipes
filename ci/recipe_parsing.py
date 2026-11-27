@@ -1,9 +1,7 @@
-"""Minimal recipe.yaml / variants.yaml parsing shared by the ci/ checks.
+"""Minimal recipe.yaml / variants.yaml parsing for check-channel-drift.py.
 
-Regex-based and stdlib-only, so check-variant-lockstep.py can run as a prek
-hook in the lint environment; check-channel-drift.py imports it alongside
-py-rattler. Both scripts are run as ``python ci/<script>.py``, which puts this
-directory on ``sys.path``.
+Regex-based and stdlib-only. The script is run as
+``python ci/check-channel-drift.py``, which puts this directory on ``sys.path``.
 """
 
 from __future__ import annotations
