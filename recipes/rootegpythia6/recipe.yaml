@@ -1,7 +1,7 @@
 context:
   version: "0.1"
   # ShipSoft fork of luketpickering/ROOTEGPythia6, which has no releases.
-  tag: "v6.28.0-ship1"
+  tag: "v6.28.0-ship2"
 
 package:
   name: rootegpythia6
@@ -9,13 +9,10 @@ package:
 
 source:
   url: https://github.com/ShipSoft/ROOTEGPythia6/archive/refs/tags/${{ tag }}.tar.gz
-  sha256: 14b02629c503539ec6f60bd8f48cacc2161264ac0e4520c51932ada6b1dc9f04
-  patches:
-    # ROOT 6.42 no longer ships snprintf.h. Drop with the next ShipSoft tag.
-    - patches/0001-include-cstdio-instead-of-snprintf.h.patch
+  sha256: e6b39909af18a0e42c0cceab2edcf92a7ea99e5ba3e8816af3aa0ce3e410d5fb
 
 build:
-  number: 12
+  number: 13
   script: build.sh
 
 requirements:
