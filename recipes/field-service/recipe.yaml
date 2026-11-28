@@ -17,7 +17,7 @@ source:
     target_directory: covfie_src
 
 build:
-  number: 2
+  number: 3
 
 outputs:
   - staging:
@@ -48,11 +48,6 @@ outputs:
       # SHiP/Units.hpp (SHiP::SHiPUnits); >=0.6.0 for SHiP::Length.
       - shipdatamodel >=0.6.0
       - geant4
-      # geant4 Config.cmake calls find_dependency() on all three; see
-      # "Known upstream workarounds" in the README.
-      - expat
-      - zlib
-      - freetype
       # ACTS adapter (header-only). ActsConfig.cmake calls find_dependency()
       # on Boost and Eigen3, which acts-core does not depend on.
       - acts-core
@@ -88,18 +83,15 @@ outputs:
         - shipdatamodel >=0.6.0
       run_exports:
         - ${{ pin_subpackage('field-service-core', upper_bound='x.x') }}
-      # The shared staging host pulls geant4 (+ its expat / zlib / freetype
-      # Config deps) and root_base for the g4-adapter and tools outputs; the
-      # core library links none of them, so suppress their run_exports here.
+      # The shared staging host pulls geant4 and root_base for the g4-adapter
+      # and tools outputs; the core library links neither, so suppress their
+      # run_exports here.
       # mp-units run_export is kept (PUBLIC link).
       ignore_run_exports:
         from_package:
           - acts-core
           - libboost-devel
           - geant4
-          - expat
-          - zlib
-          - freetype
           - root_base
           - root_cxx_standard
     tests:
@@ -128,16 +120,12 @@ outputs:
         - libstdcxx >=16.2
       run_exports:
         - ${{ pin_subpackage('field-service-mapio', upper_bound='x.x') }}
-      # Links ROOT (kept via root_base's run_exports), not Geant4 or its
-      # Config deps.
+      # Links ROOT (kept via root_base's run_exports), not Geant4.
       ignore_run_exports:
         from_package:
           - acts-core
           - libboost-devel
           - geant4
-          - expat
-          - zlib
-          - freetype
     tests:
       - script:
           - test -f $PREFIX/lib/libSHiPFieldServiceMapIO.so
@@ -158,11 +146,6 @@ outputs:
         # find_dependency(Geant4) is invoked from Config.cmake whenever the
         # G4AdapterTargets file is present in the prefix.
         - geant4
-        # ... which in turn calls find_dependency() on all three; see
-        # "Known upstream workarounds" in the README.
-        - expat
-        - zlib
-        - freetype
       run_exports:
         - ${{ pin_subpackage('field-service-g4', upper_bound='x.x') }}
       # ROOT is staged for the mapio and tools outputs, not the g4 adapter.
@@ -201,9 +184,6 @@ outputs:
           - acts-core
           - libboost-devel
           - geant4
-          - expat
-          - zlib
-          - freetype
           - mp-units
           - root_base
           - root_cxx_standard
@@ -224,16 +204,13 @@ outputs:
     requirements:
       run:
         - ${{ pin_subpackage('field-service-mapio', exact=True) }}
-      # Tools don't link Geant4 or its Config deps; mp-units is pulled in
-      # transitively via the core sub-package, not directly by these binaries.
+      # Tools don't link Geant4; mp-units is pulled in transitively via the
+      # core sub-package, not directly by these binaries.
       ignore_run_exports:
         from_package:
           - acts-core
           - libboost-devel
           - geant4
-          - expat
-          - zlib
-          - freetype
           - mp-units
     tests:
       - script:

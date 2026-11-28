@@ -10,7 +10,7 @@ source:
   sha256: 3c9b6894a933d4e1297d2493ad81399aca5793e9a2c31eafdeb4f1f5896aaa64
 
 build:
-  number: 6
+  number: 7
   skip:
     - win
   script: build.sh
@@ -47,11 +47,6 @@ requirements:
     # under ${GENIE_PREFIX}/lib.
     - genie >=3.6.2 pythia6_*
     - geant4
-    # geant4 Config.cmake calls find_dependency() on all three; see
-    # "Known upstream workarounds" in the README.
-    - expat
-    - zlib
-    - freetype
     - random123
     - libboost-devel
     - tbb-devel
