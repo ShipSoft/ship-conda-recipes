@@ -228,11 +228,13 @@ outputs:
     build:
       files: []
     requirements:
+      # The simulation set. field-service-acts is left out so that the
+      # metapackage does not bring ACTS into environments that do not track;
+      # install it explicitly where needed.
       run:
         - ${{ pin_subpackage('field-service-core', exact=True) }}
         - ${{ pin_subpackage('field-service-mapio', exact=True) }}
         - ${{ pin_subpackage('field-service-g4', exact=True) }}
-        - ${{ pin_subpackage('field-service-acts', exact=True) }}
         - ${{ pin_subpackage('field-service-tools', exact=True) }}
 
 about:
