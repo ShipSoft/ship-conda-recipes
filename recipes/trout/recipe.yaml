@@ -10,7 +10,7 @@ source:
   sha256: 093683d3d70ceed62f3977e27402f8599fc646abbf59cb4f98cc9e5a81da3d7f
 
 build:
-  number: 1
+  number: 2
   skip:
     - win
   script: build.sh
@@ -46,11 +46,6 @@ requirements:
     - root_cxx_standard ==23
     # acts_geometry_provider compiles against Geant4 headers directly.
     - geant4
-    # geant4 Config.cmake calls find_dependency() on all three; see
-    # "Known upstream workarounds" in the README.
-    - expat
-    - zlib
-    - freetype
     - random123
     - libboost-devel
     - tbb-devel

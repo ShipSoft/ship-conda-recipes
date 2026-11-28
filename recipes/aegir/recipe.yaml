@@ -10,7 +10,7 @@ source:
   sha256: ceeb7c5249b0a9b815cb36c319829b6e0a9d0c535c2ea375ece719ed1cae57d6
 
 build:
-  number: 1
+  number: 2
   skip:
     - win
   script: build.sh
@@ -38,11 +38,6 @@ requirements:
     # the C++20 ROOT build).
     - root_cxx_standard ==23
     - geant4
-    # geant4 Config.cmake calls find_dependency() on all three; see
-    # "Known upstream workarounds" in the README.
-    - expat
-    - zlib
-    - freetype
     - pythia8 >=8.312
     - random123
     # SHiP::random::PhiloxRng, the generators' per-event RNG.
